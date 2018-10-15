@@ -15,7 +15,7 @@ class GetControllerTest extends \PHPUnit\Framework\TestCase
         $request = new Request();
         $request->setMethod(Request::METHOD_GET);
 
-        $response = $controller->get($request);
+        $response = $controller->getAction($request);
 
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());

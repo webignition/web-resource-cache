@@ -54,7 +54,7 @@ class GetControllerTest extends AbstractFunctionalTestCase
         $controller = self::$container->get(GetController::class);
 
         $request = new Request([], $requestData);
-        $response = $controller->get($request);
+        $response = $controller->getAction($request);
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
@@ -84,7 +84,7 @@ class GetControllerTest extends AbstractFunctionalTestCase
         ];
 
         $request = new Request([], $requestData);
-        $response = $controller->get($request);
+        $response = $controller->getAction($request);
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }

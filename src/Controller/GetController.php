@@ -12,7 +12,7 @@ class GetController
      *
      * @return Response
      */
-    public function get(Request $request): Response
+    public function getAction(Request $request): Response
     {
         $requestData = $request->request;
         $url = trim($requestData->get('url'));

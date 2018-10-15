@@ -1,4 +1,4 @@
 get:
     path: /
-    controller: App\Controller\GetController::get
+    controller: App\Controller\GetController::getAction
     methods:    [POST]
