@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\GetController;
+use App\Services\Whitelist;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,8 +54,12 @@ class GetControllerTest extends AbstractFunctionalTestCase
             'callback' => 'http://callback.example.com/',
         ];
 
+        $whitelist = new Whitelist([
+            '/^http:\/\/[a-z]+\.example\.com\/$/',
+        ]);
+
         $request = new Request([], $requestData);
-        $response = $controller->getAction($request);
+        $response = $controller->getAction($whitelist, $request);
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }

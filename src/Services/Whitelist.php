@@ -2,30 +2,20 @@
 
 namespace App\Services;
 
+use App\Model\WhitelistItem;
 use App\Model\WhiteListItemInterface;
 
 class Whitelist
 {
     /**
-     * @var WhitelistItemFactory
-     */
-    private $itemFactory;
-
-    /**
      * @var WhiteListItemInterface[]
      */
     private $whitelistItems = [];
 
-    public function __construct(WhitelistItemFactory $itemFactory, array $whitelistItemData = [])
+    public function __construct(array $whitelistPatterns = [])
     {
-        $this->itemFactory = $itemFactory;
-
-        foreach ($whitelistItemData as $itemData) {
-            $item = $itemFactory->create($itemData);
-
-            if ($item) {
-                $this->whitelistItems[] = $item;
-            }
+        foreach ($whitelistPatterns as $pattern) {
+            $this->whitelistItems[] = new WhitelistItem(trim($pattern));
         }
     }
 
