@@ -3,21 +3,57 @@
 namespace App\Tests\Unit\Controller;
 
 use App\Controller\GetController;
+use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class GetControllerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetRequest()
+    /**
+     * @dataProvider invalidRequestDataProvider
+     *
+     * @param Whitelist $callbackUrlWhitelist
+     * @param array $requestData
+     */
+    public function testInvalidRequest(Whitelist $callbackUrlWhitelist, array $requestData)
     {
-        $controller = new GetController();
+        $controller = new GetController($callbackUrlWhitelist);
 
-        $request = new Request();
-        $request->setMethod(Request::METHOD_GET);
+        $request = new Request([], $requestData);
+        $response = $controller->getAction($request);
 
-        $response = $controller->get($request);
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
 
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    public function invalidRequestDataProvider(): array
+    {
+        return [
+            'empty request' => [
+                'callbackUrlWhitelist' => new Whitelist([]),
+                'requestData' => [],
+            ],
+            'missing callback url' => [
+                'callbackUrlWhitelist' => new Whitelist([]),
+                'requestData' => [
+                    'uri' => 'http://example.com/',
+                ],
+            ],
+            'non-whitelisted callback url (empty)' => [
+                'callbackUrlWhitelist' => new Whitelist([]),
+                'requestData' => [
+                    'uri' => 'http://example.com/',
+                    'callback' => '',
+                ],
+            ],
+            'non-whitelisted callback url (non-matching)' => [
+                'callbackUrlWhitelist' => new Whitelist([
+                    '/^http:\/\/[a-z]+\.example\.com\/$/',
+                ]),
+                'requestData' => [
+                    'uri' => 'http://example.com/',
+                    'callback' => 'http://example.com/callback',
+                ],
+            ],
+        ];
     }
 }

@@ -28,3 +28,14 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    app.callbackurl.whitelist:
+        class: App\Services\Whitelist
+        factory: 'App\Services\WhitelistFactory:create'
+        arguments:
+            $patternsString: '%env(CALLBACK_WHITELIST)%'
+
+    App\Controller\GetController:
+        class: App\Controller\GetController
+        tags: ['controller.service_arguments']
+        arguments:
+            $callbackUrlWhitelist: '@app.callbackurl.whitelist'
