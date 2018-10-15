@@ -13,7 +13,8 @@
     "require-dev": {
         "symfony/dotenv": "*",
         "phpunit/phpunit": "~7.0",
-        "symfony/phpunit-bridge": "^4.0.0"
+        "symfony/phpunit-bridge": "^4.0.0",
+        "squizlabs/php_codesniffer": "3.*"
     },
     "config": {
         "preferred-install": {
@@ -55,6 +56,11 @@
         "test": [
             "@composer test-unit",
             "@composer test-functional"
+        ],
+        "cs": "./vendor/bin/phpcs --colors --standard=PSR2 --extensions=php --ignore=src/Migrations src/ tests/",
+        "ci": [
+            "@composer cs",
+            "@composer test"
         ]
     },
     "conflict": {
@@ -62,7 +68,7 @@
     },
     "extra": {
         "symfony": {
-            "allow-contrib": false,
+            "allow-contrib": true,
             "require": "4.1.*"
         }
     }
