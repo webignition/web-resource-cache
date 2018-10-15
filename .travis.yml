@@ -4,16 +4,21 @@ env:
   global:
     - APP_ENV=test
     - APP_SECRET=Secret!
+    - DATABASE_URL=mysql://root:@127.0.0.1:3306/myapp_test
 
 language: php
 php:
   - 7.2
 
 before_install:
+  - rm phpunit.xml.dist
+  - mv phpunit.travis-ci.xml phpunit.xml.dist
+  - mysql -e 'CREATE DATABASE myapp_test;'
   - chmod +x ./bin/console
 
 install:
   - composer install
+  - php bin/console doctrine:migrations:migrate --no-interaction
 
 script:
   - composer ci
