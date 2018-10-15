@@ -54,12 +54,8 @@ class GetControllerTest extends AbstractFunctionalTestCase
             'callback' => 'http://callback.example.com/',
         ];
 
-        $whitelist = new Whitelist([
-            '/^http:\/\/[a-z]+\.example\.com\/$/',
-        ]);
-
         $request = new Request([], $requestData);
-        $response = $controller->getAction($whitelist, $request);
+        $response = $controller->getAction($request);
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }

@@ -8,13 +8,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GetController
 {
-    public function getAction(Whitelist $callbackUrlWhitelist, Request $request): Response
+    /**
+     * @var Whitelist
+     */
+    private $callbackUrlWhitelist;
+
+    public function __construct(Whitelist $callbackUrlWhitelist)
+    {
+        $this->callbackUrlWhitelist = $callbackUrlWhitelist;
+    }
+
+    public function getAction(Request $request): Response
     {
         $requestData = $request->request;
         $url = trim($requestData->get('url'));
         $callbackUrl = trim($requestData->get('callback'));
 
-        if (empty($url) || !$callbackUrlWhitelist->matches($callbackUrl)) {
+        if (empty($url) || !$this->callbackUrlWhitelist->matches($callbackUrl)) {
             return new Response('', 400);
         }
 

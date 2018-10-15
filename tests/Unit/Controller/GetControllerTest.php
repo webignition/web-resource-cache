@@ -12,14 +12,15 @@ class GetControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidRequestDataProvider
      *
+     * @param Whitelist $callbackUrlWhitelist
      * @param array $requestData
      */
     public function testInvalidRequest(Whitelist $callbackUrlWhitelist, array $requestData)
     {
-        $controller = new GetController();
+        $controller = new GetController($callbackUrlWhitelist);
 
         $request = new Request([], $requestData);
-        $response = $controller->getAction($callbackUrlWhitelist, $request);
+        $response = $controller->getAction($request);
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
