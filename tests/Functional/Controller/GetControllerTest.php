@@ -11,28 +11,81 @@ use Symfony\Component\Routing\RouterInterface;
 
 class GetControllerTest extends AbstractFunctionalTestCase
 {
-    public function testRouteWithGetRequest()
+    const ROUTE_NAME = 'get';
+
+    /**
+     * @var string
+     */
+    private $routeUrl;
+
+    protected function setUp()
     {
+        parent::setUp();
+
         /* @var RouterInterface $router */
         $router = self::$container->get(RouterInterface::class);
 
+        $this->routeUrl = $router->generate('get');
+    }
+
+    public function testGetRequest()
+    {
         $this->expectException(MethodNotAllowedHttpException::class);
 
-        $this->client->request('GET', $router->generate('get'));
+        $this->client->request('GET', $this->routeUrl);
     }
 
     public function testPostRequest()
     {
+        $this->client->request('POST', $this->routeUrl);
+        $response = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    /**
+     * @dataProvider invalidRequestDataProvider
+     *
+     * @param array $requestData
+     */
+    public function testInvalidRequest(array $requestData)
+    {
         /* @var GetController $controller */
         $controller = self::$container->get(GetController::class);
 
-        $request = new Request([], [
-            'foo' => 'bar',
-        ]);
-
+        $request = new Request([], $requestData);
         $response = $controller->get($request);
 
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    public function invalidRequestDataProvider(): array
+    {
+        return [
+            'empty request' => [
+                'requestData' => [],
+            ],
+            'missing callback url' => [
+                'requestData' => [
+                    'uri' => 'http://example.com/',
+                ],
+            ],
+        ];
+    }
+
+    public function testSuccessfulRequest()
+    {
+        /* @var GetController $controller */
+        $controller = self::$container->get(GetController::class);
+
+        $requestData = [
+            'url' => 'http://example.com/',
+            'callback' => 'http://callback.example.com/',
+        ];
+
+        $request = new Request([], $requestData);
+        $response = $controller->get($request);
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 }

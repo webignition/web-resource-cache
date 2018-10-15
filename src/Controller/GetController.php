@@ -14,6 +14,14 @@ class GetController
      */
     public function get(Request $request): Response
     {
-        return new Response('', 400);
+        $requestData = $request->request;
+        $url = trim($requestData->get('url'));
+        $callbackUrl = trim($requestData->get('callback'));
+
+        if (empty($url) || empty($callbackUrl)) {
+            return new Response('', 400);
+        }
+
+        return new Response('', 200);
     }
 }
