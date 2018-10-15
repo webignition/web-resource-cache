@@ -11,7 +11,9 @@
         "symfony/yaml": "*"
     },
     "require-dev": {
-        "symfony/dotenv": "*"
+        "symfony/dotenv": "*",
+        "phpunit/phpunit": "~7.0",
+        "symfony/phpunit-bridge": "^4.0.0"
     },
     "config": {
         "preferred-install": {
@@ -47,6 +49,12 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "test-unit": "./vendor/bin/phpunit --colors tests/Unit",
+        "test-functional": "./vendor/bin/phpunit --colors tests/Functional/",
+        "test": [
+            "@composer test-unit",
+            "@composer test-functional"
         ]
     },
     "conflict": {
