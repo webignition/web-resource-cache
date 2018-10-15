@@ -43,36 +43,6 @@ class GetControllerTest extends AbstractFunctionalTestCase
         $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }
 
-    /**
-     * @dataProvider invalidRequestDataProvider
-     *
-     * @param array $requestData
-     */
-    public function testInvalidRequest(array $requestData)
-    {
-        /* @var GetController $controller */
-        $controller = self::$container->get(GetController::class);
-
-        $request = new Request([], $requestData);
-        $response = $controller->getAction($request);
-
-        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
-    }
-
-    public function invalidRequestDataProvider(): array
-    {
-        return [
-            'empty request' => [
-                'requestData' => [],
-            ],
-            'missing callback url' => [
-                'requestData' => [
-                    'uri' => 'http://example.com/',
-                ],
-            ],
-        ];
-    }
-
     public function testSuccessfulRequest()
     {
         /* @var GetController $controller */

@@ -8,16 +8,32 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GetControllerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetRequest()
+    /**
+     * @dataProvider invalidRequestDataProvider
+     *
+     * @param array $requestData
+     */
+    public function testInvalidRequest(array $requestData)
     {
         $controller = new GetController();
 
-        $request = new Request();
-        $request->setMethod(Request::METHOD_GET);
-
+        $request = new Request([], $requestData);
         $response = $controller->getAction($request);
 
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
+    }
+
+    public function invalidRequestDataProvider(): array
+    {
+        return [
+            'empty request' => [
+                'requestData' => [],
+            ],
+            'missing callback url' => [
+                'requestData' => [
+                    'uri' => 'http://example.com/',
+                ],
+            ],
+        ];
     }
 }
