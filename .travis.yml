@@ -1,0 +1,19 @@
+sudo: false
+
+env:
+  global:
+    - APP_ENV=test
+    - APP_SECRET=Secret!
+
+language: php
+php:
+  - 7.2
+
+before_install:
+  - chmod +x ./bin/console
+
+install:
+  - composer install
+
+script:
+  - composer ci
