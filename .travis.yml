@@ -4,6 +4,7 @@ env:
   global:
     - APP_ENV=test
     - APP_SECRET=Secret!
+    - DATABASE_URL=mysql://root:@127.0.0.1:3306/myapp_test
 
 language: php
 php:
