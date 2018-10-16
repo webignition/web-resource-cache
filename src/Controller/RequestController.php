@@ -10,7 +10,7 @@ use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class GetController
+class RequestController
 {
     /**
      * @var Whitelist
@@ -37,7 +37,7 @@ class GetController
         $this->resqueQueueService = $resqueQueueService;
     }
 
-    public function getAction(Request $request): Response
+    public function requestAction(Request $request): Response
     {
         $requestData = $request->request;
         $url = trim($requestData->get('url'));

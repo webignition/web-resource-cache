@@ -34,8 +34,8 @@ services:
         arguments:
             $patternsString: '%env(CALLBACK_WHITELIST)%'
 
-    App\Controller\GetController:
-        class: App\Controller\GetController
+    App\Controller\RequestController:
+        class: App\Controller\RequestController
         tags: ['controller.service_arguments']
         arguments:
             $callbackUrlWhitelist: '@app.callbackurl.whitelist'

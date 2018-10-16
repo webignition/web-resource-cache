@@ -2,14 +2,14 @@
 
 namespace App\Tests\Unit\Controller;
 
-use App\Controller\GetController;
+use App\Controller\RequestController;
 use App\Services\GetRequestManager;
 use App\Services\ResqueQueueService;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class GetControllerTest extends \PHPUnit\Framework\TestCase
+class RequestControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider invalidRequestDataProvider
@@ -25,10 +25,10 @@ class GetControllerTest extends \PHPUnit\Framework\TestCase
         /* @var ResqueQueueService $resqueQueueService */
         $resqueQueueService = \Mockery::mock(ResqueQueueService::class);
 
-        $controller = new GetController($callbackUrlWhitelist, $getRequestManager, $resqueQueueService);
+        $controller = new RequestController($callbackUrlWhitelist, $getRequestManager, $resqueQueueService);
 
         $request = new Request([], $requestData);
-        $response = $controller->getAction($request);
+        $response = $controller->requestAction($request);
 
         $this->assertEquals(Response::HTTP_BAD_REQUEST, $response->getStatusCode());
     }

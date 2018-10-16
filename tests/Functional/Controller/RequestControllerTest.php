@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\Controller;
 
-use App\Controller\GetController;
+use App\Controller\RequestController;
 use App\Entity\GetRequest;
 use App\Resque\Job\GetResourceJob;
 use App\Services\ResqueQueueService;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\RouterInterface;
 
-class GetControllerTest extends AbstractFunctionalTestCase
+class RequestControllerTest extends AbstractFunctionalTestCase
 {
     const ROUTE_NAME = 'get';
 
@@ -57,8 +57,8 @@ class GetControllerTest extends AbstractFunctionalTestCase
 
         $this->assertTrue($resqueQueueService->isEmpty(GetResourceJob::QUEUE_NAME));
 
-        /* @var GetController $controller */
-        $controller = self::$container->get(GetController::class);
+        /* @var RequestController $controller */
+        $controller = self::$container->get(RequestController::class);
 
         $url = 'http://example.com/';
 
@@ -68,7 +68,7 @@ class GetControllerTest extends AbstractFunctionalTestCase
         ];
 
         $request = new Request([], $requestData);
-        $response = $controller->getAction($request);
+        $response = $controller->requestAction($request);
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
