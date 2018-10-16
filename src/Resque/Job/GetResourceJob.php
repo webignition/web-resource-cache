@@ -9,13 +9,6 @@ class GetResourceJob extends CommandJob
 {
     const QUEUE_NAME = 'resource-get';
 
-    public function __construct(string $id)
-    {
-        parent::__construct([
-            'id' => $id,
-        ]);
-    }
-
     protected function getQueueName(): string
     {
         return self::QUEUE_NAME;

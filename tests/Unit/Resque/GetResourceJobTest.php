@@ -9,9 +9,11 @@ class GetResourceJobTest extends \PHPUnit\Framework\TestCase
     public function testCreate()
     {
         $id = 'example-id';
-        $getResourceJob = new GetResourceJob($id);
+        $getResourceJob = new GetResourceJob([
+            'id' => $id,
+        ]);
 
-        $this->assertEquals('resource-get', $getResourceJob->queue);
+        $this->assertEquals(GetResourceJob::QUEUE_NAME, $getResourceJob->queue);
         $this->assertEquals(['id' => $id], $getResourceJob->args);
     }
 }

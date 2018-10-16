@@ -4,6 +4,7 @@ namespace App\Tests\Unit\Controller;
 
 use App\Controller\GetController;
 use App\Services\GetRequestManager;
+use App\Services\ResqueQueueService;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +22,10 @@ class GetControllerTest extends \PHPUnit\Framework\TestCase
         /* @var GetRequestManager $getRequestManager */
         $getRequestManager = \Mockery::mock(GetRequestManager::class);
 
-        $controller = new GetController($callbackUrlWhitelist, $getRequestManager);
+        /* @var ResqueQueueService $resqueQueueService */
+        $resqueQueueService = \Mockery::mock(ResqueQueueService::class);
+
+        $controller = new GetController($callbackUrlWhitelist, $getRequestManager, $resqueQueueService);
 
         $request = new Request([], $requestData);
         $response = $controller->getAction($request);
