@@ -3,8 +3,11 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\GetController;
-use App\Services\Whitelist;
+use App\Entity\GetRequest;
+use App\Resque\Job\GetResourceJob;
+use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -46,11 +49,21 @@ class GetControllerTest extends AbstractFunctionalTestCase
 
     public function testSuccessfulRequest()
     {
+        $this->clearRedis();
+
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+        $resqueQueueService = self::$container->get(ResqueQueueService::class);
+        $getRequestRepository = $entityManager->getRepository(GetRequest::class);
+
+        $this->assertTrue($resqueQueueService->isEmpty(GetResourceJob::QUEUE_NAME));
+
         /* @var GetController $controller */
         $controller = self::$container->get(GetController::class);
 
+        $url = 'http://example.com/';
+
         $requestData = [
-            'url' => 'http://example.com/',
+            'url' => $url,
             'callback' => 'http://callback.example.com/',
         ];
 
@@ -58,5 +71,15 @@ class GetControllerTest extends AbstractFunctionalTestCase
         $response = $controller->getAction($request);
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+        $retrievedGetRequest = $getRequestRepository->findOneBy([
+            'url' => $url,
+        ]);
+        $this->assertInstanceOf(GetRequest::class, $retrievedGetRequest);
+        $this->assertFalse($resqueQueueService->isEmpty(GetResourceJob::QUEUE_NAME));
+        $this->assertTrue($resqueQueueService->contains(
+            GetResourceJob::QUEUE_NAME,
+            ['id' => $retrievedGetRequest->getId()]
+        ));
     }
 }

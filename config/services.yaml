@@ -39,3 +39,7 @@ services:
         tags: ['controller.service_arguments']
         arguments:
             $callbackUrlWhitelist: '@app.callbackurl.whitelist'
+
+    # public commands required for retrieval from resque container
+    App\Command\GetResourceCommand:
+        public: true
