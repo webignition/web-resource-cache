@@ -10,11 +10,11 @@ use Doctrine\ORM\Mapping as ORM;
 class GetRequest
 {
     /**
-     * @var int
+     * @var string
      *
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(name="id", type="guid")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     private $id;
 
@@ -32,7 +32,7 @@ class GetRequest
      */
     private $callbackUrl;
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
