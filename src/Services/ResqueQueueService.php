@@ -29,25 +29,13 @@ class ResqueQueueService
      */
     private $logger;
 
-    /**
-     * @param Resque $resque
-     * @param LoggerInterface $logger
-     */
-    public function __construct(
-        Resque $resque,
-        LoggerInterface $logger
-    ) {
+    public function __construct(Resque $resque, LoggerInterface $logger)
+    {
         $this->resque = $resque;
         $this->logger = $logger;
     }
 
-    /**
-     * @param string $queue
-     * @param array $args
-     *
-     * @return boolean
-     */
-    public function contains($queue, $args = [])
+    public function contains(string $queue, ?array $args = []): bool
     {
         try {
             return !is_null($this->findJobInQueue($queue, $args));
@@ -60,28 +48,18 @@ class ResqueQueueService
         return false;
     }
 
-    /**
-     * @param Job $job
-     * @param bool $trackStatus
-     *
-     * @return null|\Resque_Job_Status
-     */
-    public function enqueue(Job $job, $trackStatus = false)
+    public function enqueue(Job $job, bool $trackStatus = false): ?\Resque_Job_Status
     {
         try {
             return $this->resque->enqueue($job, $trackStatus);
         } catch (\CredisException $credisException) {
             $this->logger->warning('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
         }
+
+        return null;
     }
 
-    /**
-     * @param string $queue
-     * @param array $args
-     *
-     * @return Job|null
-     */
-    private function findJobInQueue($queue, $args)
+    private function findJobInQueue(string $queue, ?array $args = []): ?Job
     {
         $jobs = $this->resque->getQueue($queue)->getJobs();
 
@@ -96,13 +74,7 @@ class ResqueQueueService
         return null;
     }
 
-    /**
-     * @param Job $job
-     * @param array $args
-     *
-     * @return bool
-     */
-    private function match(Job $job, $args)
+    private function match(Job $job, ?array $args = []): bool
     {
         foreach ($args as $key => $value) {
             if (!isset($job->args[$key])) {
@@ -117,22 +89,12 @@ class ResqueQueueService
         return true;
     }
 
-    /**
-     * @param string $queue
-     *
-     * @return int
-     */
-    public function getQueueLength($queue)
+    public function getQueueLength(string $queue): int
     {
         return \Resque::redis()->llen(self::QUEUE_KEY . ':' . $queue);
     }
 
-    /**
-     * @param string $queue
-     *
-     * @return bool
-     */
-    public function isEmpty($queue)
+    public function isEmpty(string $queue): bool
     {
         return $this->getQueueLength($queue) == 0;
     }
