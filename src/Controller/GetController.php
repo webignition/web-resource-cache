@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\GetRequest;
+use App\Services\GetRequestManager;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,9 +15,15 @@ class GetController
      */
     private $callbackUrlWhitelist;
 
-    public function __construct(Whitelist $callbackUrlWhitelist)
+    /**
+     * @var GetRequestManager
+     */
+    private $getRequestManager;
+
+    public function __construct(Whitelist $callbackUrlWhitelist, GetRequestManager $getRequestManager)
     {
         $this->callbackUrlWhitelist = $callbackUrlWhitelist;
+        $this->getRequestManager = $getRequestManager;
     }
 
     public function getAction(Request $request): Response
@@ -27,6 +35,15 @@ class GetController
         if (empty($url) || !$this->callbackUrlWhitelist->matches($callbackUrl)) {
             return new Response('', 400);
         }
+
+        $getRequest = $this->getRequestManager->find($url);
+        if (empty($getRequest)) {
+            $getRequest = new GetRequest();
+            $getRequest->setUrl($url);
+        }
+
+        $getRequest->addCallbackUrl($callbackUrl);
+        $this->getRequestManager->persist($getRequest);
 
         return new Response('', 200);
     }

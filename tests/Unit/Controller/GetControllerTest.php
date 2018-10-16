@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Controller;
 
 use App\Controller\GetController;
+use App\Services\GetRequestManager;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +18,10 @@ class GetControllerTest extends \PHPUnit\Framework\TestCase
      */
     public function testInvalidRequest(Whitelist $callbackUrlWhitelist, array $requestData)
     {
-        $controller = new GetController($callbackUrlWhitelist);
+        /* @var GetRequestManager $getRequestManager */
+        $getRequestManager = \Mockery::mock(GetRequestManager::class);
+
+        $controller = new GetController($callbackUrlWhitelist, $getRequestManager);
 
         $request = new Request([], $requestData);
         $response = $controller->getAction($request);
