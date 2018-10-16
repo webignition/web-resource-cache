@@ -2,12 +2,12 @@
 
 namespace App\Resque\Job;
 
-use App\Command\GetResourceCommand;
+use App\Command\RetrieveResourceCommand;
 use Symfony\Component\Console\Command\Command;
 
-class GetResourceJob extends CommandJob
+class RetrieveResourceJob extends CommandJob
 {
-    const QUEUE_NAME = 'resource-get';
+    const QUEUE_NAME = 'retrieve-resource';
 
     protected function getQueueName(): string
     {
@@ -16,8 +16,8 @@ class GetResourceJob extends CommandJob
 
     protected function getCommand(): Command
     {
-        /* @var GetResourceCommand $command */
-        $command = $this->getContainer()->get(GetResourceCommand::class);
+        /* @var RetrieveResourceCommand $command */
+        $command = $this->getContainer()->get(RetrieveResourceCommand::class);
 
         return $command;
     }

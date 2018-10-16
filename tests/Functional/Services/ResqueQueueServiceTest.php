@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\Services;
 
-use App\Resque\Job\GetResourceJob;
+use App\Resque\Job\RetrieveResourceJob;
 use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Mockery\Mock;
@@ -58,17 +58,17 @@ class ResqueQueueServiceTest extends AbstractFunctionalTestCase
         return [
             'empty queue' => [
                 'jobs' => [],
-                'queue' => GetResourceJob::QUEUE_NAME,
+                'queue' => RetrieveResourceJob::QUEUE_NAME,
                 'args' => [],
                 'expectedContains' => false,
             ],
             'non-matching args (no keys)' => [
                 'jobs' => [
-                    new GetResourceJob([
+                    new RetrieveResourceJob([
                         'id' => 'example-id',
                     ]),
                 ],
-                'queue' => GetResourceJob::QUEUE_NAME,
+                'queue' => RetrieveResourceJob::QUEUE_NAME,
                 'args' => [
                     'foo' => 'bar',
                 ],
@@ -76,11 +76,11 @@ class ResqueQueueServiceTest extends AbstractFunctionalTestCase
             ],
             'non-matching args (no matching values)' => [
                 'jobs' => [
-                    new GetResourceJob([
+                    new RetrieveResourceJob([
                         'id' => 'example-id',
                     ]),
                 ],
-                'queue' => GetResourceJob::QUEUE_NAME,
+                'queue' => RetrieveResourceJob::QUEUE_NAME,
                 'args' => [
                     'id' => 'non-matching-id',
                 ],
@@ -88,11 +88,11 @@ class ResqueQueueServiceTest extends AbstractFunctionalTestCase
             ],
             'matching args' => [
                 'jobs' => [
-                    new GetResourceJob([
+                    new RetrieveResourceJob([
                         'id' => 'example-id',
                     ]),
                 ],
-                'queue' => GetResourceJob::QUEUE_NAME,
+                'queue' => RetrieveResourceJob::QUEUE_NAME,
                 'args' => [
                     'id' => 'example-id',
                 ],
@@ -127,12 +127,12 @@ class ResqueQueueServiceTest extends AbstractFunctionalTestCase
 
     public function testEnqueueSuccess()
     {
-        $queueName = GetResourceJob::QUEUE_NAME;
+        $queueName = RetrieveResourceJob::QUEUE_NAME;
 
         $this->clearRedis();
         $this->assertTrue($this->resqueQueueService->isEmpty($queueName));
 
-        $this->resqueQueueService->enqueue(new GetResourceJob(['id' => 'example-id']));
+        $this->resqueQueueService->enqueue(new RetrieveResourceJob(['id' => 'example-id']));
         $this->assertFalse($this->resqueQueueService->isEmpty($queueName));
     }
 
@@ -153,12 +153,12 @@ class ResqueQueueServiceTest extends AbstractFunctionalTestCase
             ->with('ResqueQueueService::enqueue: Redis error []');
 
         $resqueQueueService = $this->createQueueService($resque, $logger);
-        $this->assertNull($resqueQueueService->enqueue(new GetResourceJob(['id' => 'example-id'])));
+        $this->assertNull($resqueQueueService->enqueue(new RetrieveResourceJob(['id' => 'example-id'])));
     }
 
     public function testIsEmptyFailure()
     {
-        $queue = GetResourceJob::QUEUE_NAME;
+        $queue = RetrieveResourceJob::QUEUE_NAME;
         $credisException = \Mockery::mock(\CredisException::class);
 
         /* @var Mock|Resque $resque */

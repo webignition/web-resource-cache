@@ -3,7 +3,7 @@
 namespace App\Tests\Unit\Controller;
 
 use App\Controller\RequestController;
-use App\Services\GetRequestManager;
+use App\Services\RetrieveRequestManager;
 use App\Services\ResqueQueueService;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,13 +19,13 @@ class RequestControllerTest extends \PHPUnit\Framework\TestCase
      */
     public function testInvalidRequest(Whitelist $callbackUrlWhitelist, array $requestData)
     {
-        /* @var GetRequestManager $getRequestManager */
-        $getRequestManager = \Mockery::mock(GetRequestManager::class);
+        /* @var RetrieveRequestManager $retrieveRequestManager */
+        $retrieveRequestManager = \Mockery::mock(RetrieveRequestManager::class);
 
         /* @var ResqueQueueService $resqueQueueService */
         $resqueQueueService = \Mockery::mock(ResqueQueueService::class);
 
-        $controller = new RequestController($callbackUrlWhitelist, $getRequestManager, $resqueQueueService);
+        $controller = new RequestController($callbackUrlWhitelist, $retrieveRequestManager, $resqueQueueService);
 
         $request = new Request([], $requestData);
         $response = $controller->requestAction($request);

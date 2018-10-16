@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
  *     }
  * )
  */
-class GetRequest
+class RetrieveRequest
 {
     /**
      * @var string
