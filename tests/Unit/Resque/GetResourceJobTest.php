@@ -16,4 +16,17 @@ class GetResourceJobTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(GetResourceJob::QUEUE_NAME, $getResourceJob->queue);
         $this->assertEquals(['id' => $id], $getResourceJob->args);
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function testRun()
+    {
+        $id = 'example-id';
+        $getResourceJob = new GetResourceJob([
+            'id' => $id,
+        ]);
+
+        $this->assertTrue($getResourceJob->run([]));
+    }
 }

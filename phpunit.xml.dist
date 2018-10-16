@@ -12,6 +12,7 @@
 
         <ini name="error_reporting" value="-1" />
         <env name="KERNEL_CLASS" value="App\Kernel" />
+        <server name="KERNEL_CLASS" value="App\Kernel" />
         <env name="APP_ENV" value="test" />
         <env name="APP_DEBUG" value="1" />
         <env name="APP_SECRET" value="s$cretf0rt3st" />
@@ -25,6 +26,8 @@
         <!-- Configure your db driver and server_version in config/packages/doctrine.yaml -->
         <env name="DATABASE_URL" value="mysql://db_user:db_password@127.0.0.1:3306/dev_web_resource_cache"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
+
+        <server name="DOTENV_PATH" value="../../../.env.test" />
     </php>
 
     <testsuites>
