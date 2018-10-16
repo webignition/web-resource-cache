@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\RequestController;
-use App\Entity\GetRequest;
+use App\Entity\RetrieveRequest;
 use App\Resque\Job\GetResourceJob;
 use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
@@ -53,7 +53,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
         $resqueQueueService = self::$container->get(ResqueQueueService::class);
-        $getRequestRepository = $entityManager->getRepository(GetRequest::class);
+        $retrieveRequestRepository = $entityManager->getRepository(RetrieveRequest::class);
 
         $this->assertTrue($resqueQueueService->isEmpty(GetResourceJob::QUEUE_NAME));
 
@@ -72,10 +72,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
-        $retrievedGetRequest = $getRequestRepository->findOneBy([
+        $retrievedGetRequest = $retrieveRequestRepository->findOneBy([
             'url' => $url,
         ]);
-        $this->assertInstanceOf(GetRequest::class, $retrievedGetRequest);
+        $this->assertInstanceOf(RetrieveRequest::class, $retrievedGetRequest);
         $this->assertFalse($resqueQueueService->isEmpty(GetResourceJob::QUEUE_NAME));
         $this->assertTrue($resqueQueueService->contains(
             GetResourceJob::QUEUE_NAME,

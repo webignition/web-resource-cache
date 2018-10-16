@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\GetRequest;
+use App\Entity\RetrieveRequest;
 use App\Resque\Job\GetResourceJob;
-use App\Services\GetRequestManager;
+use App\Services\RetrieveRequestManager;
 use App\Services\ResqueQueueService;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,9 +18,9 @@ class RequestController
     private $callbackUrlWhitelist;
 
     /**
-     * @var GetRequestManager
+     * @var RetrieveRequestManager
      */
-    private $getRequestManager;
+    private $retrieveRequestManager;
 
     /**
      * @var ResqueQueueService
@@ -29,11 +29,11 @@ class RequestController
 
     public function __construct(
         Whitelist $callbackUrlWhitelist,
-        GetRequestManager $getRequestManager,
+        RetrieveRequestManager $retrieveRequestManager,
         ResqueQueueService $resqueQueueService
     ) {
         $this->callbackUrlWhitelist = $callbackUrlWhitelist;
-        $this->getRequestManager = $getRequestManager;
+        $this->retrieveRequestManager = $retrieveRequestManager;
         $this->resqueQueueService = $resqueQueueService;
     }
 
@@ -47,16 +47,16 @@ class RequestController
             return new Response('', 400);
         }
 
-        $getRequest = $this->getRequestManager->find($url);
-        if (empty($getRequest)) {
-            $getRequest = new GetRequest();
-            $getRequest->setUrl($url);
+        $retrieveRequest = $this->retrieveRequestManager->find($url);
+        if (empty($retrieveRequest)) {
+            $retrieveRequest = new RetrieveRequest();
+            $retrieveRequest->setUrl($url);
         }
 
-        $getRequest->addCallbackUrl($callbackUrl);
-        $this->getRequestManager->persist($getRequest);
+        $retrieveRequest->addCallbackUrl($callbackUrl);
+        $this->retrieveRequestManager->persist($retrieveRequest);
 
-        $resqueJobArgs = ['id' => $getRequest->getId()];
+        $resqueJobArgs = ['id' => $retrieveRequest->getId()];
 
         if (!$this->resqueQueueService->contains(GetResourceJob::QUEUE_NAME, $resqueJobArgs)) {
             $this->resqueQueueService->enqueue(new GetResourceJob($resqueJobArgs));

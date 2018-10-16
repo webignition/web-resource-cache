@@ -2,28 +2,28 @@
 
 namespace App\Tests\Functional\Controller;
 
-use App\Entity\GetRequest;
-use App\Services\GetRequestManager;
+use App\Entity\RetrieveRequest;
+use App\Services\RetrieveRequestManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
 class GetRequestManagerTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var GetRequestManager
+     * @var RetrieveRequestManager
      */
-    private $getRequestManager;
+    private $retrieveRequestManager;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->getRequestManager = self::$container->get(GetRequestManager::class);
+        $this->retrieveRequestManager = self::$container->get(RetrieveRequestManager::class);
     }
 
     public function testFindNotExists()
     {
-        $this->assertNull($this->getRequestManager->find('http://example.com/'));
+        $this->assertNull($this->retrieveRequestManager->find('http://example.com/'));
     }
 
     public function testFind()
@@ -33,16 +33,16 @@ class GetRequestManagerTest extends AbstractFunctionalTestCase
 
         $url = 'http://example.com';
 
-        $getRequest = new GetRequest();
-        $getRequest->setUrl($url);
-        $getRequest->addCallbackUrl('http://foo.example.com/callback');
+        $retrieveRequest = new RetrieveRequest();
+        $retrieveRequest->setUrl($url);
+        $retrieveRequest->addCallbackUrl('http://foo.example.com/callback');
 
-        $entityManager->persist($getRequest);
+        $entityManager->persist($retrieveRequest);
         $entityManager->flush();
         $entityManager->clear();
 
-        $foundGetRequest = $this->getRequestManager->find($url);
+        $foundGetRequest = $this->retrieveRequestManager->find($url);
 
-        $this->assertEquals($getRequest, $foundGetRequest);
+        $this->assertEquals($retrieveRequest, $foundGetRequest);
     }
 }
