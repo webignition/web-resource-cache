@@ -23,7 +23,8 @@
         "squizlabs/php_codesniffer": "3.*",
         "symfony/browser-kit": "*",
         "symfony/dotenv": "*",
-        "symfony/phpunit-bridge": "^4.0.0"
+        "symfony/phpunit-bridge": "^4.0.0",
+        "mockery/mockery": "^1"
     },
     "config": {
         "preferred-install": {
