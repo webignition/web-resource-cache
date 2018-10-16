@@ -6,15 +6,20 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ * @ORM\Table(
+ *     indexes={
+ *         @ORM\Index(name="url_idx", columns={"url"}, options={"length": 255})
+ *     }
+ * )
  */
 class GetRequest
 {
     /**
-     * @var int
+     * @var string
      *
      * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(name="id", type="guid")
+     * @ORM\GeneratedValue(strategy="UUID")
      */
     private $id;
 
@@ -26,13 +31,13 @@ class GetRequest
     private $url;
 
     /**
-     * @var string
+     * @var array
      *
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="simple_array")
      */
-    private $callbackUrl;
+    private $callbackUrls = [];
 
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -47,13 +52,18 @@ class GetRequest
         return $this->url;
     }
 
-    public function setCallbackUrl(string $callbackUrl)
+    public function addCallbackUrl(string $callbackUrl)
     {
-        $this->callbackUrl = $callbackUrl;
+        if (!in_array($callbackUrl, $this->callbackUrls)) {
+            $this->callbackUrls[] = $callbackUrl;
+        }
     }
 
-    public function getCallbackUrl(): ?string
+    /**
+     * @return string[]
+     */
+    public function getCallbackUrls(): array
     {
-        return $this->callbackUrl;
+        return $this->callbackUrls;
     }
 }
