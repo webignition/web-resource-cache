@@ -6,7 +6,7 @@ use App\Entity\RetrieveRequest;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
-class GetRequestTest extends AbstractFunctionalTestCase
+class RetrieveRequestTest extends AbstractFunctionalTestCase
 {
     /**
      * @dataProvider createDataProvider
@@ -39,11 +39,11 @@ class GetRequestTest extends AbstractFunctionalTestCase
 
         $entityManager->clear();
 
-        $retrievedGetRequest = $entityManager->find(RetrieveRequest::class, $id);
+        $retrievedRetrieveRequest = $entityManager->find(RetrieveRequest::class, $id);
 
-        $this->assertEquals($id, $retrievedGetRequest->getId());
-        $this->assertEquals($url, $retrievedGetRequest->getUrl());
-        $this->assertEquals($callbackUrls, $retrievedGetRequest->getCallbackUrls());
+        $this->assertEquals($id, $retrievedRetrieveRequest->getId());
+        $this->assertEquals($url, $retrievedRetrieveRequest->getUrl());
+        $this->assertEquals($callbackUrls, $retrievedRetrieveRequest->getCallbackUrls());
     }
 
     public function createDataProvider(): array
@@ -77,7 +77,10 @@ class GetRequestTest extends AbstractFunctionalTestCase
         /* @var EntityManagerInterface $entityManager */
         $entityManager = self::$container->get(EntityManagerInterface::class);
 
-        $retrieveRequest = $this->createRetrieveRequest($retrieveRequestData['url'], $retrieveRequestData['callbackUrls']);
+        $retrieveRequest = $this->createRetrieveRequest(
+            $retrieveRequestData['url'],
+            $retrieveRequestData['callbackUrls']
+        );
 
         $this->assertNotNull($retrieveRequest->getId());
 
@@ -93,10 +96,10 @@ class GetRequestTest extends AbstractFunctionalTestCase
         $entityManager->flush();
         $entityManager->clear();
 
-        $retrievedGetRequest = $entityManager->find(RetrieveRequest::class, $id);
+        $retrievedRetrieveRequest = $entityManager->find(RetrieveRequest::class, $id);
 
-        $this->assertEquals($id, $retrievedGetRequest->getId());
-        $this->assertEquals($expectedCallbackUrls, $retrievedGetRequest->getCallbackUrls());
+        $this->assertEquals($id, $retrievedRetrieveRequest->getId());
+        $this->assertEquals($expectedCallbackUrls, $retrievedRetrieveRequest->getCallbackUrls());
     }
 
     public function updateDataProvider(): array

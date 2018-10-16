@@ -7,7 +7,7 @@ use App\Services\RetrieveRequestManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
-class GetRequestManagerTest extends AbstractFunctionalTestCase
+class RetrieveRequestManagerTest extends AbstractFunctionalTestCase
 {
     /**
      * @var RetrieveRequestManager
@@ -41,8 +41,8 @@ class GetRequestManagerTest extends AbstractFunctionalTestCase
         $entityManager->flush();
         $entityManager->clear();
 
-        $foundGetRequest = $this->retrieveRequestManager->find($url);
+        $foundRetrieveRequest = $this->retrieveRequestManager->find($url);
 
-        $this->assertEquals($retrieveRequest, $foundGetRequest);
+        $this->assertEquals($retrieveRequest, $foundRetrieveRequest);
     }
 }

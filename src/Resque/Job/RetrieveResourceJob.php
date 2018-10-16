@@ -5,9 +5,9 @@ namespace App\Resque\Job;
 use App\Command\RetrieveResourceCommand;
 use Symfony\Component\Console\Command\Command;
 
-class GetResourceJob extends CommandJob
+class RetrieveResourceJob extends CommandJob
 {
-    const QUEUE_NAME = 'resource-get';
+    const QUEUE_NAME = 'retrieve-resource';
 
     protected function getQueueName(): string
     {

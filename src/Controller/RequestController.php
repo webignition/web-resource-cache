@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\RetrieveRequest;
-use App\Resque\Job\GetResourceJob;
+use App\Resque\Job\RetrieveResourceJob;
 use App\Services\RetrieveRequestManager;
 use App\Services\ResqueQueueService;
 use App\Services\Whitelist;
@@ -58,8 +58,8 @@ class RequestController
 
         $resqueJobArgs = ['id' => $retrieveRequest->getId()];
 
-        if (!$this->resqueQueueService->contains(GetResourceJob::QUEUE_NAME, $resqueJobArgs)) {
-            $this->resqueQueueService->enqueue(new GetResourceJob($resqueJobArgs));
+        if (!$this->resqueQueueService->contains(RetrieveResourceJob::QUEUE_NAME, $resqueJobArgs)) {
+            $this->resqueQueueService->enqueue(new RetrieveResourceJob($resqueJobArgs));
         }
 
         return new Response('', 200);
