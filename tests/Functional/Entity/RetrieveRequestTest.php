@@ -9,6 +9,18 @@ use Doctrine\ORM\EntityManagerInterface;
 class RetrieveRequestTest extends AbstractFunctionalTestCase
 {
     /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->entityManager = self::$container->get(EntityManagerInterface::class);
+    }
+
+    /**
      * @dataProvider createDataProvider
      *
      * @param string $url
@@ -16,9 +28,6 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
      */
     public function testCreate(string $url, array $callbackUrls)
     {
-        /* @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
-
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl($url);
 
@@ -30,16 +39,16 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         $this->assertEquals($url, $retrieveRequest->getUrl());
         $this->assertEquals($callbackUrls, $retrieveRequest->getCallbackUrls());
 
-        $entityManager->persist($retrieveRequest);
-        $entityManager->flush();
+        $this->entityManager->persist($retrieveRequest);
+        $this->entityManager->flush();
 
         $this->assertNotNull($retrieveRequest->getId());
 
         $id = $retrieveRequest->getId();
 
-        $entityManager->clear();
+        $this->entityManager->clear();
 
-        $retrievedRetrieveRequest = $entityManager->find(RetrieveRequest::class, $id);
+        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $id);
 
         $this->assertEquals($id, $retrievedRetrieveRequest->getId());
         $this->assertEquals($url, $retrievedRetrieveRequest->getUrl());
@@ -66,17 +75,17 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @dataProvider updateDataProvider
+     * @dataProvider updateCallbackUrlsDataProvider
      *
      * @param array $retrieveRequestData
      * @param array $additionalCallbackUrls
      * @param array $expectedCallbackUrls
      */
-    public function testUpdate(array $retrieveRequestData, array $additionalCallbackUrls, array $expectedCallbackUrls)
-    {
-        /* @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
-
+    public function testUpdateCallbackUrls(
+        array $retrieveRequestData,
+        array $additionalCallbackUrls,
+        array $expectedCallbackUrls
+    ) {
         $retrieveRequest = $this->createRetrieveRequest(
             $retrieveRequestData['url'],
             $retrieveRequestData['callbackUrls']
@@ -92,17 +101,17 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
 
         $id = $retrieveRequest->getId();
 
-        $entityManager->persist($retrieveRequest);
-        $entityManager->flush();
-        $entityManager->clear();
+        $this->entityManager->persist($retrieveRequest);
+        $this->entityManager->flush();
+        $this->entityManager->clear();
 
-        $retrievedRetrieveRequest = $entityManager->find(RetrieveRequest::class, $id);
+        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $id);
 
         $this->assertEquals($id, $retrievedRetrieveRequest->getId());
         $this->assertEquals($expectedCallbackUrls, $retrievedRetrieveRequest->getCallbackUrls());
     }
 
-    public function updateDataProvider(): array
+    public function updateCallbackUrlsDataProvider(): array
     {
         return [
             'no additional callback urls' => [
@@ -154,6 +163,30 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         ];
     }
 
+    public function testIncrementRetryCount()
+    {
+        $retrieveRequest = $this->createRetrieveRequest('http://example.com', ['http://foo.example.com/callback']);
+        $this->assertSame(0, $retrieveRequest->getRetryCount());
+
+        $retrieveRequest->incrementRetryCount();
+        $this->assertSame(1, $retrieveRequest->getRetryCount());
+
+        $retrieveRequest->incrementRetryCount();
+        $this->assertSame(2, $retrieveRequest->getRetryCount());
+
+        $retrieveRequest->incrementRetryCount();
+        $this->assertSame(3, $retrieveRequest->getRetryCount());
+
+        $id = $retrieveRequest->getId();
+
+        $this->entityManager->persist($retrieveRequest);
+        $this->entityManager->flush();
+        $this->entityManager->clear();
+
+        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $id);
+        $this->assertSame(3, $retrievedRetrieveRequest->getRetryCount());
+    }
+
     private function createRetrieveRequest(string $url, array $callbackUrls): RetrieveRequest
     {
         $retrieveRequest = new RetrieveRequest();
@@ -163,11 +196,8 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
             $retrieveRequest->addCallbackUrl($callbackUrl);
         }
 
-        /* @var EntityManagerInterface $entityManager */
-        $entityManager = self::$container->get(EntityManagerInterface::class);
-
-        $entityManager->persist($retrieveRequest);
-        $entityManager->flush();
+        $this->entityManager->persist($retrieveRequest);
+        $this->entityManager->flush();
 
         return $retrieveRequest;
     }
