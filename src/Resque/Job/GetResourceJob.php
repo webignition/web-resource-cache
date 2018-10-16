@@ -2,7 +2,7 @@
 
 namespace App\Resque\Job;
 
-use App\Command\GetResourceCommand;
+use App\Command\RetrieveResourceCommand;
 use Symfony\Component\Console\Command\Command;
 
 class GetResourceJob extends CommandJob
@@ -16,8 +16,8 @@ class GetResourceJob extends CommandJob
 
     protected function getCommand(): Command
     {
-        /* @var GetResourceCommand $command */
-        $command = $this->getContainer()->get(GetResourceCommand::class);
+        /* @var RetrieveResourceCommand $command */
+        $command = $this->getContainer()->get(RetrieveResourceCommand::class);
 
         return $command;
     }

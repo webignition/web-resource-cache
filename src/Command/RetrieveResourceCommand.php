@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class GetResourceCommand extends Command
+class RetrieveResourceCommand extends Command
 {
     const RETURN_CODE_OK = 0;
 
@@ -15,8 +15,8 @@ class GetResourceCommand extends Command
     {
         $this
             ->setName('web-resource-cache:get-resource')
-            ->setDescription('Get a resource')
-            ->addArgument('id', InputArgument::REQUIRED, 'id of resource to get');
+            ->setDescription('Retrieve a resource')
+            ->addArgument('id', InputArgument::REQUIRED, 'id of resource to retrieve');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)

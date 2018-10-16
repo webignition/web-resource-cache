@@ -41,5 +41,5 @@ services:
             $callbackUrlWhitelist: '@app.callbackurl.whitelist'
 
     # public commands required for retrieval from resque container
-    App\Command\GetResourceCommand:
+    App\Command\RetrieveResourceCommand:
         public: true
