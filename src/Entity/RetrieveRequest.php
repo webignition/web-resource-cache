@@ -31,6 +31,13 @@ class RetrieveRequest
     private $url;
 
     /**
+     * @var int
+     *
+     * @ORM\Column(type="smallint")
+     */
+    private $retryCount = 0;
+
+    /**
      * @var array
      *
      * @ORM\Column(type="simple_array")
@@ -65,5 +72,15 @@ class RetrieveRequest
     public function getCallbackUrls(): array
     {
         return $this->callbackUrls;
+    }
+
+    public function incrementRetryCount()
+    {
+        $this->retryCount++;
+    }
+
+    public function getRetryCount(): int
+    {
+        return $this->retryCount;
     }
 }
