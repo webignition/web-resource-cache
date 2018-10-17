@@ -51,6 +51,18 @@ class RetrieveRequest
      */
     private $callbackUrls = [];
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=32, unique=true)
+     */
+    private $hash = '';
+
+    public function __construct()
+    {
+        $this->generateHash();
+    }
+
     public function getId(): ?string
     {
         return $this->id;
@@ -59,6 +71,7 @@ class RetrieveRequest
     public function setUrl(string $url)
     {
         $this->url = $url;
+        $this->generateHash();
     }
 
     public function getUrl(): ?string
@@ -70,6 +83,8 @@ class RetrieveRequest
     {
         if (!in_array($callbackUrl, $this->callbackUrls)) {
             $this->callbackUrls[] = $callbackUrl;
+            sort($this->callbackUrls);
+            $this->generateHash();
         }
     }
 
@@ -100,6 +115,9 @@ class RetrieveRequest
         $key = strtolower($key);
 
         $this->headers[$key] = $value;
+        asort($this->headers);
+
+        $this->generateHash();
 
         return true;
     }
@@ -115,4 +133,15 @@ class RetrieveRequest
     {
         return $this->headers;
     }
+
+    public function getHash(): string
+    {
+        return $this->hash;
+    }
+
+    private function generateHash()
+    {
+        $this->hash = md5($this->url . json_encode($this->headers) .  json_encode($this->callbackUrls));
+    }
+
 }

@@ -67,8 +67,8 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
             'url, multiple callback urls' => [
                 'url' => 'http://example.com/',
                 'callbackUrls' => [
-                    'http://foo.example.com/callback',
                     'http://bar.example.com/callback',
+                    'http://foo.example.com/callback',
                 ],
             ],
         ];
@@ -138,8 +138,8 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
                     'http://foobar.example.com/callback',
                 ],
                 'expectedCallbackUrls' => [
-                    'http://foo.example.com/callback',
                     'http://bar.example.com/callback',
+                    'http://foo.example.com/callback',
                     'http://foobar.example.com/callback',
                 ],
             ],
@@ -156,8 +156,8 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
                     'http://bar.example.com/callback',
                 ],
                 'expectedCallbackUrls' => [
-                    'http://foo.example.com/callback',
                     'http://bar.example.com/callback',
+                    'http://foo.example.com/callback',
                 ],
             ],
         ];
@@ -270,6 +270,50 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
                 ],
             ],
         ];
+    }
+
+    public function testHash()
+    {
+        $retrieveRequest = new RetrieveRequest();
+        $this->assertEquals('f6383428b86fcf5dd16653be0ee5ff67', $retrieveRequest->getHash());
+
+        $retrieveRequest->setUrl('http://foo.example.com/');
+        $this->assertEquals('5f4c7332261ccb946e5285b2b37da8a0', $retrieveRequest->getHash());
+
+        $retrieveRequest->addCallbackUrl('http://callback.example.com/');
+        $this->assertEquals('db10d9f3470a2269eee574b3364ff5af', $retrieveRequest->getHash());
+
+        $retrieveRequest->incrementRetryCount();
+        $this->assertEquals('db10d9f3470a2269eee574b3364ff5af', $retrieveRequest->getHash());
+
+        $retrieveRequest->setHeaders(['foo' => 'bar']);
+        $this->assertEquals('dc70ef853e36a36943f39b89983104fc', $retrieveRequest->getHash());
+    }
+
+    public function testCallbackUrlAddOrderDoesNotAffectHash()
+    {
+        $retrieveRequest1 = new RetrieveRequest();
+        $retrieveRequest1->addCallbackUrl('http://foo.example.com');
+        $retrieveRequest1->addCallbackUrl('http://bar.example.com');
+
+        $retrieveRequest2 = new RetrieveRequest();
+        $retrieveRequest2->addCallbackUrl('http://bar.example.com');
+        $retrieveRequest2->addCallbackUrl('http://foo.example.com');
+
+        $this->assertEquals($retrieveRequest1->getHash(), $retrieveRequest2->getHash());
+    }
+
+    public function testHeaderSetOrderDoesNotAffectHash()
+    {
+        $retrieveRequest1 = new RetrieveRequest();
+        $retrieveRequest1->setHeader('foo', 'bar');
+        $retrieveRequest1->setHeader('fizz', 'buzz');
+
+        $retrieveRequest2 = new RetrieveRequest();
+        $retrieveRequest2->setHeader('fizz', 'buzz');
+        $retrieveRequest2->setHeader('foo', 'bar');
+
+        $this->assertEquals($retrieveRequest1->getHash(), $retrieveRequest2->getHash());
     }
 
     private function createRetrieveRequest(
