@@ -83,8 +83,6 @@ class RetrieveRequest
     {
         if (!in_array($callbackUrl, $this->callbackUrls)) {
             $this->callbackUrls[] = $callbackUrl;
-            sort($this->callbackUrls);
-            $this->generateHash();
         }
     }
 
@@ -141,7 +139,7 @@ class RetrieveRequest
 
     private function generateHash()
     {
-        $this->hash = md5($this->url . json_encode($this->headers) .  json_encode($this->callbackUrls));
+        $this->hash = md5($this->url . json_encode($this->headers));
     }
 
 }
