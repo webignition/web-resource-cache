@@ -33,7 +33,7 @@ class ResourceRetriever
      */
     public function retrieve(RetrieveRequest $retrieveRequest): RequestResponse
     {
-        $request = new Request('GET', $retrieveRequest->getUrl());
+        $request = new Request('GET', $retrieveRequest->getUrl(), $retrieveRequest->getHeaders());
 
         $requestUri = $request->getUri();
         $response = null;

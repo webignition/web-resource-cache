@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Services\RetrieveRequestHashFactory;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,7 +29,14 @@ class RetrieveRequest
      *
      * @ORM\Column(type="text")
      */
-    private $url;
+    private $url = '';
+
+    /**
+     * @var array
+     *
+     * @ORM\Column(type="array")
+     */
+    private $headers = [];
 
     /**
      * @var int
@@ -44,6 +52,18 @@ class RetrieveRequest
      */
     private $callbackUrls = [];
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=32, unique=true)
+     */
+    private $hash = '';
+
+    public function __construct()
+    {
+        $this->generateHash();
+    }
+
     public function getId(): ?string
     {
         return $this->id;
@@ -52,6 +72,7 @@ class RetrieveRequest
     public function setUrl(string $url)
     {
         $this->url = $url;
+        $this->generateHash();
     }
 
     public function getUrl(): ?string
@@ -82,5 +103,43 @@ class RetrieveRequest
     public function getRetryCount(): int
     {
         return $this->retryCount;
+    }
+
+    public function setHeader(string $key, $value)
+    {
+        if (!is_string($value) && !is_int($value)) {
+            return false;
+        }
+
+        $key = strtolower($key);
+
+        $this->headers[$key] = $value;
+        asort($this->headers);
+
+        $this->generateHash();
+
+        return true;
+    }
+
+    public function setHeaders(array $headers)
+    {
+        foreach ($headers as $key => $value) {
+            $this->setHeader($key, $value);
+        }
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    public function getHash(): string
+    {
+        return $this->hash;
+    }
+
+    private function generateHash()
+    {
+        $this->hash = RetrieveRequestHashFactory::create($this->url, $this->headers);
     }
 }

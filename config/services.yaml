@@ -46,10 +46,6 @@ services:
         arguments:
             $callbackUrlWhitelist: '@app.callbackurl.whitelist'
 
-    webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
-
-    webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
-
     webignition\HttpHistoryContainer\Container:
 
     Kevinrob\GuzzleCache\CacheMiddleware:

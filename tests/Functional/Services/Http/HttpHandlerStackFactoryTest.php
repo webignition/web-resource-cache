@@ -31,14 +31,6 @@ class HttpHandlerStackFactoryTest extends AbstractFunctionalTestCase
         $this->assertNotSame($currentHandlerStackString, (string)$handlerStack);
 
         $currentHandlerStackString = (string)$handlerStack;
-        $handlerStack->remove(HttpHandlerStackFactory::MIDDLEWARE_HTTP_AUTH_KEY);
-        $this->assertNotSame($currentHandlerStackString, (string)$handlerStack);
-
-        $currentHandlerStackString = (string)$handlerStack;
-        $handlerStack->remove(HttpHandlerStackFactory::MIDDLEWARE_REQUEST_HEADERS_KEY);
-        $this->assertNotSame($currentHandlerStackString, (string)$handlerStack);
-
-        $currentHandlerStackString = (string)$handlerStack;
         $handlerStack->remove(HttpHandlerStackFactory::MIDDLEWARE_HISTORY_KEY);
         $this->assertNotSame($currentHandlerStackString, (string)$handlerStack);
     }

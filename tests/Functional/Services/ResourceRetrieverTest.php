@@ -51,13 +51,28 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
+        $httpAuthHeaderName = 'Authorization';
+        $httpAuthPasswordValue = 'Basic ' . base64_encode('example:password');
+
+        $headers = [
+            $httpAuthHeaderName => $httpAuthPasswordValue,
+            'foo' => 'bar',
+        ];
+
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl('http://example.com/');
         $retrieveRequest->addCallbackUrl('http://callback.example.com/');
+        $retrieveRequest->setHeaders($headers);
 
         $requestResponse = $this->resourceRetriever->retrieve($retrieveRequest);
         $response = $requestResponse->getResponse();
         $this->assertSame($expectedResponseStatusCode, $response->getStatusCode());
+
+        $lastRequest = $this->httpHistoryContainer->getLastRequest();
+
+        foreach ($headers as $key => $value) {
+            $this->assertEquals($value, $lastRequest->getHeaderLine($key));
+        }
     }
 
     public function retrieveReturnsResponseDataProvider(): array

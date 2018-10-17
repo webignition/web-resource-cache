@@ -24,11 +24,11 @@ class RetrieveRequestManager
         $this->repository = $entityManager->getRepository(RetrieveRequest::class);
     }
 
-    public function find(string $url): ?RetrieveRequest
+    public function findByHash(string $hash): ?RetrieveRequest
     {
         /* @var RetrieveRequest $retrieveRequest */
         $retrieveRequest = $this->repository->findOneBy([
-            'url' => $url,
+            'hash' => $hash,
         ]);
 
         return $retrieveRequest;
