@@ -305,12 +305,6 @@
     "webignition/guzzle-curl-exception": {
         "version": "1.1"
     },
-    "webignition/guzzle-http-authentication-middleware": {
-        "version": "0.2"
-    },
-    "webignition/guzzle-request-headers-middleware": {
-        "version": "0.1"
-    },
     "webignition/http-history-container": {
         "version": "0.5"
     },
