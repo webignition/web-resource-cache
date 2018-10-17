@@ -1,0 +1,17 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: true
+
+  App\Tests\Services\HttpMockHandler:
+
+  App\Services\Http\HttpHandlerStackFactory:
+    arguments:
+    - '@webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware'
+    - '@webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware'
+    - '@webignition\HttpHistoryContainer\Container'
+    - '@Kevinrob\GuzzleCache\CacheMiddleware'
+    - '@App\Tests\Services\HttpMockHandler'
+
+  App\Services\ResourceRetriever:

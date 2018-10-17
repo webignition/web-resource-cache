@@ -74,11 +74,23 @@
     "doctrine/reflection": {
         "version": "v1.0.0"
     },
+    "guzzlehttp/guzzle": {
+        "version": "6.3.3"
+    },
+    "guzzlehttp/promises": {
+        "version": "v1.3.1"
+    },
+    "guzzlehttp/psr7": {
+        "version": "1.4.2"
+    },
     "hamcrest/hamcrest-php": {
         "version": "v2.0.0"
     },
     "jdorn/sql-formatter": {
         "version": "v1.2.17"
+    },
+    "kevinrob/guzzle-cache-middleware": {
+        "version": "v3.2.1"
     },
     "mockery/mockery": {
         "version": "1.2.0"
@@ -139,6 +151,9 @@
     },
     "psr/container": {
         "version": "1.0.0"
+    },
+    "psr/http-message": {
+        "version": "1.0.1"
     },
     "psr/log": {
         "version": "1.0.2"
@@ -286,6 +301,18 @@
     },
     "theseer/tokenizer": {
         "version": "1.1.0"
+    },
+    "webignition/guzzle-curl-exception": {
+        "version": "1.1"
+    },
+    "webignition/guzzle-http-authentication-middleware": {
+        "version": "0.2"
+    },
+    "webignition/guzzle-request-headers-middleware": {
+        "version": "0.1"
+    },
+    "webignition/http-history-container": {
+        "version": "0.5"
     },
     "webignition/resque-bundle": {
         "version": "dev-master"
