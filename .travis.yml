@@ -2,6 +2,7 @@ sudo: false
 
 services:
   - redis-server
+  - memcached
 
 language: php
 php:
