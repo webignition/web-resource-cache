@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Services\RetrieveRequestHashFactory;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -28,7 +29,7 @@ class RetrieveRequest
      *
      * @ORM\Column(type="text")
      */
-    private $url;
+    private $url = '';
 
     /**
      * @var array
@@ -139,7 +140,6 @@ class RetrieveRequest
 
     private function generateHash()
     {
-        $this->hash = md5($this->url . json_encode($this->headers));
+        $this->hash = RetrieveRequestHashFactory::create($this->url, $this->headers);
     }
-
 }
