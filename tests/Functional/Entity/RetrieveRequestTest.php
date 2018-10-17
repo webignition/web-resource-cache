@@ -303,6 +303,63 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         $this->assertEquals($retrieveRequest1->getHash(), $retrieveRequest2->getHash());
     }
 
+    /**
+     * @dataProvider setHeaderValidValueTypeDataProvider
+     *
+     * @param string|int $value
+     */
+    public function testSetHeaderValidValueType($value)
+    {
+        $retrieveRequest = new RetrieveRequest();
+
+        $this->assertTrue($retrieveRequest->setHeader('foo', $value));
+        $this->assertEquals(
+            [
+                'foo' => $value,
+            ],
+            $retrieveRequest->getHeaders()
+        );
+    }
+
+    public function setHeaderValidValueTypeDataProvider(): array
+    {
+        return [
+            'string' => [
+                'value' => 'bar',
+            ],
+            'integer' => [
+                'value' => 12,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider setHeaderInvalidValueTypeDataProvider
+     *
+     * @param mixed $value
+     */
+    public function testSetHeaderInvalidValueType($value)
+    {
+        $retrieveRequest = new RetrieveRequest();
+
+        $this->assertFalse($retrieveRequest->setHeader('foo', $value));
+    }
+
+    public function setHeaderInvalidValueTypeDataProvider(): array
+    {
+        return [
+            'boolean' => [
+                'value' => true,
+            ],
+            'array' => [
+                'value' => [1, 2, 3],
+            ],
+            'object' => [
+                'value' => (object)[1, 2, 3],
+            ],
+        ];
+    }
+
     private function createRetrieveRequest(
         string $url,
         array $callbackUrls,

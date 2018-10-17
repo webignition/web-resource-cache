@@ -107,7 +107,7 @@ class RetrieveRequest
 
     public function setHeader(string $key, $value)
     {
-        if (!is_scalar($value) && !is_null($value)) {
+        if (!is_string($value) && !is_int($value)) {
             return false;
         }
 
