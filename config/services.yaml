@@ -40,6 +40,15 @@ services:
         arguments:
             $callbackUrlWhitelist: '@app.callbackurl.whitelist'
 
+    webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
+
+    webignition\Guzzle\Middleware\RequestHeaders\RequestHeadersMiddleware:
+
+    webignition\HttpHistoryContainer\Container:
+
+    Kevinrob\GuzzleCache\CacheMiddleware:
+        factory: 'App\Services\Http\HttpCacheMiddlewareFactory:create'
+
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:
         public: true
