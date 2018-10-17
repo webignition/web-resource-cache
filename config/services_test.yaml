@@ -4,4 +4,6 @@ services:
     autoconfigure: true
     public: true
 
-  App\Services\Http\HttpRetryMiddlewareFactory:
+  GuzzleHttp\Client:
+    public: true
+    factory: 'App\Services\Http\HttpClientFactory:create'

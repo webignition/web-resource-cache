@@ -4,6 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
+    curl_options:
+        CURLOPT_SSL_VERIFYPEER: false
+        CURLOPT_SSL_VERIFYHOST: false
+        CURLOPT_TIMEOUT_MS: 30000
 
 services:
     # default configuration for services in *this* file
@@ -48,6 +52,19 @@ services:
 
     Kevinrob\GuzzleCache\CacheMiddleware:
         factory: 'App\Services\Http\HttpCacheMiddlewareFactory:create'
+
+    GuzzleHttp\HandlerStack:
+        factory: 'App\Services\Http\HttpHandlerStackFactory:create'
+
+    GuzzleHttp\Cookie\CookieJarInterface:
+        class: GuzzleHttp\Cookie\CookieJar
+
+    App\Services\Http\HttpClientFactory:
+        arguments:
+            $curlOptions: '%curl_options%'
+
+    GuzzleHttp\Client:
+        factory: 'App\Services\Http\HttpClientFactory:create'
 
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:
