@@ -8,9 +8,7 @@ use App\Services\ResourceRetriever;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\UnhandledGuzzleException;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
@@ -41,46 +39,6 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
     }
 
-    public function testFoo1()
-    {
-        $httpClient = new Client();
-
-        $response = $httpClient->get('http://example.com/');
-
-        $foo = $response->getHeaders();
-
-//        var_dump($foo, json_encode($foo));
-        var_dump($foo);
-
-//        var_dump((string) $response->getBody());
-    }
-
-    public function testFoo2()
-    {
-        $httpClient = new Client();
-
-        $username = 'example';
-        $password = 'password';
-
-        $httpAuthHeaderName = 'Authorization';
-        $httpAuthPasswordValue = 'Basic ' . base64_encode($username . ':' . $password);
-
-        $headers = [
-            $httpAuthHeaderName => $httpAuthPasswordValue,
-        ];
-
-        $request = new Request('GET', 'http-auth-01.simplytestable.com', $headers);
-
-        $response = $httpClient->send($request);
-
-        $foo = $response->getHeaders();
-
-//        var_dump($foo, json_encode($foo));
-        var_dump($foo);
-
-//        var_dump((string) $response->getBody());
-    }
-
     /**
      * @dataProvider retrieveReturnsResponseDataProvider
      *
@@ -93,13 +51,28 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
+        $httpAuthHeaderName = 'Authorization';
+        $httpAuthPasswordValue = 'Basic ' . base64_encode('example:password');
+
+        $headers = [
+            $httpAuthHeaderName => $httpAuthPasswordValue,
+            'foo' => 'bar',
+        ];
+
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl('http://example.com/');
         $retrieveRequest->addCallbackUrl('http://callback.example.com/');
+        $retrieveRequest->setHeaders($headers);
 
         $requestResponse = $this->resourceRetriever->retrieve($retrieveRequest);
         $response = $requestResponse->getResponse();
         $this->assertSame($expectedResponseStatusCode, $response->getStatusCode());
+
+        $lastRequest = $this->httpHistoryContainer->getLastRequest();
+
+        foreach ($headers as $key => $value) {
+            $this->assertEquals($value, $lastRequest->getHeaderLine($key));
+        }
     }
 
     public function retrieveReturnsResponseDataProvider(): array
