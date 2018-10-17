@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\RetrieveRequest;
-use App\Exception\TransportException;
+use App\Exception\HttpTransportException;
 use App\Services\ResourceRetriever;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
@@ -45,7 +45,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
      * @param array $httpFixtures
      * @param int $expectedResponseStatusCode
      *
-     * @throws \App\Exception\TransportException
+     * @throws \App\Exception\HttpTransportException
      */
     public function testRetrieveReturnsResponse(array $httpFixtures, int $expectedResponseStatusCode)
     {
@@ -135,7 +135,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @throws TransportException
+     * @throws HttpTransportException
      */
     public function testReturnedRequestUsesRedirectUrl()
     {
@@ -180,8 +180,8 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
 
         try {
             $this->resourceRetriever->retrieve($retrieveRequest);
-            $this->fail('TransportException not thrown');
-        } catch (TransportException $transportException) {
+            $this->fail('HttpTransportException not thrown');
+        } catch (HttpTransportException $transportException) {
             $this->assertSame($expectedTransportErrorCode, $transportException->getTransportErrorCode());
             $this->assertSame($expectedIsCurlException, $transportException->isCurlException());
             $this->assertSame($expectedIsTooManyRedirectsException, $transportException->isTooManyRedirectsException());

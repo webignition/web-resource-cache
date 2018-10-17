@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entity\RetrieveRequest;
-use App\Exception\TransportException;
+use App\Exception\HttpTransportException;
 use App\Model\RequestResponse;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
@@ -29,7 +29,7 @@ class ResourceRetriever
      *
      * @return RequestResponse
      *
-     * @throws TransportException
+     * @throws HttpTransportException
      */
     public function retrieve(RetrieveRequest $retrieveRequest): RequestResponse
     {
@@ -49,9 +49,9 @@ class ResourceRetriever
         } catch (BadResponseException $badResponseException) {
             $response = $badResponseException->getResponse();
         } catch (RequestException $requestException) {
-            throw new TransportException($request, $requestException);
+            throw new HttpTransportException($request, $requestException);
         } catch (GuzzleException $guzzleException) {
-            throw new TransportException(
+            throw new HttpTransportException(
                 $request,
                 new RequestException($guzzleException->getMessage(), $request, null, $guzzleException)
             );

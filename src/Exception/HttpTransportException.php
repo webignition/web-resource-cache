@@ -9,7 +9,7 @@ use Psr\Http\Message\RequestInterface;
 use webignition\GuzzleHttp\Exception\CurlException\Exception as CurlException;
 use webignition\GuzzleHttp\Exception\CurlException\Factory as CurlExceptionFactory;
 
-class TransportException extends AbstractException
+class HttpTransportException extends AbstractHttpException
 {
     public function __construct(RequestInterface $request, RequestException $requestException)
     {

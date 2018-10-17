@@ -4,7 +4,7 @@ namespace App\Exception;
 
 use Psr\Http\Message\RequestInterface;
 
-abstract class AbstractException extends \Exception
+abstract class AbstractHttpException extends \Exception
 {
     /**
      * @var RequestInterface
