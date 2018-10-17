@@ -31,6 +31,13 @@ class RetrieveRequest
     private $url;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(type="array")
+     */
+    private $headers = [];
+
+    /**
      * @var int
      *
      * @ORM\Column(type="smallint")
@@ -82,5 +89,30 @@ class RetrieveRequest
     public function getRetryCount(): int
     {
         return $this->retryCount;
+    }
+
+    public function setHeader(string $key, $value)
+    {
+        if (!is_scalar($value) && !is_null($value)) {
+            return false;
+        }
+
+        $key = strtolower($key);
+
+        $this->headers[$key] = $value;
+
+        return true;
+    }
+
+    public function setHeaders(array $headers)
+    {
+        foreach ($headers as $key => $value) {
+            $this->setHeader($key, $value);
+        }
+    }
+
+    public function getHeaders(): array
+    {
+        return $this->headers;
     }
 }

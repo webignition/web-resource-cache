@@ -8,7 +8,9 @@ use App\Services\ResourceRetriever;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\UnhandledGuzzleException;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
@@ -37,6 +39,46 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
         $this->resourceRetriever = self::$container->get(ResourceRetriever::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
+    }
+
+    public function testFoo1()
+    {
+        $httpClient = new Client();
+
+        $response = $httpClient->get('http://example.com/');
+
+        $foo = $response->getHeaders();
+
+//        var_dump($foo, json_encode($foo));
+        var_dump($foo);
+
+//        var_dump((string) $response->getBody());
+    }
+
+    public function testFoo2()
+    {
+        $httpClient = new Client();
+
+        $username = 'example';
+        $password = 'password';
+
+        $httpAuthHeaderName = 'Authorization';
+        $httpAuthPasswordValue = 'Basic ' . base64_encode($username . ':' . $password);
+
+        $headers = [
+            $httpAuthHeaderName => $httpAuthPasswordValue,
+        ];
+
+        $request = new Request('GET', 'http-auth-01.simplytestable.com', $headers);
+
+        $response = $httpClient->send($request);
+
+        $foo = $response->getHeaders();
+
+//        var_dump($foo, json_encode($foo));
+        var_dump($foo);
+
+//        var_dump((string) $response->getBody());
     }
 
     /**

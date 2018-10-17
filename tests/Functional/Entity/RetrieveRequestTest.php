@@ -187,14 +187,104 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         $this->assertSame(3, $retrievedRetrieveRequest->getRetryCount());
     }
 
-    private function createRetrieveRequest(string $url, array $callbackUrls): RetrieveRequest
+    /**
+     * @dataProvider setHeadersDataProvider
+     *
+     * @param array $existingHeaders
+     * @param array $headers
+     * @param array $expectedHeaders
+     */
+    public function testSetHeaders(array $existingHeaders, array $headers, array $expectedHeaders)
     {
+        $retrieveRequest = $this->createRetrieveRequest(
+            'http://example.com',
+            [
+                'http://callback.example.com',
+            ],
+            $existingHeaders
+        );
+
+        $retrieveRequest->setHeaders($headers);
+
+        $this->assertEquals($expectedHeaders, $retrieveRequest->getHeaders());
+    }
+
+    public function setHeadersDataProvider(): array
+    {
+        return [
+            'no existing headers, no new headers' => [
+                'existingHeaders' => [],
+                'headers' => [],
+                'expectedHeaders' => [],
+            ],
+            'has existing headers, no new headers' => [
+                'existingHeaders' => [
+                    'foo' => 'bar',
+                ],
+                'headers' => [],
+                'expectedHeaders' => [
+                    'foo' => 'bar',
+                ],
+            ],
+            'no existing headers, has new headers' => [
+                'existingHeaders' => [],
+                'headers' => [
+                    'foo' => 'bar',
+                ],
+                'expectedHeaders' => [
+                    'foo' => 'bar',
+                ],
+            ],
+            'header name is converted to lowercase' => [
+                'existingHeaders' => [
+                    'FOO' => 'bar',
+                ],
+                'headers' => [],
+                'expectedHeaders' => [
+                    'foo' => 'bar',
+                ],
+            ],
+            'has existing headers, has new headers, no overwrite' => [
+                'existingHeaders' => [
+                    'foo' => 'bar',
+                ],
+                'headers' => [
+                    'fizz' => 'buzz',
+                ],
+                'expectedHeaders' => [
+                    'foo' => 'bar',
+                    'fizz' => 'buzz',
+                ],
+            ],
+            'has existing headers, has new headers, new headers overwrite existing headers' => [
+                'existingHeaders' => [
+                    'foo' => 'bar',
+                    'fizz' => 'buzz',
+                ],
+                'headers' => [
+                    'fizz' => 'bee',
+                ],
+                'expectedHeaders' => [
+                    'foo' => 'bar',
+                    'fizz' => 'bee',
+                ],
+            ],
+        ];
+    }
+
+    private function createRetrieveRequest(
+        string $url,
+        array $callbackUrls,
+        array $existingHeaders = []
+    ): RetrieveRequest {
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl($url);
 
         foreach ($callbackUrls as $callbackUrl) {
             $retrieveRequest->addCallbackUrl($callbackUrl);
         }
+
+        $retrieveRequest->setHeaders($existingHeaders);
 
         $this->entityManager->persist($retrieveRequest);
         $this->entityManager->flush();
