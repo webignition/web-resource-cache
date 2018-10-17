@@ -4,26 +4,14 @@ namespace App\Tests\Unit\Services\Http;
 
 use App\Services\Http\HttpCache;
 use App\Services\Http\HttpCacheMiddlewareFactory;
-use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\MemcachedCache;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 
 class HttpCacheMiddlewareFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCreateReturnsNull()
-    {
-        $httpCache = \Mockery::mock(HttpCache::class);
-        $httpCache
-            ->shouldReceive('has')
-            ->andReturn(false);
-
-        $httpCacheMiddlewareFactory = new HttpCacheMiddlewareFactory($httpCache);
-
-        $this->assertNull($httpCacheMiddlewareFactory->create());
-    }
-
     public function testCreateReturnsCacheMiddleware()
     {
-        $cache = \Mockery::mock(Cache::class);
+        $cache = \Mockery::mock(MemcachedCache::class);
 
         $httpCache = \Mockery::mock(HttpCache::class);
         $httpCache

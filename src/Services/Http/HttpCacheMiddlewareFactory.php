@@ -26,10 +26,6 @@ class HttpCacheMiddlewareFactory
      */
     public function create()
     {
-        if (!$this->cache->has()) {
-            return null;
-        }
-
         return new CacheMiddleware(
             new PrivateCacheStrategy(
                 new DoctrineCacheStorage(

@@ -8,6 +8,8 @@ parameters:
         CURLOPT_SSL_VERIFYPEER: false
         CURLOPT_SSL_VERIFYHOST: false
         CURLOPT_TIMEOUT_MS: 30000
+    memcached_host: localhost
+    memcached_port: 11211
 
 services:
     # default configuration for services in *this* file
@@ -69,3 +71,12 @@ services:
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:
         public: true
+
+    Memcached:
+        class: \Memcached
+        calls:
+            - [addServer, ['%memcached_host%', '%memcached_port%']]
+
+    Doctrine\Common\Cache\MemcachedCache:
+        calls:
+            - [setMemcached, ['@Memcached']]
