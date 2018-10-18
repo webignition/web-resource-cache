@@ -26,16 +26,6 @@ class RequestIdentifier
         $this->hash = md5($this->url . json_encode($this->headers));
     }
 
-    public function getUrl(): ?string
-    {
-        return $this->url;
-    }
-
-    public function getHeaders(): array
-    {
-        return $this->headers;
-    }
-
     public function getHash(): string
     {
         return $this->hash;
