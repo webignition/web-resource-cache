@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\RequestIdentifier;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -38,6 +39,13 @@ class Resource
      * @ORM\Column(type="text")
      */
     private $body = '';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=32, unique=true)
+     */
+    private $requestHash = '';
 
     public function getId(): ?string
     {
@@ -88,5 +96,15 @@ class Resource
     public function getBody(): string
     {
         return $this->body;
+    }
+
+    public function setRequestHash(RequestIdentifier $requestIdentifier)
+    {
+        $this->requestHash = (string) $requestIdentifier;
+    }
+
+    public function getRequestHash(): string
+    {
+        return $this->requestHash;
     }
 }
