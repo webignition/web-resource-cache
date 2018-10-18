@@ -1,0 +1,5 @@
+parameters:
+    curl_options:
+        CURLOPT_SSL_VERIFYPEER: false
+        CURLOPT_SSL_VERIFYHOST: false
+        CURLOPT_TIMEOUT_MS: 30000

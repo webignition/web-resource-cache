@@ -1,0 +1,2 @@
+parameters:
+    cache-control-min-fresh: 60

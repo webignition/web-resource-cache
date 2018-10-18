@@ -1,15 +1,13 @@
+imports:
+    - { resource: parameters/*.yaml }
+    - { resource: parameters/cache-control-min-fresh/*.yaml }
+
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
-    curl_options:
-        CURLOPT_SSL_VERIFYPEER: false
-        CURLOPT_SSL_VERIFYHOST: false
-        CURLOPT_TIMEOUT_MS: 30000
-    memcached_host: localhost
-    memcached_port: 11211
 
 services:
     # default configuration for services in *this* file
