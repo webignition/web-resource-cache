@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -99,30 +100,14 @@ class RetrieveRequest
         return $this->retryCount;
     }
 
-    public function setHeader(string $key, $value)
+    public function setHeaders(Headers $headers)
     {
-        if (!is_string($value) && !is_int($value)) {
-            return false;
-        }
-
-        $key = strtolower($key);
-
-        $this->headers[$key] = $value;
-        asort($this->headers);
-
-        return true;
+        $this->headers = $headers->toArray();
     }
 
-    public function setHeaders(array $headers)
+    public function getHeaders(): Headers
     {
-        foreach ($headers as $key => $value) {
-            $this->setHeader($key, $value);
-        }
-    }
-
-    public function getHeaders(): array
-    {
-        return $this->headers;
+        return new Headers($this->headers);
     }
 
     public function setHash(RequestIdentifier $requestIdentifier)
