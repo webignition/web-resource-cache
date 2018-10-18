@@ -11,9 +11,7 @@ class Headers
 
     public function __construct(array $headers = [])
     {
-        foreach ($headers as $key => $value) {
-            $this->set($key, $value);
-        }
+        $this->headers = $this->filter($headers);
     }
 
     public function createHash(): string
@@ -25,20 +23,11 @@ class Headers
      * @param string $key
      * @param string|int|null $value
      *
-     * @return bool
+     * @return Headers
      */
-    public function set(string $key, $value)
+    public function withHeader(string $key, $value): Headers
     {
-        if (!is_string($value) && !is_int($value)) {
-            return false;
-        }
-
-        $key = strtolower($key);
-
-        $this->headers[$key] = $value;
-        asort($this->headers);
-
-        return true;
+        return new Headers(array_merge($this->headers, $this->filter([$key => $value])));
     }
 
     /**
@@ -54,5 +43,23 @@ class Headers
     public function toArray(): array
     {
         return $this->headers;
+    }
+
+    private function filter(array $headers): array
+    {
+        $filteredHeaders = [];
+
+        foreach ($headers as $key => $value) {
+            if (!is_string($value) && !is_int($value)) {
+                continue;
+            }
+
+            $key = strtolower($key);
+
+            $filteredHeaders[$key] = $value;
+            asort($filteredHeaders);
+        }
+
+        return $filteredHeaders;
     }
 }

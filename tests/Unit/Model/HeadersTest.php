@@ -57,22 +57,25 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider setDataProvider
+     * @dataProvider withHeaderDataProvider
      *
      * @param array $existingHeaders
      * @param string $key
      * @param $value
      * @param array $expectedHeaders
      */
-    public function testSet(array $existingHeaders, string $key, $value, array $expectedHeaders)
+    public function testWithHeader(array $existingHeaders, string $key, $value, array $expectedHeaders)
     {
         $headers = new Headers($existingHeaders);
-        $headers->set($key, $value);
+        $updatedHeaders = $headers->withHeader($key, $value);
 
-        $this->assertEquals($expectedHeaders, $headers->toArray());
+        $this->assertNotSame($headers, $updatedHeaders);
+
+        $this->assertEquals($existingHeaders, $headers->toArray());
+        $this->assertEquals($expectedHeaders, $updatedHeaders->toArray());
     }
 
-    public function setDataProvider(): array
+    public function withHeaderDataProvider(): array
     {
         return [
             'no existing headers' => [
@@ -146,7 +149,7 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
         $headers = new Headers($existingHeaders);
 
         foreach ($newHeaders as $key => $value) {
-            $headers->set($key, $value);
+            $headers = $headers->withHeader($key, $value);
         }
 
         $this->assertEquals($expectedHash, $headers->createHash());
