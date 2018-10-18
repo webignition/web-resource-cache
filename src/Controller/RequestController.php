@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\RetrieveRequest;
+use App\Model\RequestIdentifier;
 use App\Resque\Job\RetrieveResourceJob;
-use App\Services\RetrieveRequestHashFactory;
 use App\Services\RetrieveRequestManager;
 use App\Services\ResqueQueueService;
 use App\Services\Whitelist;
@@ -49,14 +49,14 @@ class RequestController
         }
 
         $headers = $requestData->get('headers') ?? [];
-
-        $hash = RetrieveRequestHashFactory::create($url, $headers);
-        $retrieveRequest = $this->retrieveRequestManager->findByHash($hash);
+        $requestIdentifier = new RequestIdentifier($url, $headers);
+        $retrieveRequest = $this->retrieveRequestManager->findByHash((string) $requestIdentifier);
 
         if (empty($retrieveRequest)) {
             $retrieveRequest = new RetrieveRequest();
             $retrieveRequest->setUrl($url);
             $retrieveRequest->setHeaders($headers);
+            $retrieveRequest->setHash($requestIdentifier);
         }
 
         $retrieveRequest->addCallbackUrl($callbackUrl);

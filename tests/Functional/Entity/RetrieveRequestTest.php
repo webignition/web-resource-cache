@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Entity;
 
 use App\Entity\RetrieveRequest;
+use App\Model\RequestIdentifier;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -24,20 +25,26 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
      * @dataProvider createDataProvider
      *
      * @param string $url
+     * @param array $headers
      * @param array $callbackUrls
      */
-    public function testCreate(string $url, array $callbackUrls)
+    public function testCreate(string $url, array $headers, array $callbackUrls)
     {
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl($url);
+        $retrieveRequest->setHeaders($headers);
 
         foreach ($callbackUrls as $callbackUrl) {
             $retrieveRequest->addCallbackUrl($callbackUrl);
         }
 
+        $retrieveRequest->setHash(new RequestIdentifier($url, $headers));
+
         $this->assertNull($retrieveRequest->getId());
         $this->assertEquals($url, $retrieveRequest->getUrl());
+        $this->assertEquals($headers, $retrieveRequest->getHeaders());
         $this->assertEquals($callbackUrls, $retrieveRequest->getCallbackUrls());
+        $this->assertRegExp('/[a-z0-9]{32}/', $retrieveRequest->getHash());
 
         $this->entityManager->persist($retrieveRequest);
         $this->entityManager->flush();
@@ -45,6 +52,7 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         $this->assertNotNull($retrieveRequest->getId());
 
         $id = $retrieveRequest->getId();
+        $hash = $retrieveRequest->getHash();
 
         $this->entityManager->clear();
 
@@ -53,19 +61,42 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         $this->assertEquals($id, $retrievedRetrieveRequest->getId());
         $this->assertEquals($url, $retrievedRetrieveRequest->getUrl());
         $this->assertEquals($callbackUrls, $retrievedRetrieveRequest->getCallbackUrls());
+        $this->assertEquals($headers, $retrievedRetrieveRequest->getHeaders());
+        $this->assertEquals($hash, $retrievedRetrieveRequest->getHash());
     }
 
     public function createDataProvider(): array
     {
         return [
-            'url, single callback url' => [
+            'single callback url, no headers' => [
                 'url' => 'http://example.com/',
+                'headers' => [],
                 'callbackUrls' => [
                     'http://foo.example.com/callback',
                 ],
             ],
-            'url, multiple callback urls' => [
+            'multiple callback urls, no headers' => [
                 'url' => 'http://example.com/',
+                'headers' => [],
+                'callbackUrls' => [
+                    'http://bar.example.com/callback',
+                    'http://foo.example.com/callback',
+                ],
+            ],
+            'single callback url, has headers' => [
+                'url' => 'http://example.com/',
+                'headers' => [
+                    'foo' => 'bar',
+                ],
+                'callbackUrls' => [
+                    'http://foo.example.com/callback',
+                ],
+            ],
+            'multiple callback urls, has headers' => [
+                'url' => 'http://example.com/',
+                'headers' => [
+                    'foo' => 'bar',
+                ],
                 'callbackUrls' => [
                     'http://bar.example.com/callback',
                     'http://foo.example.com/callback',
@@ -77,19 +108,19 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
     /**
      * @dataProvider updateCallbackUrlsDataProvider
      *
-     * @param array $retrieveRequestData
+     * @param array $callbackUrls
      * @param array $additionalCallbackUrls
      * @param array $expectedCallbackUrls
      */
     public function testUpdateCallbackUrls(
-        array $retrieveRequestData,
+        array $callbackUrls,
         array $additionalCallbackUrls,
         array $expectedCallbackUrls
     ) {
-        $retrieveRequest = $this->createRetrieveRequest(
-            $retrieveRequestData['url'],
-            $retrieveRequestData['callbackUrls']
-        );
+        $url = 'http://example.com/';
+        $headers = [];
+
+        $retrieveRequest = $this->createRetrieveRequest($url, $headers, $callbackUrls);
 
         $this->assertNotNull($retrieveRequest->getId());
 
@@ -115,11 +146,8 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
     {
         return [
             'no additional callback urls' => [
-                'retrieveRequestData' => [
-                    'url' => 'http://example.com/',
-                    'callbackUrls' => [
-                        'http://foo.example.com/callback',
-                    ],
+                'callbackUrls' => [
+                    'http://foo.example.com/callback',
                 ],
                 'additionalCallbackUrls' => [],
                 'expectedCallbackUrls' => [
@@ -127,11 +155,8 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
                 ],
             ],
             'has additional callback urls, no duplicates' => [
-                'retrieveRequestData' => [
-                    'url' => 'http://example.com/',
-                    'callbackUrls' => [
-                        'http://foo.example.com/callback',
-                    ],
+                'callbackUrls' => [
+                    'http://foo.example.com/callback',
                 ],
                 'additionalCallbackUrls' => [
                     'http://bar.example.com/callback',
@@ -144,11 +169,8 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
                 ],
             ],
             'has additional callback urls, has duplicates' => [
-                'retrieveRequestData' => [
-                    'url' => 'http://example.com/',
-                    'callbackUrls' => [
-                        'http://foo.example.com/callback',
-                    ],
+                'callbackUrls' => [
+                    'http://foo.example.com/callback',
                 ],
                 'additionalCallbackUrls' => [
                     'http://foo.example.com/callback',
@@ -165,7 +187,11 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
 
     public function testIncrementRetryCount()
     {
-        $retrieveRequest = $this->createRetrieveRequest('http://example.com', ['http://foo.example.com/callback']);
+        $url = 'http://example.com';
+        $headers = [];
+        $callbackUrls = ['http://foo.example.com/callback'];
+
+        $retrieveRequest = $this->createRetrieveRequest($url, $headers, $callbackUrls);
         $this->assertSame(0, $retrieveRequest->getRetryCount());
 
         $retrieveRequest->incrementRetryCount();
@@ -198,10 +224,10 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
     {
         $retrieveRequest = $this->createRetrieveRequest(
             'http://example.com',
+            $existingHeaders,
             [
                 'http://callback.example.com',
-            ],
-            $existingHeaders
+            ]
         );
 
         $retrieveRequest->setHeaders($headers);
@@ -272,37 +298,6 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         ];
     }
 
-    public function testUpdateHash()
-    {
-        $retrieveRequest = new RetrieveRequest();
-        $this->assertEquals('d751713988987e9331980363e24189ce', $retrieveRequest->getHash());
-
-        $retrieveRequest->setUrl('http://foo.example.com/');
-        $this->assertEquals('cc2957092739eab04d826b3985af594b', $retrieveRequest->getHash());
-
-        $retrieveRequest->addCallbackUrl('http://callback.example.com/');
-        $this->assertEquals('cc2957092739eab04d826b3985af594b', $retrieveRequest->getHash());
-
-        $retrieveRequest->incrementRetryCount();
-        $this->assertEquals('cc2957092739eab04d826b3985af594b', $retrieveRequest->getHash());
-
-        $retrieveRequest->setHeaders(['foo' => 'bar']);
-        $this->assertEquals('c1e5b074eb7e4898841543edfbf7c28b', $retrieveRequest->getHash());
-    }
-
-    public function testHeaderSetOrderDoesNotAffectHash()
-    {
-        $retrieveRequest1 = new RetrieveRequest();
-        $retrieveRequest1->setHeader('foo', 'bar');
-        $retrieveRequest1->setHeader('fizz', 'buzz');
-
-        $retrieveRequest2 = new RetrieveRequest();
-        $retrieveRequest2->setHeader('fizz', 'buzz');
-        $retrieveRequest2->setHeader('foo', 'bar');
-
-        $this->assertEquals($retrieveRequest1->getHash(), $retrieveRequest2->getHash());
-    }
-
     /**
      * @dataProvider setHeaderValidValueTypeDataProvider
      *
@@ -360,19 +355,17 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         ];
     }
 
-    private function createRetrieveRequest(
-        string $url,
-        array $callbackUrls,
-        array $existingHeaders = []
-    ): RetrieveRequest {
+    private function createRetrieveRequest(string $url, array $headers, array $callbackUrls): RetrieveRequest
+    {
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl($url);
+        $retrieveRequest->setHeaders($headers);
 
         foreach ($callbackUrls as $callbackUrl) {
             $retrieveRequest->addCallbackUrl($callbackUrl);
         }
 
-        $retrieveRequest->setHeaders($existingHeaders);
+        $retrieveRequest->setHash(new RequestIdentifier($url, $headers));
 
         $this->entityManager->persist($retrieveRequest);
         $this->entityManager->flush();

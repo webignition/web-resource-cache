@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Services\RetrieveRequestHashFactory;
+use App\Model\RequestIdentifier;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -59,11 +59,6 @@ class RetrieveRequest
      */
     private $hash = '';
 
-    public function __construct()
-    {
-        $this->generateHash();
-    }
-
     public function getId(): ?string
     {
         return $this->id;
@@ -72,7 +67,6 @@ class RetrieveRequest
     public function setUrl(string $url)
     {
         $this->url = $url;
-        $this->generateHash();
     }
 
     public function getUrl(): ?string
@@ -116,8 +110,6 @@ class RetrieveRequest
         $this->headers[$key] = $value;
         asort($this->headers);
 
-        $this->generateHash();
-
         return true;
     }
 
@@ -133,13 +125,13 @@ class RetrieveRequest
         return $this->headers;
     }
 
+    public function setHash(RequestIdentifier $requestIdentifier)
+    {
+        $this->hash = (string) $requestIdentifier;
+    }
+
     public function getHash(): string
     {
         return $this->hash;
-    }
-
-    private function generateHash()
-    {
-        $this->hash = RetrieveRequestHashFactory::create($this->url, $this->headers);
     }
 }
