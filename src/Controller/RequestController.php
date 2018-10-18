@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\RetrieveRequest;
+use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Resque\Job\RetrieveResourceJob;
 use App\Services\RetrieveRequestManager;
@@ -48,7 +49,7 @@ class RequestController
             return new Response('', 400);
         }
 
-        $headers = $requestData->get('headers') ?? [];
+        $headers = new Headers($requestData->get('headers') ?? []);
         $requestIdentifier = new RequestIdentifier($url, $headers);
         $retrieveRequest = $this->retrieveRequestManager->findByHash((string) $requestIdentifier);
 

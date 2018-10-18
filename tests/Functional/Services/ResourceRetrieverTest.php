@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\RetrieveRequest;
 use App\Exception\HttpTransportException;
+use App\Model\Headers;
 use App\Services\ResourceRetriever;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
@@ -54,10 +55,10 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
         $httpAuthHeaderName = 'Authorization';
         $httpAuthPasswordValue = 'Basic ' . base64_encode('example:password');
 
-        $headers = [
+        $headers = new Headers([
             $httpAuthHeaderName => $httpAuthPasswordValue,
             'foo' => 'bar',
-        ];
+        ]);
 
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl('http://example.com/');

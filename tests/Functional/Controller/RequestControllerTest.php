@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Controller;
 
 use App\Controller\RequestController;
 use App\Entity\RetrieveRequest;
+use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Resque\Job\RetrieveResourceJob;
 use App\Services\ResqueQueueService;
@@ -103,7 +104,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', []) => [
+                    (string)new RequestIdentifier('http://example.com/', new Headers()) => [
                         'url' => 'http://example.com/',
                         'callbackUrls' => [
                             'http://callback.example.com/',
@@ -126,14 +127,14 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', []) => [
+                    (string)new RequestIdentifier('http://one.example.com/', new Headers()) => [
                         'url' => 'http://one.example.com/',
                         'callbackUrls' => [
                             'http://foo.example.com/',
                         ],
                         'headers' => [],
                     ],
-                    (string)new RequestIdentifier('http://two.example.com/', []) => [
+                    (string)new RequestIdentifier('http://two.example.com/', new Headers()) => [
                         'url' => 'http://two.example.com/',
                         'callbackUrls' => [
                             'http://bar.example.com/',
@@ -160,7 +161,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', ['foo' => 'bar']) => [
+                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])) => [
                         'url' => 'http://one.example.com/',
                         'callbackUrls' => [
                             'http://foo.example.com/',
@@ -169,7 +170,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                             'foo' => 'bar',
                         ],
                     ],
-                    (string)new RequestIdentifier('http://one.example.com/', ['fizz' => 'buzz']) => [
+                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['fizz' => 'buzz'])) => [
                         'url' => 'http://one.example.com/',
                         'callbackUrls' => [
                             'http://bar.example.com/',
@@ -198,7 +199,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', ['foo' => 'bar']) => [
+                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])) => [
                         'url' => 'http://one.example.com/',
                         'callbackUrls' => [
                             'http://foo.example.com/',
@@ -207,7 +208,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                             'foo' => 'bar',
                         ],
                     ],
-                    (string)new RequestIdentifier('http://two.example.com/', ['fizz' => 'buzz']) => [
+                    (string)new RequestIdentifier('http://two.example.com/', new Headers(['fizz' => 'buzz'])) => [
                         'url' => 'http://two.example.com/',
                         'callbackUrls' => [
                             'http://bar.example.com/',
@@ -232,7 +233,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', []) => [
+                    (string)new RequestIdentifier('http://example.com/', new Headers()) => [
                         'url' => 'http://example.com/',
                         'callbackUrls' => [
                             'http://callback.example.com/',
@@ -259,7 +260,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', ['foo' => 'bar']) => [
+                    (string)new RequestIdentifier('http://example.com/', new Headers(['foo' => 'bar'])) => [
                         'url' => 'http://example.com/',
                         'callbackUrls' => [
                             'http://callback.example.com/',

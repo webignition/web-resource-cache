@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Entity;
 
 use App\Entity\RetrieveRequest;
+use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,10 +26,10 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
      * @dataProvider createDataProvider
      *
      * @param string $url
-     * @param array $headers
+     * @param Headers $headers
      * @param array $callbackUrls
      */
-    public function testCreate(string $url, array $headers, array $callbackUrls)
+    public function testCreate(string $url, Headers $headers, array $callbackUrls)
     {
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl($url);
@@ -70,14 +71,14 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         return [
             'single callback url, no headers' => [
                 'url' => 'http://example.com/',
-                'headers' => [],
+                'headers' => new Headers(),
                 'callbackUrls' => [
                     'http://foo.example.com/callback',
                 ],
             ],
             'multiple callback urls, no headers' => [
                 'url' => 'http://example.com/',
-                'headers' => [],
+                'headers' => new Headers(),
                 'callbackUrls' => [
                     'http://bar.example.com/callback',
                     'http://foo.example.com/callback',
@@ -85,18 +86,18 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
             ],
             'single callback url, has headers' => [
                 'url' => 'http://example.com/',
-                'headers' => [
+                'headers' => new Headers([
                     'foo' => 'bar',
-                ],
+                ]),
                 'callbackUrls' => [
                     'http://foo.example.com/callback',
                 ],
             ],
             'multiple callback urls, has headers' => [
                 'url' => 'http://example.com/',
-                'headers' => [
+                'headers' => new Headers([
                     'foo' => 'bar',
-                ],
+                ]),
                 'callbackUrls' => [
                     'http://bar.example.com/callback',
                     'http://foo.example.com/callback',
@@ -118,7 +119,7 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         array $expectedCallbackUrls
     ) {
         $url = 'http://example.com/';
-        $headers = [];
+        $headers = new Headers();
 
         $retrieveRequest = $this->createRetrieveRequest($url, $headers, $callbackUrls);
 
@@ -188,7 +189,7 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
     public function testIncrementRetryCount()
     {
         $url = 'http://example.com';
-        $headers = [];
+        $headers = new Headers();
         $callbackUrls = ['http://foo.example.com/callback'];
 
         $retrieveRequest = $this->createRetrieveRequest($url, $headers, $callbackUrls);
@@ -213,149 +214,22 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         $this->assertSame(3, $retrievedRetrieveRequest->getRetryCount());
     }
 
-    /**
-     * @dataProvider setHeadersDataProvider
-     *
-     * @param array $existingHeaders
-     * @param array $headers
-     * @param array $expectedHeaders
-     */
-    public function testSetHeaders(array $existingHeaders, array $headers, array $expectedHeaders)
+
+    public function testSetHeaders()
     {
-        $retrieveRequest = $this->createRetrieveRequest(
-            'http://example.com',
-            $existingHeaders,
-            [
-                'http://callback.example.com',
-            ]
-        );
+        $originalHeaders = new Headers(['foo' => 'bar']);
+        $newHeaders = new Headers(['fizz' => 'buzz']);
 
-        $retrieveRequest->setHeaders($headers);
-
-        $this->assertEquals($expectedHeaders, $retrieveRequest->getHeaders());
-    }
-
-    public function setHeadersDataProvider(): array
-    {
-        return [
-            'no existing headers, no new headers' => [
-                'existingHeaders' => [],
-                'headers' => [],
-                'expectedHeaders' => [],
-            ],
-            'has existing headers, no new headers' => [
-                'existingHeaders' => [
-                    'foo' => 'bar',
-                ],
-                'headers' => [],
-                'expectedHeaders' => [
-                    'foo' => 'bar',
-                ],
-            ],
-            'no existing headers, has new headers' => [
-                'existingHeaders' => [],
-                'headers' => [
-                    'foo' => 'bar',
-                ],
-                'expectedHeaders' => [
-                    'foo' => 'bar',
-                ],
-            ],
-            'header name is converted to lowercase' => [
-                'existingHeaders' => [
-                    'FOO' => 'bar',
-                ],
-                'headers' => [],
-                'expectedHeaders' => [
-                    'foo' => 'bar',
-                ],
-            ],
-            'has existing headers, has new headers, no overwrite' => [
-                'existingHeaders' => [
-                    'foo' => 'bar',
-                ],
-                'headers' => [
-                    'fizz' => 'buzz',
-                ],
-                'expectedHeaders' => [
-                    'foo' => 'bar',
-                    'fizz' => 'buzz',
-                ],
-            ],
-            'has existing headers, has new headers, new headers overwrite existing headers' => [
-                'existingHeaders' => [
-                    'foo' => 'bar',
-                    'fizz' => 'buzz',
-                ],
-                'headers' => [
-                    'fizz' => 'bee',
-                ],
-                'expectedHeaders' => [
-                    'foo' => 'bar',
-                    'fizz' => 'bee',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider setHeaderValidValueTypeDataProvider
-     *
-     * @param string|int $value
-     */
-    public function testSetHeaderValidValueType($value)
-    {
         $retrieveRequest = new RetrieveRequest();
+        $retrieveRequest->setHeaders($originalHeaders);
 
-        $this->assertTrue($retrieveRequest->setHeader('foo', $value));
-        $this->assertEquals(
-            [
-                'foo' => $value,
-            ],
-            $retrieveRequest->getHeaders()
-        );
+        $this->assertSame($originalHeaders->toArray(), $retrieveRequest->getHeaders()->toArray());
+
+        $retrieveRequest->setHeaders($newHeaders);
+        $this->assertSame($newHeaders->toArray(), $retrieveRequest->getHeaders()->toArray());
     }
 
-    public function setHeaderValidValueTypeDataProvider(): array
-    {
-        return [
-            'string' => [
-                'value' => 'bar',
-            ],
-            'integer' => [
-                'value' => 12,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider setHeaderInvalidValueTypeDataProvider
-     *
-     * @param mixed $value
-     */
-    public function testSetHeaderInvalidValueType($value)
-    {
-        $retrieveRequest = new RetrieveRequest();
-
-        $this->assertFalse($retrieveRequest->setHeader('foo', $value));
-    }
-
-    public function setHeaderInvalidValueTypeDataProvider(): array
-    {
-        return [
-            'boolean' => [
-                'value' => true,
-            ],
-            'array' => [
-                'value' => [1, 2, 3],
-            ],
-            'object' => [
-                'value' => (object)[1, 2, 3],
-            ],
-        ];
-    }
-
-    private function createRetrieveRequest(string $url, array $headers, array $callbackUrls): RetrieveRequest
+    private function createRetrieveRequest(string $url, Headers $headers, array $callbackUrls): RetrieveRequest
     {
         $retrieveRequest = new RetrieveRequest();
         $retrieveRequest->setUrl($url);

@@ -3,7 +3,7 @@
 namespace App\Tests\Functional\Entity;
 
 use App\Entity\Resource;
-use App\Entity\RetrieveRequest;
+use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
@@ -70,7 +70,7 @@ class ResourceTest extends AbstractFunctionalTestCase
                 'url' => 'http://example.com/',
                 'headers' => [],
                 'body' => '',
-                'requestIdentifier' => new RequestIdentifier('http://example.com', []),
+                'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
             ],
             'has headers, empty body' => [
                 'url' => 'http://example.com/',
@@ -78,13 +78,13 @@ class ResourceTest extends AbstractFunctionalTestCase
                     'foo' => 'bar',
                 ],
                 'body' => '',
-                'requestIdentifier' => new RequestIdentifier('http://example.com', []),
+                'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
             ],
             'empty headers, has body' => [
                 'url' => 'http://example.com/',
                 'headers' => [],
                 'body' => 'body content',
-                'requestIdentifier' => new RequestIdentifier('http://example.com', []),
+                'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
             ],
             'has headers, has body' => [
                 'url' => 'http://example.com/',
@@ -92,7 +92,7 @@ class ResourceTest extends AbstractFunctionalTestCase
                     'foo' => 'bar',
                 ],
                 'body' => 'body content',
-                'requestIdentifier' => new RequestIdentifier('http://example.com', []),
+                'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
             ],
         ];
     }
