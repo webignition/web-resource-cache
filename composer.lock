@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "84d2a357dac6f41c49de02c7bb0f82a3",
+    "content-hash": "996c55a2131ff9cb793fa54a5c1caef7",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3218,6 +3218,52 @@
                 "exception"
             ],
             "time": "2018-06-29T15:50:32+00:00"
+        },
+        {
+            "name": "webignition/http-cache-control-directives",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/http-cache-control-directives.git",
+                "reference": "f2b66cc9fa7265768dfe27bfa296fe8603835ff0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/http-cache-control-directives/zipball/f2b66cc9fa7265768dfe27bfa296fe8603835ff0",
+                "reference": "f2b66cc9fa7265768dfe27bfa296fe8603835ff0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\HttpCacheControlDirectives\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Model of a web-based resource",
+            "homepage": "https://github.com/webignition/http-cache-control-directives",
+            "keywords": [
+                "cache-control",
+                "header",
+                "http"
+            ],
+            "time": "2018-10-18T16:27:05+00:00"
         },
         {
             "name": "webignition/http-history-container",
