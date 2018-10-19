@@ -29,20 +29,32 @@ class ResourceTest extends AbstractFunctionalTestCase
      * @param Headers $headers
      * @param string $body
      * @param RequestIdentifier $requestIdentifier
+     * @param \DateTime $lastStored
      */
-    public function testCreate(string $url, Headers $headers, string $body, RequestIdentifier $requestIdentifier)
-    {
+    public function testCreate(
+        string $url,
+        Headers $headers,
+        string $body,
+        RequestIdentifier $requestIdentifier,
+        \DateTime $lastStored
+    ) {
         $resource = new Resource();
+
+        $this->assertInstanceOf(\DateTime::class, $resource->getLastStored());
+        $this->assertNotEquals($lastStored, $resource->getLastStored());
+
         $resource->setUrl($url);
         $resource->setHeaders($headers);
         $resource->setBody($body);
         $resource->setRequestHash($requestIdentifier);
+        $resource->setLastStored($lastStored);
 
         $this->assertNull($resource->getId());
         $this->assertEquals($url, $resource->getUrl());
         $this->assertEquals($headers, $resource->getHeaders());
         $this->assertEquals($body, $resource->getBody());
         $this->assertEquals((string) $requestIdentifier, $resource->getRequestHash());
+        $this->assertEquals($lastStored, $resource->getLastStored());
 
         $this->entityManager->persist($resource);
         $this->entityManager->flush();
@@ -61,6 +73,7 @@ class ResourceTest extends AbstractFunctionalTestCase
         $this->assertEquals($headers, $retrievedResource->getHeaders());
         $this->assertEquals($body, $retrievedResource->getBody());
         $this->assertEquals((string) $requestIdentifier, $retrievedResource->getRequestHash());
+        $this->assertEquals($lastStored, $retrievedResource->getLastStored());
     }
 
     public function createDataProvider(): array
@@ -71,6 +84,7 @@ class ResourceTest extends AbstractFunctionalTestCase
                 'headers' => new Headers(),
                 'body' => '',
                 'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
+                'lastStored' => new \DateTime('2018-10-18 11:41'),
             ],
             'has headers, empty body' => [
                 'url' => 'http://example.com/',
@@ -79,12 +93,14 @@ class ResourceTest extends AbstractFunctionalTestCase
                 ]),
                 'body' => '',
                 'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
+                'lastStored' => new \DateTime('2018-10-18 12:41'),
             ],
             'empty headers, has body' => [
                 'url' => 'http://example.com/',
                 'headers' => new Headers(),
                 'body' => 'body content',
                 'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
+                'lastStored' => new \DateTime('2018-10-18 13:41'),
             ],
             'has headers, has body' => [
                 'url' => 'http://example.com/',
@@ -93,6 +109,7 @@ class ResourceTest extends AbstractFunctionalTestCase
                 ]),
                 'body' => 'body content',
                 'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
+                'lastStored' => new \DateTime('2018-10-18 14:41'),
             ],
         ];
     }
