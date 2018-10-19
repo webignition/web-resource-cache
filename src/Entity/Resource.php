@@ -42,11 +42,23 @@ class Resource
     private $body = '';
 
     /**
+     * @var \DateTime
+     *
+     * @ORM\Column(type="datetime")
+     */
+    private $lastStored;
+
+    /**
      * @var string
      *
      * @ORM\Column(type="string", length=32, unique=true)
      */
     private $requestHash = '';
+
+    public function __construct()
+    {
+        $this->lastStored = new \DateTime();
+    }
 
     public function getId(): ?string
     {
@@ -91,5 +103,24 @@ class Resource
     public function getRequestHash(): string
     {
         return $this->requestHash;
+    }
+
+    public function setLastStored(\DateTime $lastStored)
+    {
+        $this->lastStored = $lastStored;
+    }
+
+    public function getLastStored(): \DateTime
+    {
+        return $this->lastStored;
+    }
+
+    public function getStoredAge(\DateTime $now = null): int
+    {
+        if (empty($now)) {
+            $now = new \DateTime();
+        }
+
+        return $now->getTimestamp() - $this->lastStored->getTimestamp();
     }
 }
