@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use webignition\HttpCacheControlDirectives\HttpCacheControlDirectives;
+
 class Headers
 {
     /**
@@ -88,6 +90,33 @@ class Headers
         }
 
         return -INF;
+    }
+
+    public function hasExpired(\DateTime $now = null)
+    {
+        $expires = $this->getExpires();
+        if (null === $expires) {
+            return false;
+        }
+
+        $cacheControlDirectives = new HttpCacheControlDirectives($this->get('cache-control') ?? '');
+
+        $hasCacheControlMaxAge = $cacheControlDirectives->hasDirective(HttpCacheControlDirectives::MAX_AGE);
+        $hasCacheControlSMaxAge = $cacheControlDirectives->hasDirective(HttpCacheControlDirectives::S_MAXAGE);
+
+        if ($hasCacheControlMaxAge || $hasCacheControlSMaxAge) {
+            return false;
+        }
+
+        if (-INF === $expires) {
+            return true;
+        }
+
+        if (empty($now)) {
+            $now = new \DateTime();
+        }
+
+        return $now->getTimestamp() >= $expires->getTimestamp();
     }
 
     private function filter(array $headers): array
