@@ -62,10 +62,6 @@ services:
     GuzzleHttp\Client:
         factory: 'App\Services\Http\HttpClientFactory:create'
 
-    # public commands required for retrieval from resque container
-    App\Command\RetrieveResourceCommand:
-        public: true
-
     Memcached:
         class: \Memcached
         calls:
@@ -74,3 +70,11 @@ services:
     Doctrine\Common\Cache\MemcachedCache:
         calls:
             - [setMemcached, ['@Memcached']]
+
+    App\Services\ResourceValidator:
+        arguments:
+            - '%cache-control-min-fresh%'
+
+    # public commands required for retrieval from resque container
+    App\Command\RetrieveResourceCommand:
+        public: true
