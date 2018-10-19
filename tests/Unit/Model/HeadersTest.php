@@ -248,9 +248,9 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
      *
      * @param Headers $headers
      * @param \DateTime $now
-     * @param int $expectedAge
+     * @param int|float $expectedAge
      */
-    public function testGetAge(Headers $headers, ?\DateTime $now, int $expectedAge)
+    public function testGetAge(Headers $headers, ?\DateTime $now, $expectedAge)
     {
         $this->assertEquals($expectedAge, $headers->getAge($now));
     }
@@ -261,19 +261,19 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
             'no last-modified, no now' => [
                 'headers' => new Headers(),
                 'now' => null,
-                'expectedAge' => 0,
+                'expectedAge' => INF,
             ],
             'no last-modified, has now' => [
                 'headers' => new Headers(),
                 'now' => new \DateTime(),
-                'expectedAge' => 0,
+                'expectedAge' => INF,
             ],
             'has last-modified, invalid' => [
                 'headers' => new Headers([
                     'last-modified' => 'foo',
                 ]),
                 'now' => new \DateTime(),
-                'expectedAge' => 0,
+                'expectedAge' => INF,
             ],
             'has last-modified, valid' => [
                 'headers' => new Headers([
