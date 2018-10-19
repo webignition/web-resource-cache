@@ -289,7 +289,7 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
      * @dataProvider getExpiresDataProvider
      *
      * @param Headers $headers
-     * @param int|float $expectedExpires
+     * @param int|float|null $expectedExpires
      */
     public function testGetExpires(Headers $headers, $expectedExpires)
     {
@@ -324,6 +324,64 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
                     'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
                 ]),
                 'expectedExpires' => new \DateTime('Wed, 21 Oct 2015 07:28:00 GMT'),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider hasExpiredDataProvider
+     *
+     * @param Headers $headers
+     * @param \DateTime $now
+     * @param bool $expectedHasExpired
+     */
+    public function testHasExpired(Headers $headers, \DateTime $now, bool $expectedHasExpired)
+    {
+        $this->assertSame($expectedHasExpired, $headers->hasExpired($now));
+    }
+
+    public function hasExpiredDataProvider(): array
+    {
+        return [
+            'no expires' => [
+                'headers' => new Headers(),
+                'now' => new \DateTime(),
+                'expectedHasExpired' => false,
+            ],
+            'invalid expires (0)' => [
+                'headers' => new Headers([
+                    'expires' => 0,
+                ]),
+                'now' => new \DateTime(),
+                'expectedHasExpired' => true,
+            ],
+            'invalid expires (foo)' => [
+                'headers' => new Headers([
+                    'expires' => 'foo',
+                ]),
+                'now' => new \DateTime(),
+                'expectedHasExpired' => true,
+            ],
+            'expires in the past' => [
+                'headers' => new Headers([
+                    'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+                ]),
+                'now' => new \DateTime('Wed, 21 Oct 2015 07:28:01 GMT'),
+                'expectedHasExpired' => true,
+            ],
+            'expires now' => [
+                'headers' => new Headers([
+                    'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+                ]),
+                'now' => new \DateTime('Wed, 21 Oct 2015 07:28:00 GMT'),
+                'expectedHasExpired' => true,
+            ],
+            'expires in the future' => [
+                'headers' => new Headers([
+                    'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+                ]),
+                'now' => new \DateTime('Wed, 21 Oct 2015 07:27:59 GMT'),
+                'expectedHasExpired' => false,
             ],
         ];
     }
