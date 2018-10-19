@@ -59,11 +59,16 @@ class Headers
         return null;
     }
 
-    public function getAge(\DateTime $now = null): int
+    /**
+     * @param \DateTime|null $now
+     *
+     * @return int|float
+     */
+    public function getAge(\DateTime $now = null)
     {
         $lastModified = $this->getLastModified();
         if (empty($lastModified)) {
-            return 0;
+            return INF;
         }
 
         if (empty($now)) {
