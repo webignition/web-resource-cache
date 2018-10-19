@@ -73,6 +73,23 @@ class Headers
         return $now->getTimestamp() - $lastModified->getTimestamp();
     }
 
+    /**
+     * @return \DateTime|int|null
+     */
+    public function getExpires()
+    {
+        if (!isset($this->headers['expires'])) {
+            return null;
+        }
+
+        try {
+            return new \DateTime($this->headers['expires']);
+        } catch (\Exception $exception) {
+        }
+
+        return -INF;
+    }
+
     private function filter(array $headers): array
     {
         $filteredHeaders = [];
