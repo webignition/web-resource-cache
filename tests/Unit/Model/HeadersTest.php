@@ -209,4 +209,79 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('bar', $headers->get('foo'));
         $this->assertNull($headers->get('not-set'));
     }
+
+    /**
+     * @dataProvider getLastModifiedDataProvider
+     *
+     * @param Headers $headers
+     * @param \DateTime|null $expectedLastModified
+     */
+    public function testGetLastModified(Headers $headers, ?\DateTime $expectedLastModified)
+    {
+        $this->assertEquals($expectedLastModified, $headers->getLastModified());
+    }
+
+    public function getLastModifiedDataProvider(): array
+    {
+        return [
+            'no last-modified' => [
+                'headers' => new Headers(),
+                'expectedLastModified' => null,
+            ],
+            'has last-modified, invalid' => [
+                'headers' => new Headers([
+                    'last-modified' => 'foo',
+                ]),
+                'expectedLastModified' => null,
+            ],
+            'has last-modified, valid' => [
+                'headers' => new Headers([
+                    'last-modified' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+                ]),
+                'expectedLastModified' => new \DateTime('Wed, 21 Oct 2015 07:28:00 GMT'),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getAgeDataProvider
+     *
+     * @param Headers $headers
+     * @param \DateTime $now
+     * @param int $expectedAge
+     */
+    public function testGetAge(Headers $headers, ?\DateTime $now, int $expectedAge)
+    {
+        $this->assertEquals($expectedAge, $headers->getAge($now));
+    }
+
+    public function getAgeDataProvider(): array
+    {
+        return [
+            'no last-modified, no now' => [
+                'headers' => new Headers(),
+                'now' => null,
+                'expectedAge' => 0,
+            ],
+            'no last-modified, has now' => [
+                'headers' => new Headers(),
+                'now' => new \DateTime(),
+                'expectedAge' => 0,
+            ],
+            'has last-modified, invalid' => [
+                'headers' => new Headers([
+                    'last-modified' => 'foo',
+                ]),
+                'now' => new \DateTime(),
+                'expectedAge' => 0,
+            ],
+            'has last-modified, valid' => [
+                'headers' => new Headers([
+                    'last-modified' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+                ]),
+                'now' => new \DateTime('Wed, 21 Oct 2015 07:29:31 GMT'),
+                'expectedAge' => 91,
+            ],
+        ];
+    }
 }
