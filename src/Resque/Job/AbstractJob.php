@@ -4,7 +4,7 @@ namespace App\Resque\Job;
 
 use ResqueBundle\Resque\ContainerAwareJob;
 
-abstract class Job extends ContainerAwareJob
+abstract class AbstractJob extends ContainerAwareJob
 {
     abstract protected function getQueueName(): string;
 
