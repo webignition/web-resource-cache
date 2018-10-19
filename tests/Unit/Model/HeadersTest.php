@@ -285,6 +285,15 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testGetAgeNow()
+    {
+        $headers = new Headers([
+            'last-modified' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+        ]);
+
+        $this->assertGreaterThan(0, $headers->getAge());
+    }
+
     /**
      * @dataProvider getExpiresDataProvider
      *
