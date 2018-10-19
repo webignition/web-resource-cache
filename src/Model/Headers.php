@@ -45,6 +45,34 @@ class Headers
         return $this->headers;
     }
 
+    public function getLastModified(): ?\DateTime
+    {
+        if (!isset($this->headers['last-modified'])) {
+            return null;
+        }
+
+        try {
+            return new \DateTime($this->headers['last-modified']);
+        } catch (\Exception $exception) {
+        }
+
+        return null;
+    }
+
+    public function getAge(\DateTime $now = null): int
+    {
+        $lastModified = $this->getLastModified();
+        if (empty($lastModified)) {
+            return 0;
+        }
+
+        if (empty($now)) {
+            $now = new \DateTime();
+        }
+
+        return $now->getTimestamp() - $lastModified->getTimestamp();
+    }
+
     private function filter(array $headers): array
     {
         $filteredHeaders = [];
