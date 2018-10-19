@@ -248,9 +248,9 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
      *
      * @param Headers $headers
      * @param \DateTime $now
-     * @param int|float $expectedAge
+     * @param int|null $expectedAge
      */
-    public function testGetAge(Headers $headers, ?\DateTime $now, $expectedAge)
+    public function testGetAge(Headers $headers, ?\DateTime $now, ?int $expectedAge)
     {
         $this->assertSame($expectedAge, $headers->getAge($now));
     }
@@ -281,6 +281,49 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
                 ]),
                 'now' => new \DateTime('Wed, 21 Oct 2015 07:29:31 GMT'),
                 'expectedAge' => 91,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getExpiresDataProvider
+     *
+     * @param Headers $headers
+     * @param int|float $expectedExpires
+     */
+    public function testGetExpires(Headers $headers, $expectedExpires)
+    {
+        if ($expectedExpires instanceof \DateTime) {
+            $this->assertEquals($expectedExpires, $headers->getExpires());
+        } else {
+            $this->assertSame($expectedExpires, $headers->getExpires());
+        }
+    }
+
+    public function getExpiresDataProvider(): array
+    {
+        return [
+            'no expires' => [
+                'headers' => new Headers(),
+                'expectedExpires' => null,
+            ],
+            'invalid expires (0)' => [
+                'headers' => new Headers([
+                    'expires' => 0,
+                ]),
+                'expectedExpires' => -INF,
+            ],
+            'invalid expires (foo)' => [
+                'headers' => new Headers([
+                    'expires' => 'foo',
+                ]),
+                'expectedExpires' => -INF,
+            ],
+            'valid' => [
+                'headers' => new Headers([
+                    'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+                ]),
+                'expectedExpires' => new \DateTime('Wed, 21 Oct 2015 07:28:00 GMT'),
             ],
         ];
     }
