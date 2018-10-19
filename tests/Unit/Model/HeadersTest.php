@@ -371,6 +371,22 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
                 'now' => new \DateTime(),
                 'expectedHasExpired' => true,
             ],
+            'expires in the past and cache-control: max-age' => [
+                'headers' => new Headers([
+                    'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+                    'cache-control' => 'max-age=1'
+                ]),
+                'now' => new \DateTime(),
+                'expectedHasExpired' => false,
+            ],
+            'expires in the past and cache-control: s-maxage' => [
+                'headers' => new Headers([
+                    'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
+                    'cache-control' => 's-maxage=1'
+                ]),
+                'now' => new \DateTime(),
+                'expectedHasExpired' => false,
+            ],
             'expires in the past' => [
                 'headers' => new Headers([
                     'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
@@ -393,5 +409,14 @@ class HeadersTest extends \PHPUnit\Framework\TestCase
                 'expectedHasExpired' => false,
             ],
         ];
+    }
+
+    public function testHasExpiresNow()
+    {
+        $headers = new Headers([
+            'expires' => 'Wed, 21 Oct 3000 07:28:00 GMT',
+        ]);
+
+        $this->assertFalse($headers->hasExpired());
     }
 }
