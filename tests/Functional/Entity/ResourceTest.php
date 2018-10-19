@@ -26,11 +26,11 @@ class ResourceTest extends AbstractFunctionalTestCase
      * @dataProvider createDataProvider
      *
      * @param string $url
-     * @param array $headers
+     * @param Headers $headers
      * @param string $body
      * @param RequestIdentifier $requestIdentifier
      */
-    public function testCreate(string $url, array $headers, string $body, RequestIdentifier $requestIdentifier)
+    public function testCreate(string $url, Headers $headers, string $body, RequestIdentifier $requestIdentifier)
     {
         $resource = new Resource();
         $resource->setUrl($url);
@@ -68,29 +68,29 @@ class ResourceTest extends AbstractFunctionalTestCase
         return [
             'empty headers, empty body' => [
                 'url' => 'http://example.com/',
-                'headers' => [],
+                'headers' => new Headers(),
                 'body' => '',
                 'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
             ],
             'has headers, empty body' => [
                 'url' => 'http://example.com/',
-                'headers' => [
+                'headers' => new Headers([
                     'foo' => 'bar',
-                ],
+                ]),
                 'body' => '',
                 'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
             ],
             'empty headers, has body' => [
                 'url' => 'http://example.com/',
-                'headers' => [],
+                'headers' => new Headers(),
                 'body' => 'body content',
                 'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
             ],
             'has headers, has body' => [
                 'url' => 'http://example.com/',
-                'headers' => [
+                'headers' => new Headers([
                     'foo' => 'bar',
-                ],
+                ]),
                 'body' => 'body content',
                 'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
             ],
