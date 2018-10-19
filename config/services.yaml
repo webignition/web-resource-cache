@@ -78,3 +78,6 @@ services:
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:
         public: true
+
+    App\Command\ReturnResourceCommand:
+        public: true

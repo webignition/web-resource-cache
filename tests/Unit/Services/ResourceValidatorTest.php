@@ -80,7 +80,7 @@ class ResourceValidatorTest extends \PHPUnit\Framework\TestCase
                 'expectedIsFresh' => false,
             ],
             'cache-control: max-age=600' => [
-                'cacheControlMinFresh' => 200,
+                'cacheControlMinFresh' => 0,
                 'resourceHeaders' => new Headers([
                     'cache-control' => 'max-age=600',
                 ]),
@@ -88,7 +88,7 @@ class ResourceValidatorTest extends \PHPUnit\Framework\TestCase
                 'expectedIsFresh' => true,
             ],
             'cache-control: max-age=600; expires in the past' => [
-                'cacheControlMinFresh' => 200,
+                'cacheControlMinFresh' => 0,
                 'resourceHeaders' => new Headers([
                     'cache-control' => 'max-age=600',
                     'expires' => 'Wed, 21 Oct 2015 07:28:00 GMT',
@@ -96,14 +96,23 @@ class ResourceValidatorTest extends \PHPUnit\Framework\TestCase
                 'resourceAge' => 1,
                 'expectedIsFresh' => true,
             ],
-            'no cache-control, has last-modified older than service min-fresh' => [
+            'no cache-control, older than service min-fresh, hasExpired=true' => [
                 'cacheControlMinFresh' => 0,
                 'resourceHeaders' => $this->createHeaders([
                     'age' => 1,
-                    'hasExpired' => false,
+                    'hasExpired' => true,
                 ]),
                 'resourceAge' => 1,
                 'expectedIsFresh' => false,
+            ],
+            'no cache-control, service min-fresh > resource age, stored age > service min-fresh' => [
+                'cacheControlMinFresh' => 10,
+                'resourceHeaders' => $this->createHeaders([
+                    'age' => 3,
+                    'hasExpired' => false,
+                ]),
+                'resourceAge' => 20,
+                'expectedIsFresh' => true,
             ],
         ];
     }

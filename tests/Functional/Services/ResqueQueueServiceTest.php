@@ -9,10 +9,6 @@ use Mockery\Mock;
 use Psr\Log\LoggerInterface;
 use ResqueBundle\Resque\Job;
 use ResqueBundle\Resque\Resque;
-use App\Resque\Job\Task\AssignCollectionJob;
-use App\Resque\Job\Worker\Tasks\NotifyJob;
-use App\Services\Resque\QueueService;
-use App\Tests\Functional\AbstractBaseTestCase;
 
 class ResqueQueueServiceTest extends AbstractFunctionalTestCase
 {
