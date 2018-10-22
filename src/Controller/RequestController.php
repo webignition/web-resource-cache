@@ -9,6 +9,7 @@ use App\Resque\Job\RetrieveResourceJob;
 use App\Services\RetrieveRequestManager;
 use App\Services\ResqueQueueService;
 use App\Services\Whitelist;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -69,6 +70,6 @@ class RequestController
             $this->resqueQueueService->enqueue(new RetrieveResourceJob($resqueJobArgs));
         }
 
-        return new Response('', 200);
+        return new JsonResponse((string) $requestIdentifier, 200);
     }
 }
