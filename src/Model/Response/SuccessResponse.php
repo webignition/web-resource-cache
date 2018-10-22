@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Response;
 
 use App\Entity\Resource;
+use App\Model\RequestIdentifier;
 
 class SuccessResponse extends AbstractResponse
 {
@@ -16,5 +17,13 @@ class SuccessResponse extends AbstractResponse
         parent::__construct($requestIdentifier, self::STATUS_SUCCESS);
 
         $this->resource = $resource;
+    }
+
+    public function toScalarArray(): array
+    {
+        return array_merge(parent::toScalarArray(), [
+            'headers' => $this->resource->getHeaders()->toArray(),
+            'content' => $this->resource->getBody(),
+        ]);
     }
 }

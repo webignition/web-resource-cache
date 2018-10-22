@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Response;
 
-abstract class AbstractResponse
+use App\Model\RequestIdentifier;
+
+abstract class AbstractResponse implements ResponseInterface
 {
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';
@@ -21,5 +23,13 @@ abstract class AbstractResponse
     {
         $this->requestIdentifier = $requestIdentifier;
         $this->status = $status;
+    }
+
+    public function toScalarArray(): array
+    {
+        return [
+            'request_id' => (string) $this->requestIdentifier,
+            'status' => $this->status,
+        ];
     }
 }

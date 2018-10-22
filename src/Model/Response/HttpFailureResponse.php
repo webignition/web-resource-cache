@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Response;
+
+use App\Model\RequestIdentifier;
 
 class HttpFailureResponse extends AbstractFailureResponse
 {

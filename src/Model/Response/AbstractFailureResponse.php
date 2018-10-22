@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Response;
+
+use App\Model\RequestIdentifier;
 
 abstract class AbstractFailureResponse extends AbstractResponse
 {
@@ -23,5 +25,13 @@ abstract class AbstractFailureResponse extends AbstractResponse
 
         $this->statusCode = $statusCode;
         $this->type = $type;
+    }
+
+    public function toScalarArray(): array
+    {
+        return array_merge(parent::toScalarArray(), [
+            'failure_type' => $this->type,
+            'status_code' => $this->statusCode,
+        ]);
     }
 }
