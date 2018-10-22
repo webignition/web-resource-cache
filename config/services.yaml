@@ -79,5 +79,5 @@ services:
     App\Command\RetrieveResourceCommand:
         public: true
 
-    App\Command\ReturnResourceCommand:
+    App\Command\SendResponseCommand:
         public: true
