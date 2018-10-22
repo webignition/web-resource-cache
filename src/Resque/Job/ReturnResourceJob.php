@@ -2,7 +2,7 @@
 
 namespace App\Resque\Job;
 
-use App\Command\ReturnResourceCommand;
+use App\Command\SendResponseCommand;
 use Symfony\Component\Console\Command\Command;
 
 class ReturnResourceJob extends AbstractResourceJob
@@ -16,8 +16,8 @@ class ReturnResourceJob extends AbstractResourceJob
 
     protected function getCommand(): Command
     {
-        /* @var ReturnResourceCommand $command */
-        $command = $this->getContainer()->get(ReturnResourceCommand::class);
+        /* @var SendResponseCommand $command */
+        $command = $this->getContainer()->get(SendResponseCommand::class);
 
         return $command;
     }

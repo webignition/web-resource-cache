@@ -7,16 +7,16 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ReturnResourceCommand extends Command
+class SendResponseCommand extends Command
 {
     const RETURN_CODE_OK = 0;
 
     protected function configure()
     {
         $this
-            ->setName('web-resource-cache:return-resource')
-            ->setDescription('Return a resource to the given callback URLs')
-            ->addArgument('id', InputArgument::REQUIRED, 'id of resource to return');
+            ->setName('web-resource-cache:send-response')
+            ->setDescription('Send the response for a request to the given callback URLs')
+            ->addArgument('id', InputArgument::REQUIRED, 'id of request to which the response relates');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
