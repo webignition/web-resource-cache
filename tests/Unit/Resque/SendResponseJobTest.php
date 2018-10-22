@@ -2,18 +2,18 @@
 
 namespace App\Tests\Unit\Resque;
 
-use App\Resque\Job\ReturnResourceJob;
+use App\Resque\Job\SendResponseJob;
 
-class ReturnResourceJobTest extends \PHPUnit\Framework\TestCase
+class SendResponseJobTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {
         $id = 'example-id';
-        $returnResourceJob = new ReturnResourceJob([
+        $returnResourceJob = new SendResponseJob([
             'id' => $id,
         ]);
 
-        $this->assertEquals(ReturnResourceJob::QUEUE_NAME, $returnResourceJob->queue);
+        $this->assertEquals(SendResponseJob::QUEUE_NAME, $returnResourceJob->queue);
         $this->assertEquals(['id' => $id], $returnResourceJob->args);
     }
 
@@ -23,7 +23,7 @@ class ReturnResourceJobTest extends \PHPUnit\Framework\TestCase
     public function testRun()
     {
         $id = 'example-id';
-        $retrieveResourceJob = new ReturnResourceJob([
+        $retrieveResourceJob = new SendResponseJob([
             'id' => $id,
         ]);
 
