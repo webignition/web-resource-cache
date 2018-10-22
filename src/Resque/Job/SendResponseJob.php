@@ -5,7 +5,7 @@ namespace App\Resque\Job;
 use App\Command\SendResponseCommand;
 use Symfony\Component\Console\Command\Command;
 
-class ReturnResourceJob extends AbstractResourceJob
+class SendResponseJob extends AbstractResourceJob
 {
     const QUEUE_NAME = 'return-resource';
 
