@@ -10,6 +10,7 @@ use App\Resque\Job\RetrieveResourceJob;
 use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -53,10 +54,14 @@ class RequestControllerTest extends AbstractFunctionalTestCase
      * @dataProvider successfulRequestsDataProvider
      *
      * @param array $requestDataCollection
+     * @param array $expectedResponseDataCollection
      * @param array $expectedRetrieveRequestDataCollection
      */
-    public function testSuccessfulRequests(array $requestDataCollection, array $expectedRetrieveRequestDataCollection)
-    {
+    public function testSuccessfulRequests(
+        array $requestDataCollection,
+        array $expectedResponseDataCollection,
+        array $expectedRetrieveRequestDataCollection
+    ) {
         $this->clearRedis();
 
         $entityManager = self::$container->get(EntityManagerInterface::class);
@@ -67,10 +72,15 @@ class RequestControllerTest extends AbstractFunctionalTestCase
 
         $controller = self::$container->get(RequestController::class);
 
-        foreach ($requestDataCollection as $requestData) {
+        foreach ($requestDataCollection as $requestIndex => $requestData) {
+            $expectedResponseData = $expectedResponseDataCollection[$requestIndex];
+
+            /* @var JsonResponse $response */
             $response = $controller->requestAction(new Request([], $requestData));
 
+            $this->assertInstanceOf(JsonResponse::class, $response);
             $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+            $this->assertEquals($expectedResponseData, json_decode($response->getContent()));
         }
 
         $this->assertFalse($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
@@ -103,6 +113,9 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'headers' => [],
                     ],
                 ],
+                'expectedResponseDataCollection' => [
+                    (string)new RequestIdentifier('http://example.com/', new Headers()),
+                ],
                 'expectedRetrieveRequestDataCollection' => [
                     (string)new RequestIdentifier('http://example.com/', new Headers()) => [
                         'url' => 'http://example.com/',
@@ -125,6 +138,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'callback' => 'http://bar.example.com/',
                         'headers' => [],
                     ],
+                ],
+                'expectedResponseDataCollection' => [
+                    (string)new RequestIdentifier('http://one.example.com/', new Headers()),
+                    (string)new RequestIdentifier('http://two.example.com/', new Headers()),
                 ],
                 'expectedRetrieveRequestDataCollection' => [
                     (string)new RequestIdentifier('http://one.example.com/', new Headers()) => [
@@ -159,6 +176,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                             'fizz' => 'buzz',
                         ],
                     ],
+                ],
+                'expectedResponseDataCollection' => [
+                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])),
+                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['fizz' => 'buzz'])),
                 ],
                 'expectedRetrieveRequestDataCollection' => [
                     (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])) => [
@@ -198,6 +219,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         ],
                     ],
                 ],
+                'expectedResponseDataCollection' => [
+                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])),
+                    (string)new RequestIdentifier('http://two.example.com/', new Headers(['fizz' => 'buzz'])),
+                ],
                 'expectedRetrieveRequestDataCollection' => [
                     (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])) => [
                         'url' => 'http://one.example.com/',
@@ -232,6 +257,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'headers' => [],
                     ],
                 ],
+                'expectedResponseDataCollection' => [
+                    (string)new RequestIdentifier('http://example.com/', new Headers()),
+                    (string)new RequestIdentifier('http://example.com/', new Headers()),
+                ],
                 'expectedRetrieveRequestDataCollection' => [
                     (string)new RequestIdentifier('http://example.com/', new Headers()) => [
                         'url' => 'http://example.com/',
@@ -258,6 +287,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                             'foo' => 'bar',
                         ],
                     ],
+                ],
+                'expectedResponseDataCollection' => [
+                    (string)new RequestIdentifier('http://example.com/', new Headers(['foo' => 'bar'])),
+                    (string)new RequestIdentifier('http://example.com/', new Headers(['foo' => 'bar'])),
                 ],
                 'expectedRetrieveRequestDataCollection' => [
                     (string)new RequestIdentifier('http://example.com/', new Headers(['foo' => 'bar'])) => [
