@@ -46,4 +46,44 @@ class CurlFailureResponseTest extends AbstractResponseTest
             ],
         ];
     }
+
+    /**
+     * @dataProvider jsonSerializeDataProvider
+     *
+     * @param RequestIdentifier $requestIdentifier
+     * @param int $statusCode
+     * @param string $expectedJson
+     */
+    public function testJsonSerialize(RequestIdentifier $requestIdentifier, int $statusCode, string $expectedJson)
+    {
+        $response = new CurlFailureResponse($requestIdentifier, $statusCode);
+
+        $this->assertEquals($expectedJson, json_encode($response));
+    }
+
+    public function jsonSerializeDataProvider(): array
+    {
+        return [
+            'curl 6' => [
+                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_1'),
+                'statusCode' => 6,
+                'expectedJson' => json_encode([
+                    'request_id' => 'request_identifier_hash_1',
+                    'status' => 'failed',
+                    'failure_type' => CurlFailureResponse::TYPE_CURL,
+                    'status_code' => 6,
+                ]),
+            ],
+            'curl 28' => [
+                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_2'),
+                'statusCode' => 28,
+                'expectedArray' => json_encode([
+                    'request_id' => 'request_identifier_hash_2',
+                    'status' => 'failed',
+                    'failure_type' => CurlFailureResponse::TYPE_CURL,
+                    'status_code' => 28,
+                ]),
+            ],
+        ];
+    }
 }

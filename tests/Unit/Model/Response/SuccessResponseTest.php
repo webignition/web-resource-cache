@@ -18,9 +18,9 @@ class SuccessResponseTest extends AbstractResponseTest
      */
     public function testToScalarArray(RequestIdentifier $requestIdentifier, Resource $resource, array $expectedArray)
     {
-        $successResponse = new SuccessResponse($requestIdentifier, $resource);
+        $response = new SuccessResponse($requestIdentifier, $resource);
 
-        $this->assertEquals($expectedArray, $successResponse->toScalarArray());
+        $this->assertEquals($expectedArray, $response->toScalarArray());
     }
 
     public function toScalarArrayDataProvider(): array
@@ -43,6 +43,50 @@ class SuccessResponseTest extends AbstractResponseTest
                     'request_id' => 'request_identifier_hash_2',
                     'status' => SuccessResponse::STATUS_SUCCESS,
                 ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider jsonSerializeDataProvider
+     *
+     * @param RequestIdentifier $requestIdentifier
+     * @param Resource $resource
+     * @param string $expectedJson
+     */
+    public function testJsonSerialize(RequestIdentifier $requestIdentifier, Resource $resource, string $expectedJson)
+    {
+        $response = new SuccessResponse($requestIdentifier, $resource);
+
+        $this->assertEquals($expectedJson, json_encode($response));
+    }
+
+    public function jsonSerializeDataProvider(): array
+    {
+        return [
+            'empty headers, empty content' => [
+                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_1'),
+                'resource' => $this->createResource(new Headers(), ''),
+                'expectedJson' => json_encode([
+                    'request_id' => 'request_identifier_hash_1',
+                    'status' => SuccessResponse::STATUS_SUCCESS,
+                    'headers' => [],
+                    'content' => '',
+                ]),
+            ],
+            'has headers, has content' => [
+                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_2'),
+                'resource' => $this->createResource(new Headers([
+                    'content-type' => 'text/plain; charset=utf-8',
+                ]), 'text body content'),
+                'expectedJson' => json_encode([
+                    'request_id' => 'request_identifier_hash_2',
+                    'status' => SuccessResponse::STATUS_SUCCESS,
+                    'headers' => [
+                        'content-type' => 'text/plain; charset=utf-8',
+                    ],
+                    'content' => 'text body content',
+                ]),
             ],
         ];
     }

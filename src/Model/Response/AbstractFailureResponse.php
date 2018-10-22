@@ -34,4 +34,9 @@ abstract class AbstractFailureResponse extends AbstractResponse
             'status_code' => $this->statusCode,
         ]);
     }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toScalarArray();
+    }
 }

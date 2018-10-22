@@ -4,7 +4,7 @@ namespace App\Model\Response;
 
 use App\Model\RequestIdentifier;
 
-abstract class AbstractResponse implements ResponseInterface
+abstract class AbstractResponse implements ResponseInterface, \JsonSerializable
 {
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';
