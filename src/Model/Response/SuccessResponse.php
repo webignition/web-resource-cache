@@ -18,12 +18,4 @@ class SuccessResponse extends AbstractResponse
 
         $this->resource = $resource;
     }
-
-    public function toScalarArray(): array
-    {
-        return array_merge(parent::toScalarArray(), [
-            'headers' => $this->resource->getHeaders()->toArray(),
-            'content' => $this->resource->getBody(),
-        ]);
-    }
 }

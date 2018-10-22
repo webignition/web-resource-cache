@@ -32,8 +32,6 @@ class SuccessResponseTest extends AbstractResponseTest
                 'expectedArray' => [
                     'request_id' => 'request_identifier_hash_1',
                     'status' => SuccessResponse::STATUS_SUCCESS,
-                    'headers' => [],
-                    'content' => '',
                 ],
             ],
             'has headers, has content' => [
@@ -44,10 +42,6 @@ class SuccessResponseTest extends AbstractResponseTest
                 'expectedArray' => [
                     'request_id' => 'request_identifier_hash_2',
                     'status' => SuccessResponse::STATUS_SUCCESS,
-                    'headers' => [
-                        'content-type' => 'text/plain; charset=utf-8',
-                    ],
-                    'content' => 'text body content',
                 ],
             ],
         ];
