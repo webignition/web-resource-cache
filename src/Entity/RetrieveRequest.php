@@ -19,11 +19,11 @@ class RetrieveRequest
     /**
      * @var string
      *
+     *
      * @ORM\Id
-     * @ORM\Column(name="id", type="guid")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="string", length=32, unique=true)
      */
-    private $id;
+    private $hash = '';
 
     /**
      * @var string
@@ -53,16 +53,14 @@ class RetrieveRequest
      */
     private $callbackUrls = [];
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=32, unique=true)
-     */
-    private $hash = '';
-
-    public function getId(): ?string
+    public function setHash(RequestIdentifier $requestIdentifier)
     {
-        return $this->id;
+        $this->hash = (string) $requestIdentifier;
+    }
+
+    public function getHash(): string
+    {
+        return $this->hash;
     }
 
     public function setUrl(string $url)
@@ -108,15 +106,5 @@ class RetrieveRequest
     public function getHeaders(): Headers
     {
         return new Headers($this->headers);
-    }
-
-    public function setHash(RequestIdentifier $requestIdentifier)
-    {
-        $this->hash = (string) $requestIdentifier;
-    }
-
-    public function getHash(): string
-    {
-        return $this->hash;
     }
 }
