@@ -3,9 +3,9 @@
 namespace App\Tests\Unit\Model\Response;
 
 use App\Model\RequestIdentifier;
-use App\Model\Response\CurlFailureResponse;
+use App\Model\Response\ConnectionFailureResponse;
 
-class CurlFailureResponseTest extends AbstractResponseTest
+class ConnectionFailureResponseTest extends AbstractResponseTest
 {
     /**
      * @dataProvider toScalarArrayDataProvider
@@ -16,9 +16,9 @@ class CurlFailureResponseTest extends AbstractResponseTest
      */
     public function testToScalarArray(RequestIdentifier $requestIdentifier, int $statusCode, array $expectedArray)
     {
-        $successResponse = new CurlFailureResponse($requestIdentifier, $statusCode);
+        $response = new ConnectionFailureResponse($requestIdentifier, $statusCode);
 
-        $this->assertEquals($expectedArray, $successResponse->toScalarArray());
+        $this->assertEquals($expectedArray, $response->toScalarArray());
     }
 
     public function toScalarArrayDataProvider(): array
@@ -31,7 +31,7 @@ class CurlFailureResponseTest extends AbstractResponseTest
                     'request_id' => 'request_identifier_hash_1',
                     'status' => 'failed',
                     'status_code' => 6,
-                    'failure_type' => CurlFailureResponse::TYPE_CURL,
+                    'failure_type' => ConnectionFailureResponse::TYPE_CONNECTION,
                 ],
             ],
             'curl 28' => [
@@ -41,7 +41,7 @@ class CurlFailureResponseTest extends AbstractResponseTest
                     'request_id' => 'request_identifier_hash_2',
                     'status' => 'failed',
                     'status_code' => 28,
-                    'failure_type' => CurlFailureResponse::TYPE_CURL,
+                    'failure_type' => ConnectionFailureResponse::TYPE_CONNECTION,
                 ],
             ],
         ];
@@ -56,7 +56,7 @@ class CurlFailureResponseTest extends AbstractResponseTest
      */
     public function testJsonSerialize(RequestIdentifier $requestIdentifier, int $statusCode, string $expectedJson)
     {
-        $response = new CurlFailureResponse($requestIdentifier, $statusCode);
+        $response = new ConnectionFailureResponse($requestIdentifier, $statusCode);
 
         $this->assertEquals($expectedJson, json_encode($response));
     }
@@ -70,7 +70,7 @@ class CurlFailureResponseTest extends AbstractResponseTest
                 'expectedJson' => json_encode([
                     'request_id' => 'request_identifier_hash_1',
                     'status' => 'failed',
-                    'failure_type' => CurlFailureResponse::TYPE_CURL,
+                    'failure_type' => ConnectionFailureResponse::TYPE_CONNECTION,
                     'status_code' => 6,
                 ]),
             ],
@@ -80,7 +80,7 @@ class CurlFailureResponseTest extends AbstractResponseTest
                 'expectedArray' => json_encode([
                     'request_id' => 'request_identifier_hash_2',
                     'status' => 'failed',
-                    'failure_type' => CurlFailureResponse::TYPE_CURL,
+                    'failure_type' => ConnectionFailureResponse::TYPE_CONNECTION,
                     'status_code' => 28,
                 ]),
             ],

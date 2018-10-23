@@ -7,7 +7,7 @@ use App\Model\RequestIdentifier;
 abstract class AbstractFailureResponse extends AbstractResponse
 {
     const TYPE_HTTP = 'http';
-    const TYPE_CURL = 'curl';
+    const TYPE_CONNECTION = 'connection';
 
     /**
      * @var int
