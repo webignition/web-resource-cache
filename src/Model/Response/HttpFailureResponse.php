@@ -2,12 +2,10 @@
 
 namespace App\Model\Response;
 
-use App\Model\RequestIdentifier;
-
 class HttpFailureResponse extends AbstractKnownFailureResponse
 {
-    public function __construct(RequestIdentifier $requestIdentifier, int $statusCode)
+    public function __construct(string $requestHash, int $statusCode)
     {
-        parent::__construct($requestIdentifier, $statusCode, self::TYPE_HTTP);
+        parent::__construct($requestHash, $statusCode, self::TYPE_HTTP);
     }
 }

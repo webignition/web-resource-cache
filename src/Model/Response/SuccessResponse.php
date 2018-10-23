@@ -3,7 +3,6 @@
 namespace App\Model\Response;
 
 use App\Entity\CachedResource;
-use App\Model\RequestIdentifier;
 
 class SuccessResponse extends AbstractResponse
 {
@@ -12,9 +11,9 @@ class SuccessResponse extends AbstractResponse
      */
     private $resource;
 
-    public function __construct(RequestIdentifier $requestIdentifier, CachedResource $resource)
+    public function __construct(string $requestHash, CachedResource $resource)
     {
-        parent::__construct($requestIdentifier, self::STATUS_SUCCESS);
+        parent::__construct($requestHash, self::STATUS_SUCCESS);
 
         $this->resource = $resource;
     }

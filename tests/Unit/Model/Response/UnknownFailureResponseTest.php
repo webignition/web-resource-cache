@@ -2,20 +2,19 @@
 
 namespace App\Tests\Unit\Model\Response;
 
-use App\Model\RequestIdentifier;
 use App\Model\Response\UnknownFailureResponse;
 
-class UnknownFailureResponseTest extends AbstractResponseTest
+class UnknownFailureResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider toScalarArrayDataProvider
      *
-     * @param RequestIdentifier $requestIdentifier
+     * @param string $requestHash
      * @param array $expectedArray
      */
-    public function testToScalarArray(RequestIdentifier $requestIdentifier, array $expectedArray)
+    public function testToScalarArray(string $requestHash, array $expectedArray)
     {
-        $response = new UnknownFailureResponse($requestIdentifier);
+        $response = new UnknownFailureResponse($requestHash);
 
         $this->assertEquals($expectedArray, $response->toScalarArray());
     }
@@ -24,9 +23,9 @@ class UnknownFailureResponseTest extends AbstractResponseTest
     {
         return [
             'default' => [
-                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash'),
+                'requestHash' => 'request_hash',
                 'expectedArray' => [
-                    'request_id' => 'request_identifier_hash',
+                    'request_id' => 'request_hash',
                     'status' => 'failed',
                     'failure_type' => UnknownFailureResponse::TYPE_UNKNOWN,
                 ],
@@ -37,12 +36,12 @@ class UnknownFailureResponseTest extends AbstractResponseTest
     /**
      * @dataProvider jsonSerializeDataProvider
      *
-     * @param RequestIdentifier $requestIdentifier
+     * @param string $requestHash
      * @param string $expectedJson
      */
-    public function testJsonSerialize(RequestIdentifier $requestIdentifier, string $expectedJson)
+    public function testJsonSerialize(string $requestHash, string $expectedJson)
     {
-        $response = new UnknownFailureResponse($requestIdentifier);
+        $response = new UnknownFailureResponse($requestHash);
 
         $this->assertEquals($expectedJson, json_encode($response));
     }
@@ -51,9 +50,9 @@ class UnknownFailureResponseTest extends AbstractResponseTest
     {
         return [
             'default' => [
-                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash'),
+                'requestHash' => 'request_hash',
                 'expectedJson' => json_encode([
-                    'request_id' => 'request_identifier_hash',
+                    'request_id' => 'request_hash',
                     'status' => 'failed',
                     'failure_type' => UnknownFailureResponse::TYPE_UNKNOWN,
                 ]),
