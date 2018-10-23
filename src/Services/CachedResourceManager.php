@@ -37,4 +37,12 @@ class CachedResourceManager
 
         return $cachedResource;
     }
+
+    public function update(CachedResource $cachedResource)
+    {
+        $cachedResource->setLastStored(new \DateTime());
+
+        $this->entityManager->persist($cachedResource);
+        $this->entityManager->flush();
+    }
 }

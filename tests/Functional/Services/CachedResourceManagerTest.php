@@ -13,13 +13,13 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
     /**
      * @var CachedResourceManager
      */
-    private $cachedResourceCreator;
+    private $cachedResourceManager;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->cachedResourceCreator = self::$container->get(CachedResourceManager::class);
+        $this->cachedResourceManager = self::$container->get(CachedResourceManager::class);
     }
 
     public function testCreate()
@@ -31,7 +31,7 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
         $body = 'cached response body';
         $requestIdentifier = new RequestIdentifier($url, new Headers());
 
-        $cachedResource = $this->cachedResourceCreator->create($requestIdentifier, $url, $responseHeaders, $body);
+        $cachedResource = $this->cachedResourceManager->create($requestIdentifier, $url, $responseHeaders, $body);
 
         $this->assertInstanceOf(CachedResource::class, $cachedResource);
         $this->assertNotNull($cachedResource->getId());
@@ -41,5 +41,23 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
         $this->assertEquals($body, $cachedResource->getBody());
         $this->assertNotNull($cachedResource->getLastStored());
         $this->assertInstanceOf(\DateTime::class, $cachedResource->getLastStored());
+    }
+
+    public function testUpdate()
+    {
+        $url = 'http://example.com/';
+        $responseHeaders = new Headers([
+            'content-type' => 'text/plain',
+        ]);
+        $body = 'cached response body';
+        $requestIdentifier = new RequestIdentifier($url, new Headers());
+
+        $cachedResource = $this->cachedResourceManager->create($requestIdentifier, $url, $responseHeaders, $body);
+
+        $currentLastStored = $cachedResource->getLastStored();
+
+        $this->cachedResourceManager->update($cachedResource);
+
+        $this->assertNotEquals($currentLastStored->format('U'), $cachedResource->getLastStored()->format('U'));
     }
 }
