@@ -4,7 +4,7 @@ namespace App\Model\Response;
 
 use App\Model\RequestIdentifier;
 
-class ConnectionFailureResponse extends AbstractFailureResponse
+class ConnectionFailureResponse extends AbstractKnownFailureResponse
 {
     public function __construct(RequestIdentifier $requestIdentifier, int $statusCode)
     {

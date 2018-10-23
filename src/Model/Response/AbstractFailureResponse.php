@@ -8,22 +8,17 @@ abstract class AbstractFailureResponse extends AbstractResponse
 {
     const TYPE_HTTP = 'http';
     const TYPE_CONNECTION = 'connection';
-
-    /**
-     * @var int
-     */
-    private $statusCode;
+    const TYPE_UNKNOWN = 'unknown';
 
     /**
      * @var string
      */
     private $type;
 
-    public function __construct(RequestIdentifier $requestIdentifier, int $statusCode, string $type)
+    public function __construct(RequestIdentifier $requestIdentifier, string $type)
     {
         parent::__construct($requestIdentifier, self::STATUS_FAILED);
 
-        $this->statusCode = $statusCode;
         $this->type = $type;
     }
 
@@ -31,7 +26,6 @@ abstract class AbstractFailureResponse extends AbstractResponse
     {
         return array_merge(parent::toScalarArray(), [
             'failure_type' => $this->type,
-            'status_code' => $this->statusCode,
         ]);
     }
 

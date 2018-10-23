@@ -4,7 +4,7 @@ namespace App\Model\Response;
 
 use App\Model\RequestIdentifier;
 
-class HttpFailureResponse extends AbstractFailureResponse
+class HttpFailureResponse extends AbstractKnownFailureResponse
 {
     public function __construct(RequestIdentifier $requestIdentifier, int $statusCode)
     {
