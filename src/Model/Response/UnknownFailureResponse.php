@@ -2,12 +2,10 @@
 
 namespace App\Model\Response;
 
-use App\Model\RequestIdentifier;
-
 class UnknownFailureResponse extends AbstractFailureResponse
 {
-    public function __construct(RequestIdentifier $requestIdentifier)
+    public function __construct(string $requestHash)
     {
-        parent::__construct($requestIdentifier, self::TYPE_UNKNOWN);
+        parent::__construct($requestHash, self::TYPE_UNKNOWN);
     }
 }

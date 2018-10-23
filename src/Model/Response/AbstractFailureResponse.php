@@ -2,8 +2,6 @@
 
 namespace App\Model\Response;
 
-use App\Model\RequestIdentifier;
-
 abstract class AbstractFailureResponse extends AbstractResponse
 {
     const TYPE_HTTP = 'http';
@@ -15,9 +13,9 @@ abstract class AbstractFailureResponse extends AbstractResponse
      */
     private $type;
 
-    public function __construct(RequestIdentifier $requestIdentifier, string $type)
+    public function __construct(string $requestHash, string $type)
     {
-        parent::__construct($requestIdentifier, self::STATUS_FAILED);
+        parent::__construct($requestHash, self::STATUS_FAILED);
 
         $this->type = $type;
     }

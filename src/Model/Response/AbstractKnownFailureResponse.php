@@ -2,8 +2,6 @@
 
 namespace App\Model\Response;
 
-use App\Model\RequestIdentifier;
-
 abstract class AbstractKnownFailureResponse extends AbstractFailureResponse
 {
     /**
@@ -11,9 +9,9 @@ abstract class AbstractKnownFailureResponse extends AbstractFailureResponse
      */
     private $statusCode;
 
-    public function __construct(RequestIdentifier $requestIdentifier, int $statusCode, string $type)
+    public function __construct(string $requestHash, int $statusCode, string $type)
     {
-        parent::__construct($requestIdentifier, $type);
+        parent::__construct($requestHash, $type);
 
         $this->statusCode = $statusCode;
     }

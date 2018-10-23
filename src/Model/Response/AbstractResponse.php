@@ -2,33 +2,31 @@
 
 namespace App\Model\Response;
 
-use App\Model\RequestIdentifier;
-
 abstract class AbstractResponse implements ResponseInterface, \JsonSerializable
 {
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';
 
     /**
-     * @var RequestIdentifier
+     * @var string
      */
-    private $requestIdentifier;
+    private $requestHash;
 
     /**
      * @var string
      */
     private $status;
 
-    public function __construct(RequestIdentifier $requestIdentifier, string $status)
+    public function __construct(string $requestHash, string $status)
     {
-        $this->requestIdentifier = $requestIdentifier;
+        $this->requestHash = $requestHash;
         $this->status = $status;
     }
 
     public function toScalarArray(): array
     {
         return [
-            'request_id' => (string) $this->requestIdentifier,
+            'request_id' => $this->requestHash,
             'status' => $this->status,
         ];
     }

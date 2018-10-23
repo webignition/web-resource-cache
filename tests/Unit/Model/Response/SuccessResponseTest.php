@@ -4,24 +4,23 @@ namespace App\Tests\Unit\Model\Response;
 
 use App\Entity\CachedResource;
 use App\Model\Headers;
-use App\Model\RequestIdentifier;
 use App\Model\Response\SuccessResponse;
 
-class SuccessResponseTest extends AbstractResponseTest
+class SuccessResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider toScalarArrayDataProvider
      *
-     * @param RequestIdentifier $requestIdentifier
+     * @param string $requestHash
      * @param CachedResource $resource
      * @param array $expectedArray
      */
     public function testToScalarArray(
-        RequestIdentifier $requestIdentifier,
+        string $requestHash,
         CachedResource $resource,
         array $expectedArray
     ) {
-        $response = new SuccessResponse($requestIdentifier, $resource);
+        $response = new SuccessResponse($requestHash, $resource);
 
         $this->assertEquals($expectedArray, $response->toScalarArray());
     }
@@ -30,20 +29,20 @@ class SuccessResponseTest extends AbstractResponseTest
     {
         return [
             'empty headers, empty content' => [
-                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_1'),
+                'requestHash' => 'request_hash_1',
                 'resource' => $this->createCachedResource(new Headers(), ''),
                 'expectedArray' => [
-                    'request_id' => 'request_identifier_hash_1',
+                    'request_id' => 'request_hash_1',
                     'status' => SuccessResponse::STATUS_SUCCESS,
                 ],
             ],
             'has headers, has content' => [
-                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_2'),
+                'requestHash' => 'request_hash_2',
                 'resource' => $this->createCachedResource(new Headers([
                     'content-type' => 'text/plain; charset=utf-8',
                 ]), 'text body content'),
                 'expectedArray' => [
-                    'request_id' => 'request_identifier_hash_2',
+                    'request_id' => 'request_hash_2',
                     'status' => SuccessResponse::STATUS_SUCCESS,
                 ],
             ],
@@ -53,16 +52,16 @@ class SuccessResponseTest extends AbstractResponseTest
     /**
      * @dataProvider jsonSerializeDataProvider
      *
-     * @param RequestIdentifier $requestIdentifier
+     * @param string $requestHash
      * @param CachedResource $resource
      * @param string $expectedJson
      */
     public function testJsonSerialize(
-        RequestIdentifier $requestIdentifier,
+        string $requestHash,
         CachedResource $resource,
         string $expectedJson
     ) {
-        $response = new SuccessResponse($requestIdentifier, $resource);
+        $response = new SuccessResponse($requestHash, $resource);
 
         $this->assertEquals($expectedJson, json_encode($response));
     }
@@ -71,22 +70,22 @@ class SuccessResponseTest extends AbstractResponseTest
     {
         return [
             'empty headers, empty content' => [
-                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_1'),
+                'requestHash' => 'request_hash_1',
                 'resource' => $this->createCachedResource(new Headers(), ''),
                 'expectedJson' => json_encode([
-                    'request_id' => 'request_identifier_hash_1',
+                    'request_id' => 'request_hash_1',
                     'status' => SuccessResponse::STATUS_SUCCESS,
                     'headers' => [],
                     'content' => '',
                 ]),
             ],
             'has headers, has content' => [
-                'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_2'),
+                'requestHash' => 'request_hash_2',
                 'resource' => $this->createCachedResource(new Headers([
                     'content-type' => 'text/plain; charset=utf-8',
                 ]), 'text body content'),
                 'expectedJson' => json_encode([
-                    'request_id' => 'request_identifier_hash_2',
+                    'request_id' => 'request_hash_2',
                     'status' => SuccessResponse::STATUS_SUCCESS,
                     'headers' => [
                         'content-type' => 'text/plain; charset=utf-8',
@@ -110,5 +109,12 @@ class SuccessResponseTest extends AbstractResponseTest
             ->andReturn($body);
 
         return $resource;
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        \Mockery::close();
     }
 }
