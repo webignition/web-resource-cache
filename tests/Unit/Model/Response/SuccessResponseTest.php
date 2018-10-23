@@ -16,8 +16,11 @@ class SuccessResponseTest extends AbstractResponseTest
      * @param CachedResource $resource
      * @param array $expectedArray
      */
-    public function testToScalarArray(RequestIdentifier $requestIdentifier, CachedResource $resource, array $expectedArray)
-    {
+    public function testToScalarArray(
+        RequestIdentifier $requestIdentifier,
+        CachedResource $resource,
+        array $expectedArray
+    ) {
         $response = new SuccessResponse($requestIdentifier, $resource);
 
         $this->assertEquals($expectedArray, $response->toScalarArray());
@@ -54,8 +57,11 @@ class SuccessResponseTest extends AbstractResponseTest
      * @param CachedResource $resource
      * @param string $expectedJson
      */
-    public function testJsonSerialize(RequestIdentifier $requestIdentifier, CachedResource $resource, string $expectedJson)
-    {
+    public function testJsonSerialize(
+        RequestIdentifier $requestIdentifier,
+        CachedResource $resource,
+        string $expectedJson
+    ) {
         $response = new SuccessResponse($requestIdentifier, $resource);
 
         $this->assertEquals($expectedJson, json_encode($response));
