@@ -75,6 +75,10 @@ services:
         arguments:
             - '%cache-control-min-fresh%'
 
+    App\Services\RetryDecider:
+        arguments:
+            - '%retryable_statuses%'
+
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:
         public: true

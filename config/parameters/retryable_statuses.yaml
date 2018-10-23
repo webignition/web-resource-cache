@@ -1,0 +1,10 @@
+parameters:
+  retryable_statuses:
+    http:
+      - 408
+      - 429
+      - 503
+      - 504
+    curl:
+      - 6
+      - 28
