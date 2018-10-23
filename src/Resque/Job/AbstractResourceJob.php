@@ -7,12 +7,12 @@ abstract class AbstractResourceJob extends AbstractCommandJob
     protected function getCommandArgs(): array
     {
         return [
-            'id' => $this->args['id']
+            'request-hash' => $this->args['request-hash']
         ];
     }
 
     protected function getIdentifier(): string
     {
-        return $this->args['id'];
+        return $this->args['request-hash'];
     }
 }

@@ -8,13 +8,13 @@ class RetrieveResourceJobTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {
-        $id = 'example-id';
+        $requestHash = 'example-hash';
         $retrieveResourceJob = new RetrieveResourceJob([
-            'id' => $id,
+            'request-hash' => $requestHash,
         ]);
 
         $this->assertEquals(RetrieveResourceJob::QUEUE_NAME, $retrieveResourceJob->queue);
-        $this->assertEquals(['id' => $id], $retrieveResourceJob->args);
+        $this->assertEquals(['request-hash' => $requestHash], $retrieveResourceJob->args);
     }
 
     /**
@@ -22,9 +22,9 @@ class RetrieveResourceJobTest extends \PHPUnit\Framework\TestCase
      */
     public function testRun()
     {
-        $id = 'example-id';
+        $requestHash = 'example-hash';
         $retrieveResourceJob = new RetrieveResourceJob([
-            'id' => $id,
+            'request-hash' => $requestHash,
         ]);
 
         $this->assertTrue($retrieveResourceJob->run([]));
