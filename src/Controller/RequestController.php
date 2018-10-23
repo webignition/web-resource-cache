@@ -64,7 +64,7 @@ class RequestController
         $retrieveRequest->addCallbackUrl($callbackUrl);
         $this->retrieveRequestManager->persist($retrieveRequest);
 
-        $resqueJobArgs = ['id' => $retrieveRequest->getId()];
+        $resqueJobArgs = ['request-hash' => $retrieveRequest->getHash()];
 
         if (!$this->resqueQueueService->contains(RetrieveResourceJob::QUEUE_NAME, $resqueJobArgs)) {
             $this->resqueQueueService->enqueue(new RetrieveResourceJob($resqueJobArgs));

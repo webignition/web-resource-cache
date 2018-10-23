@@ -39,31 +39,28 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
             $retrieveRequest->addCallbackUrl($callbackUrl);
         }
 
-        $retrieveRequest->setHash(new RequestIdentifier($url, $headers));
+        $requestIdentifier = new RequestIdentifier($url, $headers);
 
-        $this->assertNull($retrieveRequest->getId());
+        $retrieveRequest->setHash($requestIdentifier);
+
+        $this->assertEquals((string) $requestIdentifier, $retrieveRequest->getHash());
         $this->assertEquals($url, $retrieveRequest->getUrl());
         $this->assertEquals($headers, $retrieveRequest->getHeaders());
         $this->assertEquals($callbackUrls, $retrieveRequest->getCallbackUrls());
-        $this->assertRegExp('/[a-z0-9]{32}/', $retrieveRequest->getHash());
 
         $this->entityManager->persist($retrieveRequest);
         $this->entityManager->flush();
 
-        $this->assertNotNull($retrieveRequest->getId());
-
-        $id = $retrieveRequest->getId();
         $hash = $retrieveRequest->getHash();
 
         $this->entityManager->clear();
 
-        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $id);
+        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $hash);
 
-        $this->assertEquals($id, $retrievedRetrieveRequest->getId());
+        $this->assertEquals($hash, $retrievedRetrieveRequest->getHash());
         $this->assertEquals($url, $retrievedRetrieveRequest->getUrl());
         $this->assertEquals($callbackUrls, $retrievedRetrieveRequest->getCallbackUrls());
         $this->assertEquals($headers, $retrievedRetrieveRequest->getHeaders());
-        $this->assertEquals($hash, $retrievedRetrieveRequest->getHash());
     }
 
     public function createDataProvider(): array
@@ -123,23 +120,20 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
 
         $retrieveRequest = $this->createRetrieveRequest($url, $headers, $callbackUrls);
 
-        $this->assertNotNull($retrieveRequest->getId());
-
         foreach ($additionalCallbackUrls as $callbackUrl) {
             $retrieveRequest->addCallbackUrl($callbackUrl);
         }
 
         $this->assertEquals($expectedCallbackUrls, $retrieveRequest->getCallbackUrls());
 
-        $id = $retrieveRequest->getId();
+        $hash = $retrieveRequest->getHash();
 
         $this->entityManager->persist($retrieveRequest);
         $this->entityManager->flush();
         $this->entityManager->clear();
 
-        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $id);
+        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $hash);
 
-        $this->assertEquals($id, $retrievedRetrieveRequest->getId());
         $this->assertEquals($expectedCallbackUrls, $retrievedRetrieveRequest->getCallbackUrls());
     }
 
@@ -204,13 +198,13 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
         $retrieveRequest->incrementRetryCount();
         $this->assertSame(3, $retrieveRequest->getRetryCount());
 
-        $id = $retrieveRequest->getId();
+        $hash = $retrieveRequest->getHash();
 
         $this->entityManager->persist($retrieveRequest);
         $this->entityManager->flush();
         $this->entityManager->clear();
 
-        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $id);
+        $retrievedRetrieveRequest = $this->entityManager->find(RetrieveRequest::class, $hash);
         $this->assertSame(3, $retrievedRetrieveRequest->getRetryCount());
     }
 
@@ -232,14 +226,13 @@ class RetrieveRequestTest extends AbstractFunctionalTestCase
     private function createRetrieveRequest(string $url, Headers $headers, array $callbackUrls): RetrieveRequest
     {
         $retrieveRequest = new RetrieveRequest();
+        $retrieveRequest->setHash(new RequestIdentifier($url, $headers));
         $retrieveRequest->setUrl($url);
         $retrieveRequest->setHeaders($headers);
 
         foreach ($callbackUrls as $callbackUrl) {
             $retrieveRequest->addCallbackUrl($callbackUrl);
         }
-
-        $retrieveRequest->setHash(new RequestIdentifier($url, $headers));
 
         $this->entityManager->persist($retrieveRequest);
         $this->entityManager->flush();

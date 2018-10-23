@@ -8,13 +8,13 @@ class SendResponseJobTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {
-        $id = 'example-id';
+        $requestHash = 'example-hash';
         $returnResourceJob = new SendResponseJob([
-            'id' => $id,
+            'request-hash' => $requestHash,
         ]);
 
         $this->assertEquals(SendResponseJob::QUEUE_NAME, $returnResourceJob->queue);
-        $this->assertEquals(['id' => $id], $returnResourceJob->args);
+        $this->assertEquals(['request-hash' => $requestHash], $returnResourceJob->args);
     }
 
     /**
@@ -22,9 +22,9 @@ class SendResponseJobTest extends \PHPUnit\Framework\TestCase
      */
     public function testRun()
     {
-        $id = 'example-id';
+        $requestHash = 'example-hash';
         $retrieveResourceJob = new SendResponseJob([
-            'id' => $id,
+            'request-hash' => $requestHash,
         ]);
 
         $this->assertTrue($retrieveResourceJob->run([]));

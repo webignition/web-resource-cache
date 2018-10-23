@@ -16,7 +16,7 @@ class RetrieveResourceCommand extends Command
         $this
             ->setName('web-resource-cache:get-resource')
             ->setDescription('Retrieve a resource')
-            ->addArgument('id', InputArgument::REQUIRED, 'id of resource to retrieve');
+            ->addArgument('request-hash', InputArgument::REQUIRED);
     }
 
     public function execute(InputInterface $input, OutputInterface $output)

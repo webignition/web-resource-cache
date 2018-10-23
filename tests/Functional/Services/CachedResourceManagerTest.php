@@ -34,7 +34,6 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
         $cachedResource = $this->cachedResourceManager->create($requestIdentifier, $url, $responseHeaders, $body);
 
         $this->assertInstanceOf(CachedResource::class, $cachedResource);
-        $this->assertNotNull($cachedResource->getId());
         $this->assertEquals((string) $requestIdentifier, $cachedResource->getRequestHash());
         $this->assertEquals($url, $cachedResource->getUrl());
         $this->assertEquals($responseHeaders, $cachedResource->getHeaders());

@@ -27,9 +27,7 @@ class RetrieveRequestManager
     public function findByHash(string $hash): ?RetrieveRequest
     {
         /* @var RetrieveRequest $retrieveRequest */
-        $retrieveRequest = $this->repository->findOneBy([
-            'hash' => $hash,
-        ]);
+        $retrieveRequest = $this->repository->find($hash);
 
         return $retrieveRequest;
     }
