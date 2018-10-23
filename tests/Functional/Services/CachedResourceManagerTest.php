@@ -7,6 +7,7 @@ use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Services\CachedResourceManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 
 class CachedResourceManagerTest extends AbstractFunctionalTestCase
 {
@@ -15,11 +16,17 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
      */
     private $cachedResourceManager;
 
+    /**
+     * @var EntityManagerInterface
+     */
+    private $entityManager;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->cachedResourceManager = self::$container->get(CachedResourceManager::class);
+        $this->entityManager = self::$container->get(EntityManagerInterface::class);
     }
 
     public function testCreate()
@@ -58,5 +65,32 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
         $this->cachedResourceManager->update($cachedResource);
 
         $this->assertNotSame($currentLastStored, $cachedResource->getLastStored());
+    }
+
+    public function testFindNotFound()
+    {
+        $this->assertNull($this->cachedResourceManager->find('foo'));
+    }
+
+    public function testFindHasFound()
+    {
+        $url = 'http://example.com/';
+        $responseHeaders = new Headers([
+            'content-type' => 'text/plain',
+        ]);
+        $body = 'cached response body';
+        $requestIdentifier = new RequestIdentifier($url, new Headers());
+
+        $this->cachedResourceManager->create($requestIdentifier, $url, $responseHeaders, $body);
+
+        $this->entityManager->clear();
+
+        $foundCachedResource = $this->cachedResourceManager->find($requestIdentifier);
+
+        $this->assertInstanceOf(CachedResource::class, $foundCachedResource);
+        $this->assertEquals((string) $requestIdentifier, $foundCachedResource->getRequestHash());
+        $this->assertEquals($url, $foundCachedResource->getUrl());
+        $this->assertEquals($responseHeaders, $foundCachedResource->getHeaders());
+        $this->assertEquals($body, $foundCachedResource->getBody());
     }
 }
