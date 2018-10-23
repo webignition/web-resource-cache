@@ -16,7 +16,7 @@ class SendResponseCommand extends Command
         $this
             ->setName('web-resource-cache:send-response')
             ->setDescription('Send the response for a request to the given callback URLs')
-            ->addArgument('request-hash', InputArgument::REQUIRED);
+            ->addArgument('response-json', InputArgument::REQUIRED);
     }
 
     public function execute(InputInterface $input, OutputInterface $output)

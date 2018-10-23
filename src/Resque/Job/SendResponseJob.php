@@ -5,7 +5,7 @@ namespace App\Resque\Job;
 use App\Command\SendResponseCommand;
 use Symfony\Component\Console\Command\Command;
 
-class SendResponseJob extends AbstractResourceJob
+class SendResponseJob extends AbstractCommandJob
 {
     const QUEUE_NAME = 'return-resource';
 
@@ -20,5 +20,17 @@ class SendResponseJob extends AbstractResourceJob
         $command = $this->getContainer()->get(SendResponseCommand::class);
 
         return $command;
+    }
+
+    protected function getCommandArgs(): array
+    {
+        return [
+            'response-json' => $this->args['response-json']
+        ];
+    }
+
+    protected function getIdentifier(): string
+    {
+        return $this->args['response-json'];
     }
 }

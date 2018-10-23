@@ -5,7 +5,7 @@ namespace App\Resque\Job;
 use App\Command\RetrieveResourceCommand;
 use Symfony\Component\Console\Command\Command;
 
-class RetrieveResourceJob extends AbstractResourceJob
+class RetrieveResourceJob extends AbstractCommandJob
 {
     const QUEUE_NAME = 'retrieve-resource';
 
@@ -20,5 +20,17 @@ class RetrieveResourceJob extends AbstractResourceJob
         $command = $this->getContainer()->get(RetrieveResourceCommand::class);
 
         return $command;
+    }
+
+    protected function getCommandArgs(): array
+    {
+        return [
+            'request-hash' => $this->args['request-hash']
+        ];
+    }
+
+    protected function getIdentifier(): string
+    {
+        return $this->args['request-hash'];
     }
 }
