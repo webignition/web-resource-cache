@@ -52,7 +52,7 @@ class RequestController
 
         $headers = new Headers($requestData->get('headers') ?? []);
         $requestIdentifier = new RequestIdentifier($url, $headers);
-        $retrieveRequest = $this->retrieveRequestManager->findByHash((string) $requestIdentifier);
+        $retrieveRequest = $this->retrieveRequestManager->find((string) $requestIdentifier);
 
         if (empty($retrieveRequest)) {
             $retrieveRequest = new RetrieveRequest();

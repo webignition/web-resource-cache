@@ -24,7 +24,7 @@ class RetrieveRequestManager
         $this->repository = $entityManager->getRepository(RetrieveRequest::class);
     }
 
-    public function findByHash(string $hash): ?RetrieveRequest
+    public function find(string $hash): ?RetrieveRequest
     {
         /* @var RetrieveRequest $retrieveRequest */
         $retrieveRequest = $this->repository->find($hash);
