@@ -75,17 +75,17 @@ class RetryDeciderTest extends AbstractFunctionalTestCase
                 'expectedIsRetryable' => true,
             ],
             'curl 54 not retryable' => [
-                'type' => RetryDecider::TYPE_CURL,
+                'type' => RetryDecider::TYPE_CONNECTION,
                 'code' => 54,
                 'expectedIsRetryable' => false,
             ],
             'curl 6 is retryable' => [
-                'type' => RetryDecider::TYPE_CURL,
+                'type' => RetryDecider::TYPE_CONNECTION,
                 'code' => 6,
                 'expectedIsRetryable' => true,
             ],
             'curl 28 is retryable' => [
-                'type' => RetryDecider::TYPE_CURL,
+                'type' => RetryDecider::TYPE_CONNECTION,
                 'code' => 28,
                 'expectedIsRetryable' => true,
             ],

@@ -34,7 +34,7 @@ class RetryDeciderTest extends \PHPUnit\Framework\TestCase
                 'retryableStatusesData' => [
                     RetryDecider::TYPE_HTTP => [],
                 ],
-                'type' => RetryDecider::TYPE_CURL,
+                'type' => RetryDecider::TYPE_CONNECTION,
                 'code' => 0,
                 'expectedIsRetryable' => false,
             ],

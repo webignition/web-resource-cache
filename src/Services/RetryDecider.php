@@ -5,7 +5,7 @@ namespace App\Services;
 class RetryDecider
 {
     const TYPE_HTTP = 'http';
-    const TYPE_CURL = 'curl';
+    const TYPE_CONNECTION = 'connection';
 
     /**
      * @var array
