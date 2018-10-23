@@ -2,9 +2,9 @@
 
 namespace App\Tests\Unit\Entity;
 
-use App\Entity\Resource;
+use App\Entity\CachedResource;
 
-class ResourceTest extends \PHPUnit\Framework\TestCase
+class CachedResourceTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider getStoredAgeDataProvider
@@ -15,7 +15,7 @@ class ResourceTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetStoredAge(\DateTime $lastStored, \DateTime $now, int $expectedAge)
     {
-        $resource = new Resource();
+        $resource = new CachedResource();
         $resource->setLastStored($lastStored);
 
         $resource->getStoredAge($now);
@@ -56,7 +56,7 @@ class ResourceTest extends \PHPUnit\Framework\TestCase
 
     public function testGetStoredAgeForNow()
     {
-        $resource = new Resource();
+        $resource = new CachedResource();
         $this->assertEquals(0, $resource->getStoredAge());
     }
 }

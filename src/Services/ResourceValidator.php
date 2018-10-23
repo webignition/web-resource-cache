@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Entity\Resource;
+use App\Entity\CachedResource;
 use webignition\HttpCacheControlDirectives\HttpCacheControlDirectives;
 
 class ResourceValidator
@@ -17,7 +17,7 @@ class ResourceValidator
         $this->cacheControlMinFresh = $cacheControlMinFresh;
     }
 
-    public function isFresh(Resource $resource): bool
+    public function isFresh(CachedResource $resource): bool
     {
         if ($resource->getStoredAge() <= $this->cacheControlMinFresh) {
             return true;

@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Services;
 
-use App\Entity\Resource;
+use App\Entity\CachedResource;
 use App\Model\Headers;
 use App\Services\ResourceValidator;
 
@@ -22,7 +22,7 @@ class ResourceValidatorTest extends \PHPUnit\Framework\TestCase
         int $resourceAge,
         bool $expectedIsFresh
     ) {
-        $resource = \Mockery::mock(Resource::class);
+        $resource = \Mockery::mock(CachedResource::class);
         $resource
             ->shouldReceive('getHeaders')
             ->andReturn($resourceHeaders);

@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Model\Response;
 
-use App\Entity\Resource;
+use App\Entity\CachedResource;
 use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Model\Response\SuccessResponse;
@@ -13,10 +13,10 @@ class SuccessResponseTest extends AbstractResponseTest
      * @dataProvider toScalarArrayDataProvider
      *
      * @param RequestIdentifier $requestIdentifier
-     * @param Resource $resource
+     * @param CachedResource $resource
      * @param array $expectedArray
      */
-    public function testToScalarArray(RequestIdentifier $requestIdentifier, Resource $resource, array $expectedArray)
+    public function testToScalarArray(RequestIdentifier $requestIdentifier, CachedResource $resource, array $expectedArray)
     {
         $response = new SuccessResponse($requestIdentifier, $resource);
 
@@ -51,10 +51,10 @@ class SuccessResponseTest extends AbstractResponseTest
      * @dataProvider jsonSerializeDataProvider
      *
      * @param RequestIdentifier $requestIdentifier
-     * @param Resource $resource
+     * @param CachedResource $resource
      * @param string $expectedJson
      */
-    public function testJsonSerialize(RequestIdentifier $requestIdentifier, Resource $resource, string $expectedJson)
+    public function testJsonSerialize(RequestIdentifier $requestIdentifier, CachedResource $resource, string $expectedJson)
     {
         $response = new SuccessResponse($requestIdentifier, $resource);
 
@@ -91,9 +91,9 @@ class SuccessResponseTest extends AbstractResponseTest
         ];
     }
 
-    private function createResource(Headers $headers, string $body): Resource
+    private function createResource(Headers $headers, string $body): CachedResource
     {
-        $resource = \Mockery::mock(Resource::class);
+        $resource = \Mockery::mock(CachedResource::class);
 
         $resource
             ->shouldReceive('getHeaders')
