@@ -58,6 +58,6 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
 
         $this->cachedResourceManager->update($cachedResource);
 
-        $this->assertNotEquals($currentLastStored->format('U'), $cachedResource->getLastStored()->format('U'));
+        $this->assertNotSame($currentLastStored, $cachedResource->getLastStored());
     }
 }
