@@ -17,3 +17,5 @@ services:
   App\Services\RetryDecider:
     arguments:
     - '%retryable_statuses%'
+
+  App\Services\CachedResourceManager:
