@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Entity\CachedResource;
 use webignition\HttpCacheControlDirectives\HttpCacheControlDirectives;
 
-class ResourceValidator
+class CachedResourceValidator
 {
     /**
      * @var int

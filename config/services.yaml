@@ -71,7 +71,7 @@ services:
         calls:
             - [setMemcached, ['@Memcached']]
 
-    App\Services\ResourceValidator:
+    App\Services\CachedResourceValidator:
         arguments:
             - '%cache-control-min-fresh%'
 

@@ -4,9 +4,9 @@ namespace App\Tests\Unit\Services;
 
 use App\Entity\CachedResource;
 use App\Model\Headers;
-use App\Services\ResourceValidator;
+use App\Services\CachedResourceValidator;
 
-class ResourceValidatorTest extends \PHPUnit\Framework\TestCase
+class CachedResourceValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider isFreshDataProvider
@@ -31,7 +31,7 @@ class ResourceValidatorTest extends \PHPUnit\Framework\TestCase
             ->shouldReceive('getStoredAge')
             ->andReturn($resourceAge);
 
-        $resourceValidator = new ResourceValidator($cacheControlMinFresh);
+        $resourceValidator = new CachedResourceValidator($cacheControlMinFresh);
 
         $this->assertEquals($expectedIsFresh, $resourceValidator->isFresh($resource));
     }
