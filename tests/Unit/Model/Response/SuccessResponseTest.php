@@ -2,7 +2,7 @@
 
 namespace App\Tests\Unit\Model\Response;
 
-use App\Entity\Resource;
+use App\Entity\CachedResource;
 use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Model\Response\SuccessResponse;
@@ -13,11 +13,14 @@ class SuccessResponseTest extends AbstractResponseTest
      * @dataProvider toScalarArrayDataProvider
      *
      * @param RequestIdentifier $requestIdentifier
-     * @param Resource $resource
+     * @param CachedResource $resource
      * @param array $expectedArray
      */
-    public function testToScalarArray(RequestIdentifier $requestIdentifier, Resource $resource, array $expectedArray)
-    {
+    public function testToScalarArray(
+        RequestIdentifier $requestIdentifier,
+        CachedResource $resource,
+        array $expectedArray
+    ) {
         $response = new SuccessResponse($requestIdentifier, $resource);
 
         $this->assertEquals($expectedArray, $response->toScalarArray());
@@ -28,7 +31,7 @@ class SuccessResponseTest extends AbstractResponseTest
         return [
             'empty headers, empty content' => [
                 'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_1'),
-                'resource' => $this->createResource(new Headers(), ''),
+                'resource' => $this->createCachedResource(new Headers(), ''),
                 'expectedArray' => [
                     'request_id' => 'request_identifier_hash_1',
                     'status' => SuccessResponse::STATUS_SUCCESS,
@@ -36,7 +39,7 @@ class SuccessResponseTest extends AbstractResponseTest
             ],
             'has headers, has content' => [
                 'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_2'),
-                'resource' => $this->createResource(new Headers([
+                'resource' => $this->createCachedResource(new Headers([
                     'content-type' => 'text/plain; charset=utf-8',
                 ]), 'text body content'),
                 'expectedArray' => [
@@ -51,11 +54,14 @@ class SuccessResponseTest extends AbstractResponseTest
      * @dataProvider jsonSerializeDataProvider
      *
      * @param RequestIdentifier $requestIdentifier
-     * @param Resource $resource
+     * @param CachedResource $resource
      * @param string $expectedJson
      */
-    public function testJsonSerialize(RequestIdentifier $requestIdentifier, Resource $resource, string $expectedJson)
-    {
+    public function testJsonSerialize(
+        RequestIdentifier $requestIdentifier,
+        CachedResource $resource,
+        string $expectedJson
+    ) {
         $response = new SuccessResponse($requestIdentifier, $resource);
 
         $this->assertEquals($expectedJson, json_encode($response));
@@ -66,7 +72,7 @@ class SuccessResponseTest extends AbstractResponseTest
         return [
             'empty headers, empty content' => [
                 'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_1'),
-                'resource' => $this->createResource(new Headers(), ''),
+                'resource' => $this->createCachedResource(new Headers(), ''),
                 'expectedJson' => json_encode([
                     'request_id' => 'request_identifier_hash_1',
                     'status' => SuccessResponse::STATUS_SUCCESS,
@@ -76,7 +82,7 @@ class SuccessResponseTest extends AbstractResponseTest
             ],
             'has headers, has content' => [
                 'requestIdentifier' => $this->createRequestIdentifier('request_identifier_hash_2'),
-                'resource' => $this->createResource(new Headers([
+                'resource' => $this->createCachedResource(new Headers([
                     'content-type' => 'text/plain; charset=utf-8',
                 ]), 'text body content'),
                 'expectedJson' => json_encode([
@@ -91,9 +97,9 @@ class SuccessResponseTest extends AbstractResponseTest
         ];
     }
 
-    private function createResource(Headers $headers, string $body): Resource
+    private function createCachedResource(Headers $headers, string $body): CachedResource
     {
-        $resource = \Mockery::mock(Resource::class);
+        $resource = \Mockery::mock(CachedResource::class);
 
         $resource
             ->shouldReceive('getHeaders')

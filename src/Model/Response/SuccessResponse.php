@@ -2,17 +2,17 @@
 
 namespace App\Model\Response;
 
-use App\Entity\Resource;
+use App\Entity\CachedResource;
 use App\Model\RequestIdentifier;
 
 class SuccessResponse extends AbstractResponse
 {
     /**
-     * @var Resource
+     * @var CachedResource
      */
     private $resource;
 
-    public function __construct(RequestIdentifier $requestIdentifier, Resource $resource)
+    public function __construct(RequestIdentifier $requestIdentifier, CachedResource $resource)
     {
         parent::__construct($requestIdentifier, self::STATUS_SUCCESS);
 

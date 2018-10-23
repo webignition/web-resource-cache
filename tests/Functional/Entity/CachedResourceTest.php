@@ -2,13 +2,13 @@
 
 namespace App\Tests\Functional\Entity;
 
-use App\Entity\Resource;
+use App\Entity\CachedResource;
 use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 
-class ResourceTest extends AbstractFunctionalTestCase
+class CachedResourceTest extends AbstractFunctionalTestCase
 {
     /**
      * @var EntityManagerInterface
@@ -38,7 +38,7 @@ class ResourceTest extends AbstractFunctionalTestCase
         RequestIdentifier $requestIdentifier,
         \DateTime $lastStored
     ) {
-        $resource = new Resource();
+        $resource = new CachedResource();
 
         $this->assertInstanceOf(\DateTime::class, $resource->getLastStored());
         $this->assertNotEquals($lastStored, $resource->getLastStored());
@@ -65,8 +65,8 @@ class ResourceTest extends AbstractFunctionalTestCase
 
         $this->entityManager->clear();
 
-        /* @var Resource $retrievedResource */
-        $retrievedResource = $this->entityManager->find(Resource::class, $id);
+        /* @var CachedResource $retrievedResource */
+        $retrievedResource = $this->entityManager->find(CachedResource::class, $id);
 
         $this->assertEquals($id, $retrievedResource->getId());
         $this->assertEquals($url, $retrievedResource->getUrl());
