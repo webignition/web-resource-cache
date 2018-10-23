@@ -49,7 +49,6 @@ class CachedResourceTest extends AbstractFunctionalTestCase
         $resource->setRequestHash($requestIdentifier);
         $resource->setLastStored($lastStored);
 
-        $this->assertNull($resource->getId());
         $this->assertEquals($url, $resource->getUrl());
         $this->assertEquals($headers, $resource->getHeaders());
         $this->assertEquals($body, $resource->getBody());
@@ -59,16 +58,13 @@ class CachedResourceTest extends AbstractFunctionalTestCase
         $this->entityManager->persist($resource);
         $this->entityManager->flush();
 
-        $this->assertNotNull($resource->getId());
-
-        $id = $resource->getId();
+        $hash = $resource->getRequestHash();
 
         $this->entityManager->clear();
 
         /* @var CachedResource $retrievedResource */
-        $retrievedResource = $this->entityManager->find(CachedResource::class, $id);
+        $retrievedResource = $this->entityManager->find(CachedResource::class, $hash);
 
-        $this->assertEquals($id, $retrievedResource->getId());
         $this->assertEquals($url, $retrievedResource->getUrl());
         $this->assertEquals($headers, $retrievedResource->getHeaders());
         $this->assertEquals($body, $retrievedResource->getBody());

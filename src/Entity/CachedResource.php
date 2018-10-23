@@ -15,10 +15,9 @@ class CachedResource
      * @var string
      *
      * @ORM\Id
-     * @ORM\Column(name="id", type="guid")
-     * @ORM\GeneratedValue(strategy="UUID")
+     * @ORM\Column(type="string", length=32, unique=true)
      */
-    private $id;
+    private $requestHash = '';
 
     /**
      * @var string
@@ -48,21 +47,9 @@ class CachedResource
      */
     private $lastStored;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(type="string", length=32, unique=true)
-     */
-    private $requestHash = '';
-
     public function __construct()
     {
         $this->lastStored = new \DateTime();
-    }
-
-    public function getId(): ?string
-    {
-        return $this->id;
     }
 
     public function setUrl(string $url)
