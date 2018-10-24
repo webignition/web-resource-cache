@@ -82,9 +82,9 @@ class CachedResource
         return $this->body;
     }
 
-    public function setRequestHash(RequestIdentifier $requestIdentifier)
+    public function setRequestHash(string $requestHash)
     {
-        $this->requestHash = (string) $requestIdentifier;
+        $this->requestHash = (string) $requestHash;
     }
 
     public function getRequestHash(): string
