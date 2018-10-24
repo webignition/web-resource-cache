@@ -82,6 +82,8 @@ services:
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:
         public: true
+        arguments:
+            $maxRetries: '%max_retries%'
 
     App\Command\SendResponseCommand:
         public: true
