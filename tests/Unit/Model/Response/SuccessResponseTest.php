@@ -3,8 +3,8 @@
 namespace App\Tests\Unit\Model\Response;
 
 use App\Entity\CachedResource;
-use App\Model\Headers;
 use App\Model\Response\SuccessResponse;
+use webignition\HttpHeaders\Headers;
 
 class SuccessResponseTest extends \PHPUnit\Framework\TestCase
 {
@@ -88,7 +88,7 @@ class SuccessResponseTest extends \PHPUnit\Framework\TestCase
                     'request_id' => 'request_hash_2',
                     'status' => SuccessResponse::STATUS_SUCCESS,
                     'headers' => [
-                        'content-type' => 'text/plain; charset=utf-8',
+                        'content-type' => ['text/plain; charset=utf-8'],
                     ],
                     'content' => 'text body content',
                 ]),

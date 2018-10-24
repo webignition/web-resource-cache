@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Entity\CachedResource;
-use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use Doctrine\ORM\EntityManagerInterface;
+use webignition\HttpHeaders\Headers;
 
 class CachedResourceManager
 {

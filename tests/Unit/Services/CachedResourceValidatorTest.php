@@ -3,8 +3,8 @@
 namespace App\Tests\Unit\Services;
 
 use App\Entity\CachedResource;
-use App\Model\Headers;
 use App\Services\CachedResourceValidator;
+use webignition\HttpHeaders\Headers;
 
 class CachedResourceValidatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -122,19 +122,13 @@ class CachedResourceValidatorTest extends \PHPUnit\Framework\TestCase
         $headers = \Mockery::mock(Headers::class);
 
         if (!isset($args['cache-control'])) {
-            $args['cache-control'] = '';
+            $args['cache-control'] = [];
         }
 
         $headers
             ->shouldReceive('get')
             ->with('cache-control')
             ->andReturn($args['cache-control']);
-
-        if (isset($args['last-modified'])) {
-            $headers
-                ->shouldReceive('getLastModified')
-                ->andReturn($args['last-modified']);
-        }
 
         if (isset($args['age'])) {
             $headers

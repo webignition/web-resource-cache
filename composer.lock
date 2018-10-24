@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "996c55a2131ff9cb793fa54a5c1caef7",
+    "content-hash": "52bdc68c4dc3ae09daa94dce57f03f7a",
     "packages": [
         {
             "name": "chrisboulton/php-resque",
@@ -3221,16 +3221,16 @@
         },
         {
             "name": "webignition/http-cache-control-directives",
-            "version": "0.1",
+            "version": "0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/http-cache-control-directives.git",
-                "reference": "f2b66cc9fa7265768dfe27bfa296fe8603835ff0"
+                "reference": "95b19d2cb08ebaab0a4d74641eeb687d6b2df23d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/http-cache-control-directives/zipball/f2b66cc9fa7265768dfe27bfa296fe8603835ff0",
-                "reference": "f2b66cc9fa7265768dfe27bfa296fe8603835ff0",
+                "url": "https://api.github.com/repos/webignition/http-cache-control-directives/zipball/95b19d2cb08ebaab0a4d74641eeb687d6b2df23d",
+                "reference": "95b19d2cb08ebaab0a4d74641eeb687d6b2df23d",
                 "shasum": ""
             },
             "require": {
@@ -3263,7 +3263,53 @@
                 "header",
                 "http"
             ],
-            "time": "2018-10-18T16:27:05+00:00"
+            "time": "2018-10-24T06:27:06+00:00"
+        },
+        {
+            "name": "webignition/http-headers",
+            "version": "0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webignition/http-headers.git",
+                "reference": "70d5a9b47ce8e501675ca5dde34747f3cfebbc7c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webignition/http-headers/zipball/70d5a9b47ce8e501675ca5dde34747f3cfebbc7c",
+                "reference": "70d5a9b47ce8e501675ca5dde34747f3cfebbc7c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2",
+                "webignition/http-cache-control-directives": ">=0.2,<1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7",
+                "squizlabs/php_codesniffer": "^3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "webignition\\HttpHeaders\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jon Cram",
+                    "email": "jon@webignition.net"
+                }
+            ],
+            "description": "Models a collection of HTTP headers",
+            "homepage": "https://github.com/webignition/http-headers",
+            "keywords": [
+                "headers",
+                "http"
+            ],
+            "time": "2018-10-24T07:32:00+00:00"
         },
         {
             "name": "webignition/http-history-container",

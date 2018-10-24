@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entity\CachedResource;
 use webignition\HttpCacheControlDirectives\HttpCacheControlDirectives;
+use webignition\HttpCacheControlDirectives\Tokens;
 
 class CachedResourceValidator
 {
@@ -24,17 +25,22 @@ class CachedResourceValidator
         }
 
         $resourceHeaders = $resource->getHeaders();
-        $cacheControlDirectives = new HttpCacheControlDirectives($resourceHeaders->get('cache-control') ?? '');
+        $cacheControlHeaders = $resourceHeaders->get('cache-control');
+        $cacheControlDirectives = new HttpCacheControlDirectives();
 
-        if ($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::NO_STORE)) {
+        foreach ($cacheControlHeaders as $cacheControlHeader) {
+            $cacheControlDirectives->addDirectives($cacheControlHeader);
+        }
+
+        if ($cacheControlDirectives->hasDirective(Tokens::NO_STORE)) {
             return false;
         }
 
-        if ($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::NO_CACHE)) {
+        if ($cacheControlDirectives->hasDirective(Tokens::NO_CACHE)) {
             return false;
         }
 
-        $hasMaxAge = $cacheControlDirectives->hasDirective(HttpCacheControlDirectives::MAX_AGE);
+        $hasMaxAge = $cacheControlDirectives->hasDirective(Tokens::MAX_AGE);
         if ($hasMaxAge && $resource->getStoredAge() <= $cacheControlDirectives->getMaxAge()) {
             return true;
         }

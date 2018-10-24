@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\RetrieveRequest;
-use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Resque\Job\RetrieveResourceJob;
 use App\Services\RetrieveRequestManager;
@@ -12,6 +11,7 @@ use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use webignition\HttpHeaders\Headers;
 
 class RequestController
 {

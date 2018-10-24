@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use Doctrine\ORM\Mapping as ORM;
+use webignition\HttpHeaders\Headers;
 
 /**
  * @ORM\Entity
