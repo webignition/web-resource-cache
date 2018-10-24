@@ -308,6 +308,9 @@
     "webignition/http-cache-control-directives": {
         "version": "0.1"
     },
+    "webignition/http-headers": {
+        "version": "0.1"
+    },
     "webignition/http-history-container": {
         "version": "0.5"
     },
