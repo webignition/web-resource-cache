@@ -20,15 +20,10 @@ abstract class AbstractFailureResponse extends AbstractResponse
         $this->type = $type;
     }
 
-    public function toScalarArray(): array
-    {
-        return array_merge(parent::toScalarArray(), [
-            'failure_type' => $this->type,
-        ]);
-    }
-
     public function jsonSerialize(): array
     {
-        return $this->toScalarArray();
+        return array_merge(parent::jsonSerialize(), [
+            'failure_type' => $this->type,
+        ]);
     }
 }

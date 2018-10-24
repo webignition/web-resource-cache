@@ -20,7 +20,7 @@ class DecoratedSuccessResponse extends SuccessResponse
 
     public function jsonSerialize(): array
     {
-        return array_merge($this->toScalarArray(), [
+        return array_merge(parent::jsonSerialize(), [
             'headers' => $this->resource->getHeaders()->toArray(),
             'content' => $this->resource->getBody(),
         ]);

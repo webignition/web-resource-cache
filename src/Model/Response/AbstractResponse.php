@@ -2,7 +2,7 @@
 
 namespace App\Model\Response;
 
-abstract class AbstractResponse implements ResponseInterface, \JsonSerializable
+abstract class AbstractResponse implements \JsonSerializable
 {
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';
@@ -23,7 +23,7 @@ abstract class AbstractResponse implements ResponseInterface, \JsonSerializable
         $this->status = $status;
     }
 
-    public function toScalarArray(): array
+    public function jsonSerialize(): array
     {
         return [
             'request_id' => $this->requestHash,

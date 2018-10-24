@@ -9,47 +9,6 @@ use webignition\HttpHeaders\Headers;
 class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider toScalarArrayDataProvider
-     *
-     * @param string $requestHash
-     * @param CachedResource $resource
-     * @param array $expectedArray
-     */
-    public function testToScalarArray(
-        string $requestHash,
-        CachedResource $resource,
-        array $expectedArray
-    ) {
-        $response = new DecoratedSuccessResponse($requestHash, $resource);
-
-        $this->assertEquals($expectedArray, $response->toScalarArray());
-    }
-
-    public function toScalarArrayDataProvider(): array
-    {
-        return [
-            'empty headers, empty content' => [
-                'requestHash' => 'request_hash_1',
-                'resource' => $this->createCachedResource(new Headers(), ''),
-                'expectedArray' => [
-                    'request_id' => 'request_hash_1',
-                    'status' => DecoratedSuccessResponse::STATUS_SUCCESS,
-                ],
-            ],
-            'has headers, has content' => [
-                'requestHash' => 'request_hash_2',
-                'resource' => $this->createCachedResource(new Headers([
-                    'content-type' => 'text/plain; charset=utf-8',
-                ]), 'text body content'),
-                'expectedArray' => [
-                    'request_id' => 'request_hash_2',
-                    'status' => DecoratedSuccessResponse::STATUS_SUCCESS,
-                ],
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider jsonSerializeDataProvider
      *
      * @param string $requestHash

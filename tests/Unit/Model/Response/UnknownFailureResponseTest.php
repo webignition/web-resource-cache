@@ -7,33 +7,6 @@ use App\Model\Response\UnknownFailureResponse;
 class UnknownFailureResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider toScalarArrayDataProvider
-     *
-     * @param string $requestHash
-     * @param array $expectedArray
-     */
-    public function testToScalarArray(string $requestHash, array $expectedArray)
-    {
-        $response = new UnknownFailureResponse($requestHash);
-
-        $this->assertEquals($expectedArray, $response->toScalarArray());
-    }
-
-    public function toScalarArrayDataProvider(): array
-    {
-        return [
-            'default' => [
-                'requestHash' => 'request_hash',
-                'expectedArray' => [
-                    'request_id' => 'request_hash',
-                    'status' => 'failed',
-                    'failure_type' => UnknownFailureResponse::TYPE_UNKNOWN,
-                ],
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider jsonSerializeDataProvider
      *
      * @param string $requestHash

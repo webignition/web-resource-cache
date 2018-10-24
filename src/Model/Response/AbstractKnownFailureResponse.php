@@ -16,9 +16,9 @@ abstract class AbstractKnownFailureResponse extends AbstractFailureResponse
         $this->statusCode = $statusCode;
     }
 
-    public function toScalarArray(): array
+    public function jsonSerialize(): array
     {
-        return array_merge(parent::toScalarArray(), [
+        return array_merge(parent::jsonSerialize(), [
             'status_code' => $this->statusCode,
         ]);
     }

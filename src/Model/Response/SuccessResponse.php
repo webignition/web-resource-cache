@@ -8,9 +8,4 @@ class SuccessResponse extends AbstractResponse
     {
         parent::__construct($requestHash, self::STATUS_SUCCESS);
     }
-
-    public function jsonSerialize(): array
-    {
-        return $this->toScalarArray();
-    }
 }

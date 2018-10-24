@@ -7,39 +7,6 @@ use App\Model\Response\SuccessResponse;
 class SuccessResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider toScalarArrayDataProvider
-     *
-     * @param string $requestHash
-     * @param array $expectedArray
-     */
-    public function testToScalarArray(string $requestHash, array $expectedArray)
-    {
-        $response = new SuccessResponse($requestHash);
-
-        $this->assertEquals($expectedArray, $response->toScalarArray());
-    }
-
-    public function toScalarArrayDataProvider(): array
-    {
-        return [
-            'empty headers, empty content' => [
-                'requestHash' => 'request_hash_1',
-                'expectedArray' => [
-                    'request_id' => 'request_hash_1',
-                    'status' => SuccessResponse::STATUS_SUCCESS,
-                ],
-            ],
-            'has headers, has content' => [
-                'requestHash' => 'request_hash_2',
-                'expectedArray' => [
-                    'request_id' => 'request_hash_2',
-                    'status' => SuccessResponse::STATUS_SUCCESS,
-                ],
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider jsonSerializeDataProvider
      *
      * @param string $requestHash
