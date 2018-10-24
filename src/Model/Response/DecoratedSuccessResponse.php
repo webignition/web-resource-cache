@@ -4,23 +4,27 @@ namespace App\Model\Response;
 
 use App\Entity\CachedResource;
 
-class DecoratedSuccessResponse extends SuccessResponse
+class DecoratedSuccessResponse implements \JsonSerializable
 {
+    /**
+     * @var SuccessResponse
+     */
+    private $response;
+
     /**
      * @var CachedResource
      */
     private $resource;
 
-    public function __construct(string $requestHash, CachedResource $resource)
+    public function __construct(SuccessResponse $response, CachedResource $resource)
     {
-        parent::__construct($requestHash);
-
+        $this->response = $response;
         $this->resource = $resource;
     }
 
     public function jsonSerialize(): array
     {
-        return array_merge(parent::jsonSerialize(), [
+        return array_merge($this->response->jsonSerialize(), [
             'headers' => $this->resource->getHeaders()->toArray(),
             'content' => $this->resource->getBody(),
         ]);
