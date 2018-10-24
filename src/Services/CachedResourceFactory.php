@@ -17,12 +17,21 @@ class CachedResourceFactory
 
         $cachedResource = new CachedResource();
 
-        $cachedResource->setHeaders(new Headers($response->getHeaders()));
-        $cachedResource->setBody((string) $response->getBody());
+        $this->updateResponse($cachedResource, $response);
 
         $cachedResource->setRequestHash($retrieveRequest->getHash());
         $cachedResource->setUrl($retrieveRequest->getUrl());
 
         return $cachedResource;
+    }
+
+    public function updateResponse(CachedResource $cachedResource, HttpResponseInterface $response)
+    {
+        if (200 !== $response->getStatusCode()) {
+            return null;
+        }
+
+        $cachedResource->setHeaders(new Headers($response->getHeaders()));
+        $cachedResource->setBody((string) $response->getBody());
     }
 }

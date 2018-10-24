@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Services;
 
+use App\Entity\CachedResource;
 use App\Entity\RetrieveRequest;
 use App\Services\CachedResourceFactory;
 use GuzzleHttp\Psr7\Response;
@@ -89,5 +90,80 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
                 'expectedCachedResourceBody' => 'response body',
             ],
         ];
+    }
+
+    public function testUpdateResponseNotSuccessResponse()
+    {
+        $response = new Response(200, ['foo' => 'bar'], 'response content');
+
+        $cachedResource = $this->cachedResourceFactory->create(new RetrieveRequest(), $response);
+
+        $this->assertSame($cachedResource->getHeaders()->toArray(), $response->getHeaders());
+        $this->assertSame($cachedResource->getBody(), (string) $response->getBody());
+
+        $this->cachedResourceFactory->updateResponse($cachedResource, new Response(404));
+
+        $this->assertSame($cachedResource->getHeaders()->toArray(), $response->getHeaders());
+        $this->assertSame($cachedResource->getBody(), (string) $response->getBody());
+    }
+
+    /**
+     * @dataProvider updatedResponseSuccessDataProvider
+     *
+     * @param CachedResource $cachedResource
+     * @param HttpResponseInterface $response
+     * @param array $expectedCachedResourceHeaders
+     * @param string $expectedCachedResourceBody
+     */
+    public function testUpdateResponseSuccess(
+        CachedResource $cachedResource,
+        HttpResponseInterface $response,
+        array $expectedCachedResourceHeaders,
+        string $expectedCachedResourceBody
+    ) {
+        $this->cachedResourceFactory->updateResponse($cachedResource, $response);
+
+        $this->assertSame($expectedCachedResourceHeaders, $cachedResource->getHeaders()->toArray());
+        $this->assertSame($expectedCachedResourceBody, $cachedResource->getBody());
+    }
+
+    public function updatedResponseSuccessDataProvider(): array
+    {
+        return [
+            'initial: no headers, no body; updated: no headers, no body' => [
+                'cachedResource' => $this->createCachedResource(new Headers(), ''),
+                'response' => new Response(),
+                'expectedCachedResourceHeaders' => [],
+                'expectedCachedResourceBody' => '',
+            ],
+            'initial: no headers, no body; updated: has headers, has body' => [
+                'cachedResource' => $this->createCachedResource(new Headers(), ''),
+                'response' => new Response(200, ['foo' => 'bar'], 'response content'),
+                'expectedCachedResourceHeaders' => ['foo' => ['bar']],
+                'expectedCachedResourceBody' => 'response content',
+            ],
+            'initial: has headers, has body; updated: no headers, no body' => [
+                'cachedResource' => $this->createCachedResource(new Headers(['foo' => 'bar']), 'response content'),
+                'response' => new Response(),
+                'expectedCachedResourceHeaders' => [],
+                'expectedCachedResourceBody' => '',
+            ],
+            'initial: has headers, has body; updated: has headers, has body' => [
+                'cachedResource' => $this->createCachedResource(new Headers(['foo' => 'bar']), 'response content'),
+                'response' => new Response(200, ['fizz' => 'buzz'], 'updated response content'),
+                'expectedCachedResourceHeaders' => ['fizz' => ['buzz']],
+                'expectedCachedResourceBody' => 'updated response content',
+            ],
+        ];
+    }
+
+    private function createCachedResource(Headers $headers, string $body): CachedResource
+    {
+        $cachedResource = new CachedResource();
+
+        $cachedResource->setHeaders($headers);
+        $cachedResource->setBody($body);
+
+        return $cachedResource;
     }
 }
