@@ -288,6 +288,5 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $this->assertArrayNotHasKey('foo', $cachedResourceHeaders);
         $this->assertSame($updatedHeaders['fizz'], $cachedResourceHeaders['fizz']);
         $this->assertSame($updatedBody, $cachedResource->getBody());
-
     }
 }
