@@ -2,14 +2,14 @@
 
 namespace App\Model\Response;
 
-abstract class AbstractKnownFailureResponse extends AbstractFailureResponse
+class KnownFailureResponse extends AbstractFailureResponse
 {
     /**
      * @var int
      */
     private $statusCode;
 
-    public function __construct(string $requestHash, int $statusCode, string $type)
+    public function __construct(string $requestHash, string $type, int $statusCode)
     {
         parent::__construct($requestHash, $type);
 

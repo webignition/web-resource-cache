@@ -2,7 +2,7 @@
 
 namespace App\Model\Response;
 
-abstract class AbstractFailureResponse extends AbstractResponse
+class AbstractFailureResponse extends AbstractResponse
 {
     const TYPE_HTTP = 'http';
     const TYPE_CONNECTION = 'connection';
