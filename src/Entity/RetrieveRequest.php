@@ -53,9 +53,9 @@ class RetrieveRequest
      */
     private $callbackUrls = [];
 
-    public function setHash(RequestIdentifier $requestIdentifier)
+    public function setHash(string $hash)
     {
-        $this->hash = (string) $requestIdentifier;
+        $this->hash = $hash;
     }
 
     public function getHash(): string
