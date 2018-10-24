@@ -7,11 +7,8 @@ use App\Resque\Job\RetrieveResourceJob;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use ResqueBundle\Resque\ContainerAwareJob;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\HttpKernel\KernelInterface;
 
-class RetrieveResourceJobTest extends \PHPUnit\Framework\TestCase
+class RetrieveResourceJobTest extends AbstractJobTest
 {
     public function testCreate()
     {
@@ -34,8 +31,11 @@ class RetrieveResourceJobTest extends \PHPUnit\Framework\TestCase
             'request-hash' => $requestHash,
         ]);
 
-        $retrieveResourceCommand = $this->createRetrieveResourceCommand(
-            $requestHash,
+        $retrieveResourceCommand = $this->createCommand(
+            RetrieveResourceCommand::class,
+            [
+                'request-hash' => $requestHash,
+            ],
             RetrieveResourceCommand::RETURN_CODE_OK
         );
 
@@ -63,8 +63,11 @@ class RetrieveResourceJobTest extends \PHPUnit\Framework\TestCase
             'request-hash' => $requestHash,
         ]);
 
-        $retrieveResourceCommand = $this->createRetrieveResourceCommand(
-            $requestHash,
+        $retrieveResourceCommand = $this->createCommand(
+            RetrieveResourceCommand::class,
+            [
+                'request-hash' => $requestHash,
+            ],
             RetrieveResourceCommand::RETURN_CODE_RETRIEVE_REQUEST_NOT_FOUND
         );
 
@@ -89,41 +92,5 @@ class RetrieveResourceJobTest extends \PHPUnit\Framework\TestCase
         $property->setValue($retrieveResourceJob, $this->createKernel($container));
 
         $this->assertTrue($retrieveResourceJob->run([]));
-    }
-
-    private function createRetrieveResourceCommand(string $requestHash, int $returnCode)
-    {
-        $retrieveResourceCommand = \Mockery::mock(RetrieveResourceCommand::class);
-        $retrieveResourceCommand
-            ->shouldReceive('run')
-            ->withArgs(function (ArrayInput $input, BufferedOutput $output) use ($requestHash) {
-
-                $reflector = new \ReflectionClass(ArrayInput::class);
-                $property = $reflector->getProperty('parameters');
-                $property->setAccessible('true');
-                $property->getValue($input);
-
-                $this->assertEquals(
-                    [
-                        'request-hash' => $requestHash,
-                    ],
-                    $property->getValue($input)
-                );
-
-                return true;
-            })
-            ->andReturn($returnCode);
-
-        return $retrieveResourceCommand;
-    }
-
-    private function createKernel(ContainerInterface $container)
-    {
-        $kernel = \Mockery::mock(KernelInterface::class);
-        $kernel
-            ->shouldReceive('getContainer')
-            ->andReturn($container);
-
-        return $kernel;
     }
 }

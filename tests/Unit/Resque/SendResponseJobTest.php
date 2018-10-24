@@ -2,13 +2,17 @@
 
 namespace App\Tests\Unit\Resque;
 
+use App\Command\SendResponseCommand;
 use App\Model\Response\AbstractResponse;
 use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 use App\Resque\Job\SendResponseJob;
+use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
+use ResqueBundle\Resque\ContainerAwareJob;
 
-class SendResponseJobTest extends \PHPUnit\Framework\TestCase
+class SendResponseJobTest extends AbstractJobTest
 {
     /**
      * @dataProvider responseDataProvider
@@ -34,7 +38,7 @@ class SendResponseJobTest extends \PHPUnit\Framework\TestCase
      *
      * @throws \Exception
      */
-    public function testRun(AbstractResponse $response)
+    public function testRunSuccess(AbstractResponse $response)
     {
         $sendResponseJob = new SendResponseJob([
             'response-json' => json_encode($response),
@@ -62,5 +66,47 @@ class SendResponseJobTest extends \PHPUnit\Framework\TestCase
                 'response' => new SuccessResponse('request_hash_4'),
             ],
         ];
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testRunFailure()
+    {
+        $response = new UnknownFailureResponse('request_hash_1');
+
+        $sendResponseJob = new SendResponseJob([
+            'response-json' => json_encode($response),
+        ]);
+
+        $sendResponseCommand = $this->createCommand(
+            SendResponseCommand::class,
+            [
+                'response-json' => '{"request_id":"request_hash_1","status":"failed","failure_type":"unknown"}',
+            ],
+            1
+        );
+
+        $logger = \Mockery::mock(LoggerInterface::class);
+        $logger
+            ->shouldReceive('error');
+
+        $container = \Mockery::mock(ContainerInterface::class);
+        $container
+            ->shouldReceive('get')
+            ->with(SendResponseCommand::class)
+            ->andReturn($sendResponseCommand);
+
+        $container
+            ->shouldReceive('get')
+            ->with('logger')
+            ->andReturn($logger);
+
+        $reflector = new \ReflectionClass(ContainerAwareJob::class);
+        $property = $reflector->getProperty('kernel');
+        $property->setAccessible(true);
+        $property->setValue($sendResponseJob, $this->createKernel($container));
+
+        $this->assertTrue($sendResponseJob->run([]));
     }
 }
