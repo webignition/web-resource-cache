@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use App\Entity\CachedResource;
+use App\Entity\RetrieveRequest;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 use webignition\HttpHeaders\Headers;
 
 class CachedResourceFactory
 {
-    public function createFromPsr7Response(HttpResponseInterface $response): ?CachedResource
+    public function create(RetrieveRequest $retrieveRequest, HttpResponseInterface $response): ?CachedResource
     {
         if (200 !== $response->getStatusCode()) {
             return null;
@@ -18,6 +19,9 @@ class CachedResourceFactory
 
         $cachedResource->setHeaders(new Headers($response->getHeaders()));
         $cachedResource->setBody((string) $response->getBody());
+
+        $cachedResource->setRequestHash($retrieveRequest->getHash());
+        $cachedResource->setUrl($retrieveRequest->getUrl());
 
         return $cachedResource;
     }

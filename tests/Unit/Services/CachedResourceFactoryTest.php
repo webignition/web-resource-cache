@@ -2,6 +2,7 @@
 
 namespace App\Tests\Unit\Services;
 
+use App\Entity\RetrieveRequest;
 use App\Services\CachedResourceFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
@@ -26,9 +27,9 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
      *
      * @param HttpResponseInterface $response
      */
-    public function testCreateFromPsr7ResponseNotSuccessResponse(HttpResponseInterface $response)
+    public function testCreateResponseNotSuccessResponse(HttpResponseInterface $response)
     {
-        $this->assertNull($this->cachedResourceFactory->createFromPsr7Response($response));
+        $this->assertNull($this->cachedResourceFactory->create(new RetrieveRequest(), $response));
     }
 
     public function createFromPsr7ResponseNotSuccessResponseDataProvider(): array
@@ -44,27 +45,33 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider createFromPsr7ResponseSuccessResponseDataProvider
+     * @dataProvider createSuccessDataProvider
      *
      * @param HttpResponseInterface $response
      * @param array $expectedCachedResourceHeaders
      * @param string $expectedCachedResourceBody
      */
-    public function testCreateFromPsr7ResponseSuccessResponse(
+    public function testCreateSuccess(
         HttpResponseInterface $response,
         array $expectedCachedResourceHeaders,
         string $expectedCachedResourceBody
     ) {
-        $cachedResource = $this->cachedResourceFactory->createFromPsr7Response($response);
+        $retrieveRequest = new RetrieveRequest();
+        $retrieveRequest->setUrl('http://example.com/');
+        $retrieveRequest->setHash('request_hash');
+
+        $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $response);
 
         $cachedResourceHeaders = $cachedResource->getHeaders();
 
         $this->assertInstanceOf(Headers::class, $cachedResourceHeaders);
         $this->assertSame($expectedCachedResourceHeaders, $cachedResourceHeaders->toArray());
         $this->assertSame($expectedCachedResourceBody, $cachedResource->getBody());
+        $this->assertSame($retrieveRequest->getUrl(), $cachedResource->getUrl());
+        $this->assertSame($retrieveRequest->getHash(), $cachedResource->getRequestHash());
     }
 
-    public function createFromPsr7ResponseSuccessResponseDataProvider(): array
+    public function createSuccessDataProvider(): array
     {
         return [
             'empty headers, empty body' => [
