@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use webignition\HttpHeaders\Headers;
+
 class RequestIdentifier
 {
     /**

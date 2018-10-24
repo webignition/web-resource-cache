@@ -3,11 +3,11 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\CachedResource;
-use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Services\CachedResourceManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
+use webignition\HttpHeaders\Headers;
 
 class CachedResourceManagerTest extends AbstractFunctionalTestCase
 {

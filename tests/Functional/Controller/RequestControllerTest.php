@@ -4,7 +4,6 @@ namespace App\Tests\Functional\Controller;
 
 use App\Controller\RequestController;
 use App\Entity\RetrieveRequest;
-use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Resque\Job\RetrieveResourceJob;
 use App\Services\ResqueQueueService;
@@ -15,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\RouterInterface;
+use webignition\HttpHeaders\Headers;
 
 class RequestControllerTest extends AbstractFunctionalTestCase
 {

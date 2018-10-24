@@ -2,8 +2,8 @@
 
 namespace App\Tests\Unit\Model;
 
-use App\Model\Headers;
 use App\Model\RequestIdentifier;
+use webignition\HttpHeaders\Headers;
 
 class RequestIdentifierTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,14 +36,14 @@ class RequestIdentifierTest extends \PHPUnit\Framework\TestCase
                     'array' => [],
                     'object' => (object) [],
                 ]),
-                'expectedHash' => '118e35f631be802c41bec5c9dfb0f415',
+                'expectedHash' => '00bd01b2277e9401e89dc3431afe0db6',
             ],
             'has headers, all valid' => [
                 'url' => 'http://example.com/',
                 'headers' => new Headers([
                     'foo' => 'bar',
                 ]),
-                'expectedHash' => 'fda3da5c3d7c68725e824361e55a1b93',
+                'expectedHash' => 'e0db2182d9cc7589763876fb7cee314f',
             ],
             'has headers, some valid' => [
                 'url' => 'http://example.com/',
@@ -53,7 +53,7 @@ class RequestIdentifierTest extends \PHPUnit\Framework\TestCase
                     'array' => [],
                     'object' => (object) [],
                 ]),
-                'expectedHash' => 'fda3da5c3d7c68725e824361e55a1b93',
+                'expectedHash' => 'c1ec8873271ff238158cfa672cbfb253',
             ],
         ];
     }

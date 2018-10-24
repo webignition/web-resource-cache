@@ -3,10 +3,10 @@
 namespace App\Tests\Functional\Entity;
 
 use App\Entity\RetrieveRequest;
-use App\Model\Headers;
 use App\Model\RequestIdentifier;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
+use webignition\HttpHeaders\Headers;
 
 class RetrieveRequestTest extends AbstractFunctionalTestCase
 {

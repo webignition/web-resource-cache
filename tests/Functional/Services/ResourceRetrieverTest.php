@@ -4,7 +4,6 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\RetrieveRequest;
 use App\Exception\HttpTransportException;
-use App\Model\Headers;
 use App\Services\ResourceRetriever;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
@@ -12,6 +11,7 @@ use App\Tests\UnhandledGuzzleException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
+use webignition\HttpHeaders\Headers;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class ResourceRetrieverTest extends AbstractFunctionalTestCase
