@@ -44,18 +44,25 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
             'not an array' => [
                 'json' => json_encode(true),
             ],
-            'missing class' => [
+            'missing request_id' => [
                 'json' => json_encode([
                     'foo' => 'bar',
                 ]),
             ],
+            'missing class' => [
+                'json' => json_encode([
+                    'request_id' => 'request_hash',
+                ]),
+            ],
             'invalid class' => [
                 'json' => json_encode([
+                    'request_id' => 'request_hash',
                     'class' => 'Foo',
                 ]),
             ],
             'class not implements ResponseInterface' => [
                 'json' => json_encode([
+                    'request_id' => 'request_hash',
                     'class' => get_class($this),
                 ]),
             ],

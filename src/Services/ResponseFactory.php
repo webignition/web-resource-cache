@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\ResponseInterface;
+use App\Model\Response\SuccessResponse;
+use App\Model\Response\UnknownFailureResponse;
 
 class ResponseFactory
 {
@@ -17,30 +19,19 @@ class ResponseFactory
 
         $modelClass = $data['class'];
 
-        if (!class_exists($modelClass)) {
-            return null;
-        }
-
-        if (!in_array(ResponseInterface::class, class_implements($modelClass))) {
-            return null;
-        }
-
         if (!$this->validateData($data, $modelClass)) {
             return null;
         }
 
-        /**
-         * unknown
-         *  request_id
-         * success
-         *  request_id
-         * known
-         *  request_id
-         *  failure_type
-         *  status_code
-         */
+        if (KnownFailureResponse::class === $modelClass) {
+            return new KnownFailureResponse($data['request_id'], $data['failure_type'], $data['status_code']);
+        }
 
-        return $modelClass::fromJson(json_encode($data));
+        if (UnknownFailureResponse::class === $modelClass) {
+            return new UnknownFailureResponse($data['request_id']);
+        }
+
+        return new SuccessResponse($data['request_id']);
     }
 
     private function decodeJson(string $json)
@@ -51,15 +42,17 @@ class ResponseFactory
             return null;
         }
 
-        $requestId = $data['request_id'] ?? null;
-
-        if (empty($requestId)) {
-            return null;
-        }
-
         $modelClass = $data['class'] ?? null;
 
         if (empty($modelClass)) {
+            return null;
+        }
+
+        if (!class_exists($modelClass)) {
+            return null;
+        }
+
+        if (!in_array(ResponseInterface::class, class_implements($modelClass))) {
             return null;
         }
 
