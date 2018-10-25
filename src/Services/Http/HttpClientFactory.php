@@ -23,26 +23,10 @@ class HttpClientFactory
      */
     private $handlerStack;
 
-    /**
-     * @var HttpRetryMiddleware
-     */
-    private $httpRetryMiddleware;
-
-    /**
-     * @param array $curlOptions
-     * @param HandlerStack $handlerStack
-     * @param CookieJarInterface $cookieJar
-     * @param HttpRetryMiddleware $httpRetryMiddleware
-     */
-    public function __construct(
-        array $curlOptions,
-        HandlerStack $handlerStack,
-        CookieJarInterface $cookieJar,
-        HttpRetryMiddleware $httpRetryMiddleware
-    ) {
+    public function __construct(array $curlOptions, HandlerStack $handlerStack, CookieJarInterface $cookieJar)
+    {
         $this->setCurlOptions($curlOptions);
 
-        $this->httpRetryMiddleware = $httpRetryMiddleware;
         $this->cookieJar = $cookieJar;
         $this->handlerStack = $handlerStack;
     }
@@ -52,8 +36,6 @@ class HttpClientFactory
      */
     public function create()
     {
-        $this->httpRetryMiddleware->enable();
-
         return new Client([
             'curl' => $this->curlOptions,
             'verify' => false,

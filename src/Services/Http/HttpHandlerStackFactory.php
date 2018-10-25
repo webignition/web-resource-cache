@@ -23,21 +23,29 @@ class HttpHandlerStackFactory
     private $cacheMiddleware;
 
     /**
+     * @var Middleware
+     */
+    private $retryMiddleware;
+
+    /**
      * @var callable|null
      */
     private $handler;
 
     /**
      * @param HttpHistoryContainer $historyContainer
+     * @param HttpRetryMiddlewareFactory $httpRetryMiddlewareFactory
      * @param CacheMiddleware|null $cacheMiddleware
      * @param callable|null $handler
      */
     public function __construct(
         HttpHistoryContainer $historyContainer,
+        HttpRetryMiddlewareFactory $httpRetryMiddlewareFactory,
         CacheMiddleware $cacheMiddleware = null,
         callable $handler = null
     ) {
         $this->historyContainer = $historyContainer;
+        $this->retryMiddleware = $httpRetryMiddlewareFactory->create();
         $this->cacheMiddleware = $cacheMiddleware;
         $this->handler = $handler;
     }
@@ -53,6 +61,7 @@ class HttpHandlerStackFactory
             $handlerStack->push($this->cacheMiddleware, self::MIDDLEWARE_CACHE_KEY);
         }
 
+        $handlerStack->push($this->retryMiddleware);
         $handlerStack->push(Middleware::history($this->historyContainer), self::MIDDLEWARE_HISTORY_KEY);
 
         return $handlerStack;
