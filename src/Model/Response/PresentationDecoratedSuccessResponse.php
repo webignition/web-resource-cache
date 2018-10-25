@@ -4,7 +4,7 @@ namespace App\Model\Response;
 
 use App\Entity\CachedResource;
 
-class PresentationDecoratedSuccessResponse implements \JsonSerializable
+class PresentationDecoratedSuccessResponse implements ResponseInterface
 {
     /**
      * @var SuccessResponse
@@ -28,5 +28,10 @@ class PresentationDecoratedSuccessResponse implements \JsonSerializable
             'headers' => $this->resource->getHeaders()->toArray(),
             'content' => $this->resource->getBody(),
         ]);
+    }
+
+    public function getRequestId(): string
+    {
+        return $this->response->getRequestId();
     }
 }

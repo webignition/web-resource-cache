@@ -56,6 +56,18 @@ class PresentationDecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCa
         ];
     }
 
+    public function testGetRequestId()
+    {
+        $requestHash = 'request-hash';
+
+        $response = new PresentationDecoratedSuccessResponse(
+            new SuccessResponse($requestHash),
+            \Mockery::mock(CachedResource::class)
+        );
+
+        $this->assertEquals($requestHash, $response->getRequestId());
+    }
+
     private function createCachedResource(Headers $headers, string $body): CachedResource
     {
         $resource = \Mockery::mock(CachedResource::class);

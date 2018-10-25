@@ -2,7 +2,7 @@
 
 namespace App\Model\Response;
 
-class RebuildableDecoratedResponse implements \JsonSerializable
+class RebuildableDecoratedResponse implements ResponseInterface
 {
     /**
      * @var AbstractResponse
@@ -19,5 +19,10 @@ class RebuildableDecoratedResponse implements \JsonSerializable
         return array_merge($this->response->jsonSerialize(), [
             'class' => get_class($this->response),
         ]);
+    }
+
+    public function getRequestId(): string
+    {
+        return $this->response->getRequestId();
     }
 }
