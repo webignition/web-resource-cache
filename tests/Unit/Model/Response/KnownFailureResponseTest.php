@@ -184,4 +184,13 @@ class KnownFailureResponseTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    public function testGetRequestId()
+    {
+        $requestHash = 'request-hash';
+
+        $response = new KnownFailureResponse($requestHash, KnownFailureResponse::TYPE_HTTP, 404);
+
+        $this->assertEquals($requestHash, $response->getRequestId());
+    }
 }

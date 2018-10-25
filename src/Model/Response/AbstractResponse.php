@@ -31,6 +31,11 @@ abstract class AbstractResponse implements ResponseInterface
         ];
     }
 
+    public function getRequestId(): string
+    {
+        return $this->requestHash;
+    }
+
     protected static function decodeJson(string $json): ?array
     {
         $data = json_decode(trim($json), true);
