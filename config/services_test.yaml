@@ -9,6 +9,7 @@ services:
   App\Services\Http\HttpHandlerStackFactory:
     arguments:
     - '@webignition\HttpHistoryContainer\Container'
+    - '@App\Services\Http\HttpRetryMiddlewareFactory'
     - '@Kevinrob\GuzzleCache\CacheMiddleware'
     - '@App\Tests\Services\HttpMockHandler'
 
