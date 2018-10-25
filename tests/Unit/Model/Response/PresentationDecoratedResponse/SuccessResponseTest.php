@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Tests\Unit\Model\Response;
+namespace App\Tests\Unit\Model\Response\PresentationDecoratedResponse;
 
 use App\Entity\CachedResource;
-use App\Model\Response\DecoratedSuccessResponse;
-use App\Model\Response\SuccessResponse;
+use App\Model\Response\PresentationDecoratedResponse\SuccessResponse;
+use App\Model\Response\SuccessResponse as BaseSuccessResponse;
 use webignition\HttpHeaders\Headers;
 
-class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
+class SuccessResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider jsonSerializeDataProvider
      *
-     * @param SuccessResponse $successResponse
+     * @param BaseSuccessResponse $successResponse
      * @param CachedResource $cachedResource
      * @param string $expectedJson
      */
     public function testJsonSerialize(
-        SuccessResponse $successResponse,
+        BaseSuccessResponse $successResponse,
         CachedResource $cachedResource,
         string $expectedJson
     ) {
-        $decoratedSuccessResponse = new DecoratedSuccessResponse($successResponse, $cachedResource);
+        $decoratedSuccessResponse = new SuccessResponse($successResponse, $cachedResource);
 
         $this->assertEquals($expectedJson, json_encode($decoratedSuccessResponse));
     }
@@ -30,23 +30,23 @@ class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'empty headers, empty content' => [
-                'successResponse' => new SuccessResponse('request_hash_1'),
+                'successResponse' => new BaseSuccessResponse('request_hash_1'),
                 'cachedResource' => $this->createCachedResource(new Headers(), ''),
                 'expectedJson' => json_encode([
                     'request_id' => 'request_hash_1',
-                    'status' => SuccessResponse::STATUS_SUCCESS,
+                    'status' => BaseSuccessResponse::STATUS_SUCCESS,
                     'headers' => [],
                     'content' => '',
                 ]),
             ],
             'has headers, has content' => [
-                'successResponse' => new SuccessResponse('request_hash_2'),
+                'successResponse' => new BaseSuccessResponse('request_hash_2'),
                 'cachedResource' => $this->createCachedResource(new Headers([
                     'content-type' => 'text/plain; charset=utf-8',
                 ]), 'text body content'),
                 'expectedJson' => json_encode([
                     'request_id' => 'request_hash_2',
-                    'status' => SuccessResponse::STATUS_SUCCESS,
+                    'status' => BaseSuccessResponse::STATUS_SUCCESS,
                     'headers' => [
                         'content-type' => ['text/plain; charset=utf-8'],
                     ],
