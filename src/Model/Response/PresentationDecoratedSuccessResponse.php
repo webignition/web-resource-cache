@@ -4,7 +4,7 @@ namespace App\Model\Response;
 
 use App\Entity\CachedResource;
 
-class DecoratedSuccessResponse implements \JsonSerializable
+class PresentationDecoratedSuccessResponse implements \JsonSerializable
 {
     /**
      * @var SuccessResponse

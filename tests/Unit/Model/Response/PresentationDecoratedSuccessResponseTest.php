@@ -3,11 +3,11 @@
 namespace App\Tests\Unit\Model\Response;
 
 use App\Entity\CachedResource;
-use App\Model\Response\DecoratedSuccessResponse;
+use App\Model\Response\PresentationDecoratedSuccessResponse;
 use App\Model\Response\SuccessResponse;
 use webignition\HttpHeaders\Headers;
 
-class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
+class PresentationDecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider jsonSerializeDataProvider
@@ -21,7 +21,7 @@ class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
         CachedResource $cachedResource,
         string $expectedJson
     ) {
-        $decoratedSuccessResponse = new DecoratedSuccessResponse($successResponse, $cachedResource);
+        $decoratedSuccessResponse = new PresentationDecoratedSuccessResponse($successResponse, $cachedResource);
 
         $this->assertEquals($expectedJson, json_encode($decoratedSuccessResponse));
     }

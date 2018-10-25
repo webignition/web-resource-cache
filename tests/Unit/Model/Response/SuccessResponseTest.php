@@ -22,17 +22,10 @@ class SuccessResponseTest extends \PHPUnit\Framework\TestCase
     public function jsonSerializeDataProvider(): array
     {
         return [
-            'empty headers, empty content' => [
+            'default' => [
                 'requestHash' => 'request_hash_1',
                 'expectedJson' => json_encode([
                     'request_id' => 'request_hash_1',
-                    'status' => SuccessResponse::STATUS_SUCCESS,
-                ]),
-            ],
-            'has headers, has content' => [
-                'requestHash' => 'request_hash_2',
-                'expectedJson' => json_encode([
-                    'request_id' => 'request_hash_2',
                     'status' => SuccessResponse::STATUS_SUCCESS,
                 ]),
             ],
