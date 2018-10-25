@@ -68,14 +68,4 @@ class HttpRetryMiddlewareTest extends AbstractFunctionalTestCase
 
         $this->assertEquals(self::RESPONSE_BODY, $response->getBody()->getContents());
     }
-
-    public function testAfterDisabling()
-    {
-        $this->httpRetryMiddleware->enable();
-        $this->httpRetryMiddleware->disable();
-
-        $this->expectException(ServerException::class);
-
-        $this->httpClient->get(self::REQUEST_URL);
-    }
 }

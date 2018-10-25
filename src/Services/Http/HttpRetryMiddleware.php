@@ -32,9 +32,4 @@ class HttpRetryMiddleware
     {
         $this->handlerStack->push($this->httpRetryMiddleware, self::HANDLER_STACK_KEY);
     }
-
-    public function disable()
-    {
-        $this->handlerStack->remove(self::HANDLER_STACK_KEY);
-    }
 }
