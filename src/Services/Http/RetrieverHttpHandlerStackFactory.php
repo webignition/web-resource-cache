@@ -32,12 +32,6 @@ class RetrieverHttpHandlerStackFactory
      */
     private $handler;
 
-    /**
-     * @param HttpHistoryContainer $historyContainer
-     * @param HttpRetryMiddlewareFactory $httpRetryMiddlewareFactory
-     * @param CacheMiddleware|null $cacheMiddleware
-     * @param callable|null $handler
-     */
     public function __construct(
         HttpHistoryContainer $historyContainer,
         HttpRetryMiddlewareFactory $httpRetryMiddlewareFactory,
