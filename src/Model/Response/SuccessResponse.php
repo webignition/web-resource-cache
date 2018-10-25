@@ -11,18 +11,12 @@ class SuccessResponse extends AbstractResponse
 
     public static function fromJson(string $json): ?ResponseInterface
     {
-        $data = json_decode(trim($json), true);
+        $data = static::decodeJson($json);
 
-        if (!is_array($data)) {
+        if (empty($data)) {
             return null;
         }
 
-        $requestId = $data['request_id'] ?? null;
-
-        if (empty($requestId)) {
-            return null;
-        }
-
-        return new static($requestId);
+        return new static($data['request_id']);
     }
 }

@@ -30,4 +30,21 @@ abstract class AbstractResponse implements ResponseInterface
             'status' => $this->status,
         ];
     }
+
+    protected static function decodeJson(string $json): ?array
+    {
+        $data = json_decode(trim($json), true);
+
+        if (!is_array($data)) {
+            return null;
+        }
+
+        $requestId = $data['request_id'] ?? null;
+
+        if (empty($requestId)) {
+            return null;
+        }
+
+        return $data;
+    }
 }

@@ -25,9 +25,20 @@ class KnownFailureResponse extends AbstractFailureResponse
 
     public static function fromJson(string $json): ?ResponseInterface
     {
-        $data = json_decode(trim($json), true);
+        $data = static::decodeJson($json);
 
-        if (!is_array($data)) {
+        if (empty($data)) {
+            return null;
+        }
+
+        return new static($data['request_id'], $data['failure_type'], $data['status_code']);
+    }
+
+    protected static function decodeJson(string $json): ?array
+    {
+        $data = parent::decodeJson($json);
+
+        if (empty($data)) {
             return null;
         }
 
@@ -39,6 +50,6 @@ class KnownFailureResponse extends AbstractFailureResponse
             return null;
         }
 
-        return new static($requestId, $type, $statusCode);
+        return $data;
     }
 }
