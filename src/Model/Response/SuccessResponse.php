@@ -8,15 +8,4 @@ class SuccessResponse extends AbstractResponse
     {
         parent::__construct($requestHash, self::STATUS_SUCCESS);
     }
-
-    public static function fromJson(string $json): ?ResponseInterface
-    {
-        $data = static::decodeJson($json);
-
-        if (empty($data)) {
-            return null;
-        }
-
-        return new static($data['request_id']);
-    }
 }

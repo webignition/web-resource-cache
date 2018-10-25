@@ -32,53 +32,6 @@ class SuccessResponseTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider fromJsonInvalidDataDataProvider
-     *
-     * @param string $json
-     */
-    public function testFromJsonInvalidData(string $json)
-    {
-        $this->assertNull(SuccessResponse::fromJson($json));
-    }
-
-    public function fromJsonInvalidDataDataProvider(): array
-    {
-        return [
-            'empty' => [
-                'json' => '',
-            ],
-            'not an array' => [
-                'json' => json_encode('foo'),
-            ],
-            'missing request_id' => [
-                'json' => json_encode([
-                    'foo' => 'bar',
-                ]),
-            ],
-        ];
-    }
-
-    public function testFromJsonValidData()
-    {
-        $requestHash = 'request_hash';
-
-        $json = json_encode([
-            'request_id' => $requestHash,
-        ]);
-
-        $response = SuccessResponse::fromJson($json);
-
-        $this->assertInstanceOf(SuccessResponse::class, $response);
-        $this->assertEquals(
-            json_encode([
-                'request_id' => $requestHash,
-                'status' => SuccessResponse::STATUS_SUCCESS,
-            ]),
-            json_encode($response)
-        );
-    }
-
     public function testGetRequestId()
     {
         $requestHash = 'request-hash';
