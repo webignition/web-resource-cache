@@ -49,7 +49,8 @@ services:
     Kevinrob\GuzzleCache\CacheMiddleware:
         factory: 'App\Services\Http\HttpCacheMiddlewareFactory:create'
 
-    GuzzleHttp\HandlerStack:
+    web_resource_cache.http.handler_stack.retriever:
+        class: GuzzleHttp\HandlerStack
         factory: 'App\Services\Http\RetrieverHttpHandlerStackFactory:create'
 
     GuzzleHttp\Cookie\CookieJarInterface:
@@ -58,6 +59,7 @@ services:
     App\Services\Http\RetrieverHttpClientFactory:
         arguments:
             $curlOptions: '%curl_options%'
+            $handlerStack: '@web_resource_cache.http.handler_stack.retriever'
 
     GuzzleHttp\Client:
         factory: 'App\Services\Http\RetrieverHttpClientFactory:create'

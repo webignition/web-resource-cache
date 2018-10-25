@@ -41,7 +41,10 @@ class RetrieverHttpClientFactoryTest extends AbstractFunctionalTestCase
         }
 
         $this->assertFalse($httpClient->getConfig('verify'));
-        $this->assertEquals(self::$container->get(HandlerStack::class), $httpClient->getConfig('handler'));
+        $this->assertEquals(
+            self::$container->get('web_resource_cache.http.handler_stack.retriever'),
+            $httpClient->getConfig('handler')
+        );
         $this->assertEquals(self::$container->get(CookieJarInterface::class), $httpClient->getConfig('cookies'));
     }
 }
