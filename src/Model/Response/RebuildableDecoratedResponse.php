@@ -9,7 +9,7 @@ class RebuildableDecoratedResponse implements ResponseInterface
      */
     private $response;
 
-    public function __construct(AbstractResponse $response)
+    public function __construct(ResponseInterface $response)
     {
         $this->response = $response;
     }
