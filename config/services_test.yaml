@@ -26,8 +26,6 @@ services:
 #      $curlOptions: '%curl_options%'
 
   App\Services\Http\ClientFactory:
-    arguments:
-      $handlerStack: '@web_resource_cache.http.handler_stack.sender'
 
 #  web_resource_cache.http.client.sender:
 #    class: GuzzleHttp\Client

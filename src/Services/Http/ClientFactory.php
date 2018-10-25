@@ -15,22 +15,13 @@ class ClientFactory
         'max_retries' => RetryMiddlewareFactory::MAX_RETRIES,
     ];
 
-    /**
-     * @var HandlerStack
-     */
-    protected $handlerStack;
-
-    public function __construct(HandlerStack $handlerStack)
-    {
-        $this->handlerStack = $handlerStack;
-    }
-
-    public function create(array $curlOptions): Client
+    public function create(array $curlOptions, ?HandlerStack $handlerStack = null): Client
     {
         $curlOptions = $this->filterCurlOptions($curlOptions);
 
         $clientConfig = array_merge($this->createClientConfig(), [
             'curl' => $curlOptions,
+            'handler' => $handlerStack,
         ]);
 
         return new Client($clientConfig);
@@ -38,9 +29,7 @@ class ClientFactory
 
     protected function createClientConfig(): array
     {
-        return array_merge($this->defaultConfig, [
-            'handler' => $this->handlerStack,
-        ]);
+        return array_merge($this->defaultConfig);
     }
 
     private function filterCurlOptions(array $curlOptions)

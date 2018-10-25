@@ -3,7 +3,6 @@
 namespace App\Services\Http;
 
 use GuzzleHttp\Cookie\CookieJarInterface;
-use GuzzleHttp\HandlerStack;
 
 class RetrieverClientFactory extends ClientFactory
 {
@@ -12,10 +11,8 @@ class RetrieverClientFactory extends ClientFactory
      */
     private $cookieJar;
 
-    public function __construct(HandlerStack $handlerStack, CookieJarInterface $cookieJar)
+    public function __construct(CookieJarInterface $cookieJar)
     {
-        parent::__construct($handlerStack);
-
         $this->cookieJar = $cookieJar;
     }
 
