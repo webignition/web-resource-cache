@@ -12,9 +12,9 @@ class RetrieverClientFactory extends ClientFactory
      */
     private $cookieJar;
 
-    public function __construct(array $curlOptions, HandlerStack $handlerStack, CookieJarInterface $cookieJar)
+    public function __construct(HandlerStack $handlerStack, CookieJarInterface $cookieJar)
     {
-        parent::__construct($curlOptions, $handlerStack);
+        parent::__construct($handlerStack);
 
         $this->cookieJar = $cookieJar;
     }

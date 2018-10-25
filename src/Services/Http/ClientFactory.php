@@ -16,19 +16,12 @@ class ClientFactory
     ];
 
     /**
-     * @var array
-     */
-    protected $curlOptions;
-
-    /**
      * @var HandlerStack
      */
     protected $handlerStack;
 
-    public function __construct(array $curlOptions, HandlerStack $handlerStack)
+    public function __construct(HandlerStack $handlerStack)
     {
-        $this->curlOptions = $this->filterCurlOptions($curlOptions);
-
         $this->handlerStack = $handlerStack;
     }
 

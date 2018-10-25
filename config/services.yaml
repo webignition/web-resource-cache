@@ -64,12 +64,10 @@ services:
 
     App\Services\Http\RetrieverClientFactory:
         arguments:
-            $curlOptions: '%curl_options%'
             $handlerStack: '@web_resource_cache.http.handler_stack.retriever'
 
     App\Services\Http\ClientFactory:
         arguments:
-            $curlOptions: '%curl_options%'
             $handlerStack: '@web_resource_cache.http.handler_stack.sender'
 
     web_resource_cache.http.client.retriever:
