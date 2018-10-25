@@ -6,7 +6,7 @@ use App\Services\Http\Cache;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\Common\Cache\MemcachedCache;
 
-class HttpCacheTest extends AbstractFunctionalTestCase
+class CacheTest extends AbstractFunctionalTestCase
 {
     /**
      * @var Cache
