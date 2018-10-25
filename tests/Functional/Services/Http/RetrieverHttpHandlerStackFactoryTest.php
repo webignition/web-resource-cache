@@ -6,7 +6,7 @@ use App\Services\Http\RetrieverHttpHandlerStackFactory;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use GuzzleHttp\HandlerStack;
 
-class HttpHandlerStackFactoryTest extends AbstractFunctionalTestCase
+class RetrieverHttpHandlerStackFactoryTest extends AbstractFunctionalTestCase
 {
     /**
      * @var RetrieverHttpHandlerStackFactory
