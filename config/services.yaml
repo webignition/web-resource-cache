@@ -61,6 +61,8 @@ services:
     web_resource_cache.http.handler_stack.sender:
         class: GuzzleHttp\HandlerStack
         factory: 'App\Services\Http\HandlerStackFactory:create'
+        arguments:
+            $middlewareCollection: '@App\Services\Http\SenderMiddlewareCollection'
 
     web_resource_cache.http.client.retriever:
         class: GuzzleHttp\Client
@@ -98,6 +100,10 @@ services:
     App\Services\ResourceRetriever:
         arguments:
             $httpClient: '@web_resource_cache.http.client.retriever'
+
+    App\Services\ResponseSender:
+        arguments:
+            $httpClient: '@web_resource_cache.http.client.sender'
 
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:
