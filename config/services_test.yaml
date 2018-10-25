@@ -10,7 +10,7 @@ services:
     class: GuzzleHttp\HandlerStack
     factory: 'App\Services\Http\HandlerStackFactory:create'
     arguments:
-      $middlewareCollection: '@App\Services\Http\RetrieverHttpHandlerStackMiddlewareCollection'
+      $middlewareCollection: '@App\Services\Http\RetrieverMiddlewareCollection'
       $handler: '@App\Tests\Services\HttpMockHandler'
 
   App\Services\RetryDecider:

@@ -7,7 +7,7 @@ use GuzzleHttp\Middleware;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class RetrieverHttpHandlerStackMiddlewareCollection extends ArrayCollection
+class RetrieverMiddlewareCollection extends ArrayCollection
 {
     const MIDDLEWARE_CACHE_KEY = 'cache';
     const MIDDLEWARE_RETRY_KEY = 'retry';
