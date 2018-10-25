@@ -62,7 +62,7 @@ services:
     GuzzleHttp\Client:
         factory: 'App\Services\Http\RetrieverHttpClientFactory:create'
 
-    web_resource_cache.http_client.retriever:
+    web_resource_cache.http.client.retriever:
         class: GuzzleHttp\Client
         factory: 'App\Services\Http\RetrieverHttpClientFactory:create'
 
@@ -85,7 +85,7 @@ services:
 
     App\Services\ResourceRetriever:
         arguments:
-            $httpClient: '@web_resource_cache.http_client.retriever'
+            $httpClient: '@web_resource_cache.http.client.retriever'
 
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:

@@ -16,7 +16,7 @@ class RetrieverHttpClientTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->httpClient = self::$container->get('web_resource_cache.http_client.retriever');
+        $this->httpClient = self::$container->get('web_resource_cache.http.client.retriever');
     }
 
     public function testGet()
