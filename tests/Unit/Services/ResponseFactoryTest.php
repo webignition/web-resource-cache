@@ -2,18 +2,11 @@
 
 namespace App\Tests\Unit\Services;
 
-use App\Entity\CachedResource;
-use App\Entity\RetrieveRequest;
-use App\Model\Response\AbstractResponse;
 use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
-use App\Services\CachedResourceFactory;
 use App\Services\ResponseFactory;
-use GuzzleHttp\Psr7\Response;
-use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
-use webignition\HttpHeaders\Headers;
 
 class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
 {

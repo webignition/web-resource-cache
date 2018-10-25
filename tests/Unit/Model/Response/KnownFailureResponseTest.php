@@ -72,44 +72,6 @@ class KnownFailureResponseTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider fromJsonInvalidDataDataProvider
-     *
-     * @param string $json
-     */
-    public function testFromJsonInvalidData(string $json)
-    {
-        $this->assertNull(KnownFailureResponse::fromJson($json));
-    }
-
-    public function fromJsonInvalidDataDataProvider(): array
-    {
-        return [
-            'empty' => [
-                'json' => '',
-            ],
-            'not an array' => [
-                'json' => json_encode('foo'),
-            ],
-            'missing request_id' => [
-                'json' => json_encode([
-                    'foo' => 'bar',
-                ]),
-            ],
-            'missing failure_type' => [
-                'json' => json_encode([
-                    'request_id' => 'request_hash',
-                ]),
-            ],
-            'missing status_code' => [
-                'json' => json_encode([
-                    'request_id' => 'request_hash',
-                    'failure_type' => KnownFailureResponse::TYPE_HTTP,
-                ]),
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider fromJsonValidDataDataProvider
      *
      * @param string $json

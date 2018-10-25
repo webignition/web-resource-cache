@@ -34,33 +34,6 @@ class UnknownFailureResponseTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider fromJsonInvalidDataDataProvider
-     *
-     * @param string $json
-     */
-    public function testFromJsonInvalidData(string $json)
-    {
-        $this->assertNull(UnknownFailureResponse::fromJson($json));
-    }
-
-    public function fromJsonInvalidDataDataProvider(): array
-    {
-        return [
-            'empty' => [
-                'json' => '',
-            ],
-            'not an array' => [
-                'json' => json_encode('foo'),
-            ],
-            'missing request_id' => [
-                'json' => json_encode([
-                    'foo' => 'bar',
-                ]),
-            ],
-        ];
-    }
-
     public function testFromJsonValidData()
     {
         $requestHash = 'request_hash';
