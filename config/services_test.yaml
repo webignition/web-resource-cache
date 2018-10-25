@@ -6,7 +6,7 @@ services:
 
   App\Tests\Services\HttpMockHandler:
 
-  App\Services\Http\HttpHandlerStackFactory:
+  App\Services\Http\RetrieverHttpHandlerStackFactory:
     arguments:
     - '@webignition\HttpHistoryContainer\Container'
     - '@App\Services\Http\HttpRetryMiddlewareFactory'

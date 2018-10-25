@@ -2,14 +2,14 @@
 
 namespace App\Tests\Functional\Services\Http;
 
-use App\Services\Http\HttpHandlerStackFactory;
+use App\Services\Http\RetrieverHttpHandlerStackFactory;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use GuzzleHttp\HandlerStack;
 
 class HttpHandlerStackFactoryTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var HttpHandlerStackFactory
+     * @var RetrieverHttpHandlerStackFactory
      */
     private $httpHandlerStackFactory;
 
@@ -17,7 +17,7 @@ class HttpHandlerStackFactoryTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->httpHandlerStackFactory = self::$container->get(HttpHandlerStackFactory::class);
+        $this->httpHandlerStackFactory = self::$container->get(RetrieverHttpHandlerStackFactory::class);
     }
 
     public function testCreate()
@@ -27,11 +27,11 @@ class HttpHandlerStackFactoryTest extends AbstractFunctionalTestCase
         $this->assertInstanceOf(HandlerStack::class, $handlerStack);
 
         $currentHandlerStackString = (string)$handlerStack;
-        $handlerStack->remove(HttpHandlerStackFactory::MIDDLEWARE_CACHE_KEY);
+        $handlerStack->remove(RetrieverHttpHandlerStackFactory::MIDDLEWARE_CACHE_KEY);
         $this->assertNotSame($currentHandlerStackString, (string)$handlerStack);
 
         $currentHandlerStackString = (string)$handlerStack;
-        $handlerStack->remove(HttpHandlerStackFactory::MIDDLEWARE_HISTORY_KEY);
+        $handlerStack->remove(RetrieverHttpHandlerStackFactory::MIDDLEWARE_HISTORY_KEY);
         $this->assertNotSame($currentHandlerStackString, (string)$handlerStack);
     }
 }

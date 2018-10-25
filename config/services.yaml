@@ -50,7 +50,7 @@ services:
         factory: 'App\Services\Http\HttpCacheMiddlewareFactory:create'
 
     GuzzleHttp\HandlerStack:
-        factory: 'App\Services\Http\HttpHandlerStackFactory:create'
+        factory: 'App\Services\Http\RetrieverHttpHandlerStackFactory:create'
 
     GuzzleHttp\Cookie\CookieJarInterface:
         class: GuzzleHttp\Cookie\CookieJar
