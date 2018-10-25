@@ -15,14 +15,18 @@ class ClientFactory
         'max_retries' => RetryMiddlewareFactory::MAX_RETRIES,
     ];
 
-    public function create(array $curlOptions, HandlerStack $handlerStack): Client
+    public function create(array $curlOptions, HandlerStack $handlerStack, array $config = []): Client
     {
         $curlOptions = $this->filterCurlOptions($curlOptions);
 
-        $clientConfig = array_merge($this->createClientConfig(), [
-            'curl' => $curlOptions,
-            'handler' => $handlerStack,
-        ]);
+        $clientConfig = array_merge(
+            $this->createClientConfig(),
+            [
+                'curl' => $curlOptions,
+                'handler' => $handlerStack,
+            ],
+            $config
+        );
 
         return new Client($clientConfig);
     }

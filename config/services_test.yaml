@@ -18,17 +18,23 @@ services:
     - '%retryable_statuses%'
 
   App\Services\CachedResourceManager:
-#
-#  web_resource_cache.http.client.retriever:
-#    class: GuzzleHttp\Client
-#    factory: 'App\Services\Http\RetrieverClientFactory:create'
-#    arguments:
-#      $curlOptions: '%curl_options%'
 
   App\Services\Http\ClientFactory:
 
-#  web_resource_cache.http.client.sender:
-#    class: GuzzleHttp\Client
-#    factory: 'App\Services\Http\ClientFactory:create'
-#    arguments:
-#      $curlOptions: '%curl_options%'
+  web_resource_cache.http.client.retriever:
+    public: true
+    class: GuzzleHttp\Client
+    factory: 'App\Services\Http\ClientFactory:create'
+    arguments:
+      $curlOptions: '%curl_options%'
+      $handlerStack: '@web_resource_cache.http.handler_stack.retriever'
+      $config:
+        cookies: '@GuzzleHttp\Cookie\CookieJarInterface'
+
+  web_resource_cache.http.client.sender:
+    public: true
+    class: GuzzleHttp\Client
+    factory: 'App\Services\Http\ClientFactory:create'
+    arguments:
+      $curlOptions: '%curl_options%'
+      $handlerStack: '@web_resource_cache.http.handler_stack.sender'
