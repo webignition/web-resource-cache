@@ -3,7 +3,7 @@
 namespace App\Tests\Unit\Services\Http;
 
 use App\Services\Http\Cache;
-use App\Services\Http\HttpCacheMiddlewareFactory;
+use App\Services\Http\CacheMiddlewareFactory;
 use Doctrine\Common\Cache\MemcachedCache;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 
@@ -22,7 +22,7 @@ class HttpCacheMiddlewareFactoryTest extends \PHPUnit\Framework\TestCase
             ->shouldReceive('get')
             ->andReturn($cache);
 
-        $httpCacheMiddlewareFactory = new HttpCacheMiddlewareFactory($httpCache);
+        $httpCacheMiddlewareFactory = new CacheMiddlewareFactory($httpCache);
 
         $this->assertInstanceOf(CacheMiddleware::class, $httpCacheMiddlewareFactory->create());
     }

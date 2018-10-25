@@ -6,7 +6,7 @@ use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 
-class HttpCacheMiddlewareFactory
+class CacheMiddlewareFactory
 {
     /**
      * @var Cache

@@ -47,7 +47,7 @@ services:
     webignition\HttpHistoryContainer\Container:
 
     Kevinrob\GuzzleCache\CacheMiddleware:
-        factory: 'App\Services\Http\HttpCacheMiddlewareFactory:create'
+        factory: 'App\Services\Http\CacheMiddlewareFactory:create'
 
     web_resource_cache.http.handler_stack.retriever:
         class: GuzzleHttp\HandlerStack
