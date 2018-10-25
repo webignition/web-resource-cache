@@ -8,7 +8,7 @@ services:
 
   web_resource_cache.http.handler_stack.retriever:
     class: GuzzleHttp\HandlerStack
-    factory: 'App\Services\Http\HttpHandlerStackFactory:create'
+    factory: 'App\Services\Http\HandlerStackFactory:create'
     arguments:
       $middlewareCollection: '@App\Services\Http\RetrieverHttpHandlerStackMiddlewareCollection'
       $handler: '@App\Tests\Services\HttpMockHandler'

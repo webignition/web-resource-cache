@@ -5,7 +5,7 @@ namespace App\Services\Http;
 use App\Services\ArrayCollection;
 use GuzzleHttp\HandlerStack;
 
-class HttpHandlerStackFactory
+class HandlerStackFactory
 {
     public function create(ArrayCollection $middlewareCollection = null, callable $handler = null): HandlerStack
     {
