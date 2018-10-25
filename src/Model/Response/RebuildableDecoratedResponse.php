@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Model\Response\RebuildableDecoratedResponse;
+namespace App\Model\Response;
 
-use App\Model\Response\AbstractResponse;
-
-class Response implements \JsonSerializable
+class RebuildableDecoratedResponse implements \JsonSerializable
 {
     /**
      * @var AbstractResponse

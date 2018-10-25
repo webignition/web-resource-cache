@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Model\Response\PresentationDecoratedResponse;
+namespace App\Model\Response;
 
 use App\Entity\CachedResource;
-use App\Model\Response\SuccessResponse as BaseSuccessResponse;
 
-class SuccessResponse implements \JsonSerializable
+class PresentationDecoratedSuccessResponse implements \JsonSerializable
 {
     /**
-     * @var BaseSuccessResponse
+     * @var SuccessResponse
      */
     private $response;
 
@@ -17,7 +16,7 @@ class SuccessResponse implements \JsonSerializable
      */
     private $resource;
 
-    public function __construct(BaseSuccessResponse $response, CachedResource $resource)
+    public function __construct(SuccessResponse $response, CachedResource $resource)
     {
         $this->response = $response;
         $this->resource = $resource;

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Tests\Unit\Model\Response\RebuildableDecoratedResponse;
+namespace App\Tests\Unit\Model\Response;
 
 use App\Model\Response\AbstractResponse;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse\Response;
+use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 
-class ResponseTest extends \PHPUnit\Framework\TestCase
+class RebuildableDecoratedResponseTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider jsonSerializeDataProvider
@@ -20,7 +20,7 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
         AbstractResponse $wrappedResponse,
         string $expectedJson
     ) {
-        $decoratedSuccessResponse = new Response($wrappedResponse);
+        $decoratedSuccessResponse = new RebuildableDecoratedResponse($wrappedResponse);
 
         $this->assertEquals($expectedJson, json_encode($decoratedSuccessResponse));
     }
