@@ -61,9 +61,6 @@ services:
             $curlOptions: '%curl_options%'
             $handlerStack: '@web_resource_cache.http.handler_stack.retriever'
 
-    GuzzleHttp\Client:
-        factory: 'App\Services\Http\RetrieverHttpClientFactory:create'
-
     web_resource_cache.http.client.retriever:
         class: GuzzleHttp\Client
         factory: 'App\Services\Http\RetrieverHttpClientFactory:create'

@@ -27,7 +27,7 @@ class RetrieverHttpClientFactoryTest extends AbstractFunctionalTestCase
         $httpClient = $this->retrieverHttpClientFactory->create();
 
         $this->assertInstanceOf(Client::class, $httpClient);
-        $this->assertEquals(self::$container->get(Client::class), $httpClient);
+        $this->assertEquals(self::$container->get('web_resource_cache.http.client.retriever'), $httpClient);
 
         $httpClientCurlOptions = $httpClient->getConfig('curl');
 

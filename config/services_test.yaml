@@ -13,8 +13,6 @@ services:
     - '@Kevinrob\GuzzleCache\CacheMiddleware'
     - '@App\Tests\Services\HttpMockHandler'
 
-  App\Services\ResourceRetriever:
-
   App\Services\RetryDecider:
     arguments:
     - '%retryable_statuses%'
