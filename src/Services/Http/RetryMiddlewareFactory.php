@@ -8,7 +8,7 @@ use GuzzleHttp\Middleware;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class HttpRetryMiddlewareFactory
+class RetryMiddlewareFactory
 {
     const MAX_RETRIES = 5;
 

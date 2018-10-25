@@ -15,7 +15,7 @@ class RetrieverHttpHandlerStackMiddlewareCollection extends ArrayCollection
 
     public function __construct(
         HttpHistoryContainer $historyContainer,
-        HttpRetryMiddlewareFactory $httpRetryMiddlewareFactory,
+        RetryMiddlewareFactory $httpRetryMiddlewareFactory,
         CacheMiddleware $cacheMiddleware
     ) {
         parent::__construct([

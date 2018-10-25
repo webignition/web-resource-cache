@@ -35,7 +35,7 @@ class ClientFactory
             'curl' => $this->curlOptions,
             'verify' => false,
             'handler' => $this->handlerStack,
-            'max_retries' => HttpRetryMiddlewareFactory::MAX_RETRIES,
+            'max_retries' => RetryMiddlewareFactory::MAX_RETRIES,
         ];
     }
 
