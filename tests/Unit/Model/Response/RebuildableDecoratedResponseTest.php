@@ -57,4 +57,15 @@ class RebuildableDecoratedResponseTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    public function testGetRequestId()
+    {
+        $requestHash = 'request-hash';
+
+        $response = new RebuildableDecoratedResponse(
+            new SuccessResponse($requestHash)
+        );
+
+        $this->assertEquals($requestHash, $response->getRequestId());
+    }
 }
