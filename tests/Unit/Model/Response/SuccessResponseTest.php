@@ -32,26 +32,6 @@ class SuccessResponseTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFromJsonValidData()
-    {
-        $requestHash = 'request_hash';
-
-        $json = json_encode([
-            'request_id' => $requestHash,
-        ]);
-
-        $response = SuccessResponse::fromJson($json);
-
-        $this->assertInstanceOf(SuccessResponse::class, $response);
-        $this->assertEquals(
-            json_encode([
-                'request_id' => $requestHash,
-                'status' => SuccessResponse::STATUS_SUCCESS,
-            ]),
-            json_encode($response)
-        );
-    }
-
     public function testGetRequestId()
     {
         $requestHash = 'request-hash';

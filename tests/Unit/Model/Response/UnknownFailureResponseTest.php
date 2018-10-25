@@ -34,27 +34,6 @@ class UnknownFailureResponseTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFromJsonValidData()
-    {
-        $requestHash = 'request_hash';
-
-        $json = json_encode([
-            'request_id' => $requestHash,
-        ]);
-
-        $response = UnknownFailureResponse::fromJson($json);
-
-        $this->assertInstanceOf(UnknownFailureResponse::class, $response);
-        $this->assertEquals(
-            json_encode([
-                'request_id' => $requestHash,
-                'status' => UnknownFailureResponse::STATUS_FAILED,
-                'failure_type' => AbstractFailureResponse::TYPE_UNKNOWN,
-            ]),
-            json_encode($response)
-        );
-    }
-
     public function testGetRequestId()
     {
         $requestHash = 'request-hash';
