@@ -6,17 +6,17 @@ use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 
-class HttpCacheMiddlewareFactory
+class CacheMiddlewareFactory
 {
     /**
-     * @var HttpCache
+     * @var Cache
      */
     private $cache;
 
     /**
-     * @param HttpCache $cache
+     * @param Cache $cache
      */
-    public function __construct(HttpCache $cache)
+    public function __construct(Cache $cache)
     {
         $this->cache = $cache;
     }

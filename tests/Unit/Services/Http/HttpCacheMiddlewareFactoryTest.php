@@ -2,8 +2,8 @@
 
 namespace App\Tests\Unit\Services\Http;
 
-use App\Services\Http\HttpCache;
-use App\Services\Http\HttpCacheMiddlewareFactory;
+use App\Services\Http\Cache;
+use App\Services\Http\CacheMiddlewareFactory;
 use Doctrine\Common\Cache\MemcachedCache;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 
@@ -11,20 +11,20 @@ class HttpCacheMiddlewareFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateReturnsCacheMiddleware()
     {
-        $cache = \Mockery::mock(MemcachedCache::class);
+        $memcachedCache = \Mockery::mock(MemcachedCache::class);
 
-        $httpCache = \Mockery::mock(HttpCache::class);
-        $httpCache
+        $cache = \Mockery::mock(Cache::class);
+        $cache
             ->shouldReceive('has')
             ->andReturn(true);
 
-        $httpCache
+        $cache
             ->shouldReceive('get')
-            ->andReturn($cache);
+            ->andReturn($memcachedCache);
 
-        $httpCacheMiddlewareFactory = new HttpCacheMiddlewareFactory($httpCache);
+        $cacheMiddlewareFactory = new CacheMiddlewareFactory($cache);
 
-        $this->assertInstanceOf(CacheMiddleware::class, $httpCacheMiddlewareFactory->create());
+        $this->assertInstanceOf(CacheMiddleware::class, $cacheMiddlewareFactory->create());
     }
 
     protected function tearDown()

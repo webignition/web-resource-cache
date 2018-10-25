@@ -2,39 +2,39 @@
 
 namespace App\Tests\Functional\Services\Http;
 
-use App\Services\Http\HttpCache;
+use App\Services\Http\Cache;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\Common\Cache\MemcachedCache;
 
-class HttpCacheTest extends AbstractFunctionalTestCase
+class CacheTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var HttpCache
+     * @var Cache
      */
-    private $httpCache;
+    private $cache;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->httpCache = self::$container->get(HttpCache::class);
+        $this->cache = self::$container->get(Cache::class);
     }
 
     public function testGet()
     {
-        $this->assertInstanceOf(MemcachedCache::class, $this->httpCache->get());
+        $this->assertInstanceOf(MemcachedCache::class, $this->cache->get());
     }
 
     public function testClear()
     {
         $id = 'foo';
 
-        $memcachedCache = $this->httpCache->get();
+        $memcachedCache = $this->cache->get();
         $memcachedCache->save($id, 'data');
 
         $this->assertTrue($memcachedCache->contains($id));
 
-        $this->httpCache->clear();
+        $this->cache->clear();
 
         $this->assertFalse($memcachedCache->contains($id));
     }

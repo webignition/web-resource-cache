@@ -5,7 +5,7 @@ namespace App\Services\Http;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 
-class HttpClientFactory
+class ClientFactory
 {
     /**
      * @var array
@@ -35,7 +35,7 @@ class HttpClientFactory
             'curl' => $this->curlOptions,
             'verify' => false,
             'handler' => $this->handlerStack,
-            'max_retries' => HttpRetryMiddlewareFactory::MAX_RETRIES,
+            'max_retries' => RetryMiddlewareFactory::MAX_RETRIES,
         ];
     }
 

@@ -7,7 +7,7 @@ use GuzzleHttp\Middleware;
 use Kevinrob\GuzzleCache\CacheMiddleware;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class RetrieverHttpHandlerStackMiddlewareCollection extends ArrayCollection
+class RetrieverMiddlewareCollection extends ArrayCollection
 {
     const MIDDLEWARE_CACHE_KEY = 'cache';
     const MIDDLEWARE_RETRY_KEY = 'retry';
@@ -15,12 +15,12 @@ class RetrieverHttpHandlerStackMiddlewareCollection extends ArrayCollection
 
     public function __construct(
         HttpHistoryContainer $historyContainer,
-        HttpRetryMiddlewareFactory $httpRetryMiddlewareFactory,
+        RetryMiddlewareFactory $retryMiddlewareFactory,
         CacheMiddleware $cacheMiddleware
     ) {
         parent::__construct([
             self::MIDDLEWARE_CACHE_KEY => $cacheMiddleware,
-            self::MIDDLEWARE_RETRY_KEY => $httpRetryMiddlewareFactory->create(),
+            self::MIDDLEWARE_RETRY_KEY => $retryMiddlewareFactory->create(),
             self::MIDDLEWARE_HISTORY_KEY => Middleware::history($historyContainer),
         ]);
     }

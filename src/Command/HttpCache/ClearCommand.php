@@ -2,7 +2,7 @@
 
 namespace App\Command\HttpCache;
 
-use App\Services\Http\HttpCache;
+use App\Services\Http\Cache;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,14 +10,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ClearCommand extends Command
 {
     /**
-     * @var HttpCache
+     * @var Cache
      */
-    private $httpCache;
+    private $cache;
 
-    public function __construct(HttpCache $httpCache)
+    public function __construct(Cache $cache)
     {
         parent::__construct();
-        $this->httpCache = $httpCache;
+        $this->cache = $cache;
     }
 
     /**
@@ -36,6 +36,6 @@ class ClearCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->httpCache->clear() ? 0 : 1;
+        return $this->cache->clear() ? 0 : 1;
     }
 }
