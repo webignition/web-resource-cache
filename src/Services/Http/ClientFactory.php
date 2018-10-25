@@ -5,7 +5,7 @@ namespace App\Services\Http;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 
-class HttpClientFactory
+class ClientFactory
 {
     /**
      * @var array

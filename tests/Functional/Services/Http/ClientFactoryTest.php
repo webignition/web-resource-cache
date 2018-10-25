@@ -2,14 +2,14 @@
 
 namespace App\Tests\Functional\Services\Http;
 
-use App\Services\Http\HttpClientFactory;
+use App\Services\Http\ClientFactory;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use GuzzleHttp\Client;
 
-class HttpClientFactoryTest extends AbstractFunctionalTestCase
+class ClientFactoryTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var HttpClientFactory
+     * @var ClientFactory
      */
     private $httpClientFactory;
 
@@ -17,7 +17,7 @@ class HttpClientFactoryTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->httpClientFactory = self::$container->get(HttpClientFactory::class);
+        $this->httpClientFactory = self::$container->get(ClientFactory::class);
     }
 
     public function testCreate()

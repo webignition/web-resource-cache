@@ -5,7 +5,7 @@ namespace App\Services\Http;
 use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\HandlerStack;
 
-class RetrieverHttpClientFactory extends HttpClientFactory
+class RetrieverClientFactory extends ClientFactory
 {
     /**
      * @var CookieJarInterface

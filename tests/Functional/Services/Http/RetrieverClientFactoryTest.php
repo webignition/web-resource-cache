@@ -2,14 +2,14 @@
 
 namespace App\Tests\Functional\Services\Http;
 
-use App\Services\Http\RetrieverHttpClientFactory;
+use App\Services\Http\RetrieverClientFactory;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use GuzzleHttp\Client;
 
-class RetrieverHttpClientFactoryTest extends AbstractFunctionalTestCase
+class RetrieverClientFactoryTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var RetrieverHttpClientFactory
+     * @var RetrieverClientFactory
      */
     private $retrieverHttpClientFactory;
 
@@ -17,7 +17,7 @@ class RetrieverHttpClientFactoryTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->retrieverHttpClientFactory = self::$container->get(RetrieverHttpClientFactory::class);
+        $this->retrieverHttpClientFactory = self::$container->get(RetrieverClientFactory::class);
     }
 
     public function testCreate()
