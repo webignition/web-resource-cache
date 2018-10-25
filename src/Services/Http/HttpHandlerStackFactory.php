@@ -4,7 +4,7 @@ namespace App\Services\Http;
 
 use GuzzleHttp\HandlerStack;
 
-class SenderHttpHandlerStackFactory
+class HttpHandlerStackFactory
 {
     /**
      * @var callable|null
