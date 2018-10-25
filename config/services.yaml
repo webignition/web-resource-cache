@@ -62,6 +62,10 @@ services:
     GuzzleHttp\Client:
         factory: 'App\Services\Http\HttpClientFactory:create'
 
+    web_resource_cache.http_client.retriever:
+        class: GuzzleHttp\Client
+        factory: 'App\Services\Http\HttpClientFactory:create'
+
     Memcached:
         class: \Memcached
         calls:
@@ -78,6 +82,10 @@ services:
     App\Services\RetryDecider:
         arguments:
             - '%retryable_statuses%'
+
+    App\Services\ResourceRetriever:
+        arguments:
+            $httpClient: '@web_resource_cache.http_client.retriever'
 
     # public commands required for retrieval from resque container
     App\Command\RetrieveResourceCommand:

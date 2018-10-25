@@ -20,3 +20,7 @@ services:
     - '%retryable_statuses%'
 
   App\Services\CachedResourceManager:
+
+  web_resource_cache.http_client.retriever:
+    class: GuzzleHttp\Client
+    factory: 'App\Services\Http\HttpClientFactory:create'
