@@ -10,36 +10,28 @@ class ClientFactory
     /**
      * @var array
      */
-    protected $curlOptions;
+    private $defaultConfig = [
+        'verify' => false,
+        'max_retries' => RetryMiddlewareFactory::MAX_RETRIES,
+    ];
 
-    /**
-     * @var HandlerStack
-     */
-    protected $handlerStack;
-
-    public function __construct(array $curlOptions, HandlerStack $handlerStack)
+    public function create(array $curlOptions, HandlerStack $handlerStack, array $config = []): Client
     {
-        $this->setCurlOptions($curlOptions);
+        $curlOptions = $this->filterCurlOptions($curlOptions);
 
-        $this->handlerStack = $handlerStack;
+        $clientConfig = array_merge(
+            $this->defaultConfig,
+            [
+                'curl' => $curlOptions,
+                'handler' => $handlerStack,
+            ],
+            $config
+        );
+
+        return new Client($clientConfig);
     }
 
-    public function create(): Client
-    {
-        return new Client($this->createClientConfig());
-    }
-
-    protected function createClientConfig(): array
-    {
-        return [
-            'curl' => $this->curlOptions,
-            'verify' => false,
-            'handler' => $this->handlerStack,
-            'max_retries' => RetryMiddlewareFactory::MAX_RETRIES,
-        ];
-    }
-
-    private function setCurlOptions(array $curlOptions)
+    private function filterCurlOptions(array $curlOptions)
     {
         $definedCurlOptions = [];
 
@@ -49,6 +41,6 @@ class ClientFactory
             }
         }
 
-        $this->curlOptions = $definedCurlOptions;
+        return $definedCurlOptions;
     }
 }
