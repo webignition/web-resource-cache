@@ -30,7 +30,7 @@ class RetrieverHttpHandlerStackFactory extends HttpHandlerStackFactory
     public function __construct(
         HttpHistoryContainer $historyContainer,
         HttpRetryMiddlewareFactory $httpRetryMiddlewareFactory,
-        CacheMiddleware $cacheMiddleware = null,
+        CacheMiddleware $cacheMiddleware,
         callable $handler = null
     ) {
         parent::__construct($handler);
@@ -47,10 +47,7 @@ class RetrieverHttpHandlerStackFactory extends HttpHandlerStackFactory
     {
         $handlerStack = parent::create();
 
-        if ($this->cacheMiddleware) {
-            $handlerStack->push($this->cacheMiddleware, self::MIDDLEWARE_CACHE_KEY);
-        }
-
+        $handlerStack->push($this->cacheMiddleware, self::MIDDLEWARE_CACHE_KEY);
         $handlerStack->push($this->retryMiddleware);
         $handlerStack->push(Middleware::history($this->historyContainer), self::MIDDLEWARE_HISTORY_KEY);
 
