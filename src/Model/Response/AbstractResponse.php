@@ -2,7 +2,7 @@
 
 namespace App\Model\Response;
 
-abstract class AbstractResponse implements \JsonSerializable
+abstract class AbstractResponse implements ResponseInterface
 {
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';

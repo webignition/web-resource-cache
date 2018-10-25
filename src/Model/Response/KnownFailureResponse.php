@@ -22,4 +22,23 @@ class KnownFailureResponse extends AbstractFailureResponse
             'status_code' => $this->statusCode,
         ]);
     }
+
+    public static function fromJson(string $json): ?ResponseInterface
+    {
+        $data = json_decode(trim($json), true);
+
+        if (!is_array($data)) {
+            return null;
+        }
+
+        $requestId = $data['request_id'] ?? null;
+        $type = $data['failure_type'] ?? null;
+        $statusCode = $data['status_code'] ?? null;
+
+        if (empty($requestId) || empty($type) || null === $statusCode) {
+            return null;
+        }
+
+        return new static($requestId, $type, $statusCode);
+    }
 }
