@@ -49,6 +49,9 @@ services:
     Kevinrob\GuzzleCache\CacheMiddleware:
         factory: 'App\Services\Http\CacheMiddlewareFactory:create'
 
+    GuzzleHttp\Cookie\CookieJarInterface:
+        class: GuzzleHttp\Cookie\CookieJar
+
     web_resource_cache.http.handler_stack.retriever:
         class: GuzzleHttp\HandlerStack
         factory: 'App\Services\Http\HandlerStackFactory:create'
@@ -58,11 +61,6 @@ services:
     web_resource_cache.http.handler_stack.sender:
         class: GuzzleHttp\HandlerStack
         factory: 'App\Services\Http\HandlerStackFactory:create'
-
-    GuzzleHttp\Cookie\CookieJarInterface:
-        class: GuzzleHttp\Cookie\CookieJar
-
-    App\Services\Http\ClientFactory:
 
     web_resource_cache.http.client.retriever:
         class: GuzzleHttp\Client
