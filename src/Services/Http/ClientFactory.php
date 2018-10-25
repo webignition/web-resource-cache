@@ -20,7 +20,7 @@ class ClientFactory
         $curlOptions = $this->filterCurlOptions($curlOptions);
 
         $clientConfig = array_merge(
-            $this->createClientConfig(),
+            $this->defaultConfig,
             [
                 'curl' => $curlOptions,
                 'handler' => $handlerStack,
@@ -29,11 +29,6 @@ class ClientFactory
         );
 
         return new Client($clientConfig);
-    }
-
-    protected function createClientConfig(): array
-    {
-        return array_merge($this->defaultConfig);
     }
 
     private function filterCurlOptions(array $curlOptions)
