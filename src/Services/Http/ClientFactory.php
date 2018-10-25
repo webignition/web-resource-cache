@@ -15,7 +15,7 @@ class ClientFactory
         'max_retries' => RetryMiddlewareFactory::MAX_RETRIES,
     ];
 
-    public function create(array $curlOptions, ?HandlerStack $handlerStack = null): Client
+    public function create(array $curlOptions, HandlerStack $handlerStack): Client
     {
         $curlOptions = $this->filterCurlOptions($curlOptions);
 
