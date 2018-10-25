@@ -5,6 +5,8 @@ namespace App\Command;
 use App\Entity\RetrieveRequest;
 use App\Exception\HttpTransportException;
 use App\Model\Response\KnownFailureResponse;
+use App\Model\Response\RebuildableDecoratedResponse;
+use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 use App\Resque\Job\RetrieveResourceJob;
@@ -130,10 +132,8 @@ class RetrieveResourceCommand extends Command
         $requestHash = $retrieveRequest->getHash();
 
         if ($hasUnknownFailure) {
-            $response = new UnknownFailureResponse($requestHash);
-
             $sendResponseJobArgs = [
-                'response-json' => json_encode($response),
+                'response-json' => $this->createResponseJson(new UnknownFailureResponse($requestHash)),
             ];
 
             if (!$this->resqueQueueService->contains(SendResponseJob::QUEUE_NAME, $sendResponseJobArgs)) {
@@ -171,7 +171,7 @@ class RetrieveResourceCommand extends Command
         }
 
         $sendResponseJobArgs = [
-            'response-json' => json_encode($response),
+            'response-json' => $this->createResponseJson($response),
         ];
 
         if (!$this->resqueQueueService->contains(SendResponseJob::QUEUE_NAME, $sendResponseJobArgs)) {
@@ -179,5 +179,10 @@ class RetrieveResourceCommand extends Command
         }
 
         return self::RETURN_CODE_OK;
+    }
+
+    private function createResponseJson(ResponseInterface $response): string
+    {
+        return json_encode(new RebuildableDecoratedResponse($response));
     }
 }

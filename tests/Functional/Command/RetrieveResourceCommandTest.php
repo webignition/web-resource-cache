@@ -203,6 +203,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
                     'request_id' => '{{ requestHash }}',
                     'status' => UnknownFailureResponse::STATUS_FAILED,
                     'failure_type' => UnknownFailureResponse::TYPE_UNKNOWN,
+                    'class' => UnknownFailureResponse::class,
                 ]),
             ],
             'HTTP 200' => [
@@ -212,6 +213,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
                 'expectedResqueJobData' => json_encode([
                     'request_id' => '{{ requestHash }}',
                     'status' => SuccessResponse::STATUS_SUCCESS,
+                    'class' => SuccessResponse::class,
                 ]),
             ],
             'HTTP 404' => [
@@ -223,6 +225,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
                     'status' => KnownFailureResponse::STATUS_FAILED,
                     'failure_type' => KnownFailureResponse::TYPE_HTTP,
                     'status_code' => 404,
+                    'class' => KnownFailureResponse::class,
                 ]),
             ],
             'HTTP 301' => [
@@ -232,6 +235,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
                     'status' => KnownFailureResponse::STATUS_FAILED,
                     'failure_type' => KnownFailureResponse::TYPE_HTTP,
                     'status_code' => 301,
+                    'class' => KnownFailureResponse::class,
                 ]),
             ],
         ];
