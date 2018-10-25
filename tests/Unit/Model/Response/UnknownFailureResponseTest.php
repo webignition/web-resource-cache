@@ -2,7 +2,6 @@
 
 namespace App\Tests\Unit\Model\Response;
 
-use App\Model\Response\AbstractFailureResponse;
 use App\Model\Response\UnknownFailureResponse;
 
 class UnknownFailureResponseTest extends \PHPUnit\Framework\TestCase
