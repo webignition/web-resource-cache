@@ -51,7 +51,9 @@ services:
 
     web_resource_cache.http.handler_stack.retriever:
         class: GuzzleHttp\HandlerStack
-        factory: 'App\Services\Http\RetrieverHttpHandlerStackFactory:create'
+        factory: 'App\Services\Http\HttpHandlerStackFactory:create'
+        arguments:
+            $middlewareCollection: '@App\Services\Http\RetrieverHttpHandlerStackMiddlewareCollection'
 
     web_resource_cache.http.handler_stack.sender:
         class: GuzzleHttp\HandlerStack

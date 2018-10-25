@@ -35,6 +35,7 @@ class HttpClientTest extends AbstractFunctionalTestCase
      *
      * @param string $serviceId
      * @param string $expectedSenderServiceId
+     * @param bool $expectedHasCookieJar
      */
     public function testConfig(string $serviceId, string $expectedSenderServiceId, bool $expectedHasCookieJar)
     {
