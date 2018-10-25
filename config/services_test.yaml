@@ -13,6 +13,13 @@ services:
       $middlewareCollection: '@App\Services\Http\RetrieverMiddlewareCollection'
       $handler: '@App\Tests\Services\HttpMockHandler'
 
+  web_resource_cache.http.handler_stack.sender:
+    class: GuzzleHttp\HandlerStack
+    factory: 'App\Services\Http\HandlerStackFactory:create'
+    arguments:
+      $middlewareCollection: '@App\Services\Http\SenderMiddlewareCollection'
+      $handler: '@App\Tests\Services\HttpMockHandler'
+
   App\Services\RetryDecider:
     arguments:
     - '%retryable_statuses%'
@@ -36,3 +43,7 @@ services:
     arguments:
       $curlOptions: '%curl_options%'
       $handlerStack: '@web_resource_cache.http.handler_stack.sender'
+
+  App\Services\ResponseSender:
+    arguments:
+      $httpClient: '@web_resource_cache.http.client.sender'
