@@ -3,7 +3,6 @@
 namespace App\Services\Http;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\HandlerStack;
 
 class HttpClientFactory
@@ -11,43 +10,35 @@ class HttpClientFactory
     /**
      * @var array
      */
-    private $curlOptions;
-
-    /**
-     * @var CookieJarInterface
-     */
-    private $cookieJar;
+    protected $curlOptions;
 
     /**
      * @var HandlerStack
      */
-    private $handlerStack;
+    protected $handlerStack;
 
-    public function __construct(array $curlOptions, HandlerStack $handlerStack, CookieJarInterface $cookieJar)
+    public function __construct(array $curlOptions, HandlerStack $handlerStack)
     {
         $this->setCurlOptions($curlOptions);
 
-        $this->cookieJar = $cookieJar;
         $this->handlerStack = $handlerStack;
     }
 
-    /**
-     * @return Client
-     */
-    public function create()
+    public function create(): Client
     {
-        return new Client([
+        return new Client($this->createClientConfig());
+    }
+
+    protected function createClientConfig(): array
+    {
+        return [
             'curl' => $this->curlOptions,
             'verify' => false,
             'handler' => $this->handlerStack,
             'max_retries' => HttpRetryMiddlewareFactory::MAX_RETRIES,
-            'cookies' => $this->cookieJar,
-        ]);
+        ];
     }
 
-    /**
-     * @param array $curlOptions
-     */
     private function setCurlOptions(array $curlOptions)
     {
         $definedCurlOptions = [];
