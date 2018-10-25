@@ -15,12 +15,12 @@ class RetrieverMiddlewareCollection extends ArrayCollection
 
     public function __construct(
         HttpHistoryContainer $historyContainer,
-        RetryMiddlewareFactory $httpRetryMiddlewareFactory,
+        RetryMiddlewareFactory $retryMiddlewareFactory,
         CacheMiddleware $cacheMiddleware
     ) {
         parent::__construct([
             self::MIDDLEWARE_CACHE_KEY => $cacheMiddleware,
-            self::MIDDLEWARE_RETRY_KEY => $httpRetryMiddlewareFactory->create(),
+            self::MIDDLEWARE_RETRY_KEY => $retryMiddlewareFactory->create(),
             self::MIDDLEWARE_HISTORY_KEY => Middleware::history($historyContainer),
         ]);
     }

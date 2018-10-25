@@ -12,14 +12,14 @@ class ClearCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider runDataProvider
      *
-     * @param Cache $httpCache
+     * @param Cache $cache
      * @param bool $expectedReturnCode
      *
      * @throws \Exception
      */
-    public function testRun(Cache $httpCache, bool $expectedReturnCode)
+    public function testRun(Cache $cache, bool $expectedReturnCode)
     {
-        $command = new ClearCommand($httpCache);
+        $command = new ClearCommand($cache);
 
         $this->assertEquals(
             $expectedReturnCode,
@@ -31,11 +31,11 @@ class ClearCommandTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'fail' => [
-                'httpCache' => $this->createHttpCache(false),
+                'cache' => $this->createHttpCache(false),
                 'expectedReturnCode' => 1,
             ],
             'success' => [
-                'httpCache' => $this->createHttpCache(true),
+                'cache' => $this->createHttpCache(true),
                 'expectedReturnCode' => 0,
             ],
         ];
@@ -43,12 +43,12 @@ class ClearCommandTest extends \PHPUnit\Framework\TestCase
 
     private function createHttpCache(bool $clearReturnValue): Cache
     {
-        $httpCache = \Mockery::mock(Cache::class);
-        $httpCache
+        $cache = \Mockery::mock(Cache::class);
+        $cache
             ->shouldReceive('clear')
             ->andReturn($clearReturnValue);
 
-        return $httpCache;
+        return $cache;
     }
 
     protected function tearDown()

@@ -12,12 +12,12 @@ class ClearCommand extends Command
     /**
      * @var Cache
      */
-    private $httpCache;
+    private $cache;
 
-    public function __construct(Cache $httpCache)
+    public function __construct(Cache $cache)
     {
         parent::__construct();
-        $this->httpCache = $httpCache;
+        $this->cache = $cache;
     }
 
     /**
@@ -36,6 +36,6 @@ class ClearCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->httpCache->clear() ? 0 : 1;
+        return $this->cache->clear() ? 0 : 1;
     }
 }

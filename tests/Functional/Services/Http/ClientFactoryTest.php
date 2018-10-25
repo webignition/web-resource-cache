@@ -11,18 +11,18 @@ class ClientFactoryTest extends AbstractFunctionalTestCase
     /**
      * @var ClientFactory
      */
-    private $httpClientFactory;
+    private $clientFactory;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->httpClientFactory = self::$container->get(ClientFactory::class);
+        $this->clientFactory = self::$container->get(ClientFactory::class);
     }
 
     public function testCreate()
     {
-        $httpClient = $this->httpClientFactory->create();
+        $httpClient = $this->clientFactory->create();
 
         $this->assertInstanceOf(Client::class, $httpClient);
         $this->assertEquals(self::$container->get('web_resource_cache.http.client.sender'), $httpClient);

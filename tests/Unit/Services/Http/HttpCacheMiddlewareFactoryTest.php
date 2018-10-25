@@ -11,20 +11,20 @@ class HttpCacheMiddlewareFactoryTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreateReturnsCacheMiddleware()
     {
-        $cache = \Mockery::mock(MemcachedCache::class);
+        $memcachedCache = \Mockery::mock(MemcachedCache::class);
 
-        $httpCache = \Mockery::mock(Cache::class);
-        $httpCache
+        $cache = \Mockery::mock(Cache::class);
+        $cache
             ->shouldReceive('has')
             ->andReturn(true);
 
-        $httpCache
+        $cache
             ->shouldReceive('get')
-            ->andReturn($cache);
+            ->andReturn($memcachedCache);
 
-        $httpCacheMiddlewareFactory = new CacheMiddlewareFactory($httpCache);
+        $cacheMiddlewareFactory = new CacheMiddlewareFactory($cache);
 
-        $this->assertInstanceOf(CacheMiddleware::class, $httpCacheMiddlewareFactory->create());
+        $this->assertInstanceOf(CacheMiddleware::class, $cacheMiddlewareFactory->create());
     }
 
     protected function tearDown()

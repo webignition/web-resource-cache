@@ -10,17 +10,17 @@ class RetryMiddlewareFactoryTest extends AbstractFunctionalTestCase
     /**
      * @var RetryMiddlewareFactory
      */
-    private $httpRetryMiddlewareFactory;
+    private $retryMiddlewareFactory;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->httpRetryMiddlewareFactory = self::$container->get(RetryMiddlewareFactory::class);
+        $this->retryMiddlewareFactory = self::$container->get(RetryMiddlewareFactory::class);
     }
 
     public function testCreate()
     {
-        $this->assertInstanceOf(\Closure::class, $this->httpRetryMiddlewareFactory->create());
+        $this->assertInstanceOf(\Closure::class, $this->retryMiddlewareFactory->create());
     }
 }
