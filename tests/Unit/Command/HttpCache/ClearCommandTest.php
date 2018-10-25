@@ -3,7 +3,7 @@
 namespace App\Tests\Unit\Command\HttpCache;
 
 use App\Command\HttpCache\ClearCommand;
-use App\Services\Http\HttpCache;
+use App\Services\Http\Cache;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -12,12 +12,12 @@ class ClearCommandTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider runDataProvider
      *
-     * @param HttpCache $httpCache
+     * @param Cache $httpCache
      * @param bool $expectedReturnCode
      *
      * @throws \Exception
      */
-    public function testRun(HttpCache $httpCache, bool $expectedReturnCode)
+    public function testRun(Cache $httpCache, bool $expectedReturnCode)
     {
         $command = new ClearCommand($httpCache);
 
@@ -41,9 +41,9 @@ class ClearCommandTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function createHttpCache(bool $clearReturnValue): HttpCache
+    private function createHttpCache(bool $clearReturnValue): Cache
     {
-        $httpCache = \Mockery::mock(HttpCache::class);
+        $httpCache = \Mockery::mock(Cache::class);
         $httpCache
             ->shouldReceive('clear')
             ->andReturn($clearReturnValue);

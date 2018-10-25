@@ -2,14 +2,14 @@
 
 namespace App\Tests\Functional\Services\Http;
 
-use App\Services\Http\HttpCache;
+use App\Services\Http\Cache;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\Common\Cache\MemcachedCache;
 
 class HttpCacheTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var HttpCache
+     * @var Cache
      */
     private $httpCache;
 
@@ -17,7 +17,7 @@ class HttpCacheTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->httpCache = self::$container->get(HttpCache::class);
+        $this->httpCache = self::$container->get(Cache::class);
     }
 
     public function testGet()

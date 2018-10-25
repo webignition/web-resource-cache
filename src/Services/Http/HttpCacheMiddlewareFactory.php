@@ -9,14 +9,14 @@ use Kevinrob\GuzzleCache\Strategy\PrivateCacheStrategy;
 class HttpCacheMiddlewareFactory
 {
     /**
-     * @var HttpCache
+     * @var Cache
      */
     private $cache;
 
     /**
-     * @param HttpCache $cache
+     * @param Cache $cache
      */
-    public function __construct(HttpCache $cache)
+    public function __construct(Cache $cache)
     {
         $this->cache = $cache;
     }

@@ -2,10 +2,10 @@
 
 namespace App\Services\Http;
 
-use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\Cache as DoctrineCache;
 use Doctrine\Common\Cache\MemcachedCache;
 
-class HttpCache
+class Cache
 {
     /**
      * @var MemcachedCache
@@ -18,7 +18,7 @@ class HttpCache
     }
 
     /**
-     * @return MemcachedCache|Cache
+     * @return MemcachedCache|DoctrineCache
      */
     public function get()
     {
