@@ -81,4 +81,13 @@ class UnknownFailureResponseTest extends \PHPUnit\Framework\TestCase
             json_encode($response)
         );
     }
+
+    public function testGetRequestId()
+    {
+        $requestHash = 'request-hash';
+
+        $response = new UnknownFailureResponse($requestHash);
+
+        $this->assertEquals($requestHash, $response->getRequestId());
+    }
 }

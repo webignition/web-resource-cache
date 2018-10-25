@@ -78,4 +78,13 @@ class SuccessResponseTest extends \PHPUnit\Framework\TestCase
             json_encode($response)
         );
     }
+
+    public function testGetRequestId()
+    {
+        $requestHash = 'request-hash';
+
+        $response = new SuccessResponse($requestHash);
+
+        $this->assertEquals($requestHash, $response->getRequestId());
+    }
 }
