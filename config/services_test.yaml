@@ -23,4 +23,4 @@ services:
 
   web_resource_cache.http_client.retriever:
     class: GuzzleHttp\Client
-    factory: 'App\Services\Http\HttpClientFactory:create'
+    factory: 'App\Services\Http\RetrieverHttpClientFactory:create'

@@ -6,7 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\HandlerStack;
 
-class HttpClientFactory
+class RetrieverHttpClientFactory
 {
     /**
      * @var array

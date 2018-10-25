@@ -2,29 +2,29 @@
 
 namespace App\Tests\Functional\Services\Http;
 
-use App\Services\Http\HttpClientFactory;
+use App\Services\Http\RetrieverHttpClientFactory;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\HandlerStack;
 
-class HttpClientFactoryTest extends AbstractFunctionalTestCase
+class RetrieverHttpClientFactoryTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var HttpClientFactory
+     * @var RetrieverHttpClientFactory
      */
-    private $httpClientFactory;
+    private $retrieverHttpClientFactory;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->httpClientFactory = self::$container->get(HttpClientFactory::class);
+        $this->retrieverHttpClientFactory = self::$container->get(RetrieverHttpClientFactory::class);
     }
 
     public function testCreate()
     {
-        $httpClient = $this->httpClientFactory->create();
+        $httpClient = $this->retrieverHttpClientFactory->create();
 
         $this->assertInstanceOf(Client::class, $httpClient);
         $this->assertEquals(self::$container->get(Client::class), $httpClient);
