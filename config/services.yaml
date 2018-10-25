@@ -53,6 +53,10 @@ services:
         class: GuzzleHttp\HandlerStack
         factory: 'App\Services\Http\RetrieverHttpHandlerStackFactory:create'
 
+    web_resource_cache.http.handler_stack.sender:
+        class: GuzzleHttp\HandlerStack
+        factory: 'App\Services\Http\HttpHandlerStackFactory:create'
+
     GuzzleHttp\Cookie\CookieJarInterface:
         class: GuzzleHttp\Cookie\CookieJar
 
@@ -61,9 +65,18 @@ services:
             $curlOptions: '%curl_options%'
             $handlerStack: '@web_resource_cache.http.handler_stack.retriever'
 
+    App\Services\Http\HttpClientFactory:
+        arguments:
+            $curlOptions: '%curl_options%'
+            $handlerStack: '@web_resource_cache.http.handler_stack.sender'
+
     web_resource_cache.http.client.retriever:
         class: GuzzleHttp\Client
         factory: 'App\Services\Http\RetrieverHttpClientFactory:create'
+
+    web_resource_cache.http.client.sender:
+        class: GuzzleHttp\Client
+        factory: 'App\Services\Http\HttpClientFactory:create'
 
     Memcached:
         class: \Memcached

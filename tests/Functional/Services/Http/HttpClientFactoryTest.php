@@ -2,31 +2,30 @@
 
 namespace App\Tests\Functional\Services\Http;
 
-use App\Services\Http\RetrieverHttpClientFactory;
+use App\Services\Http\HttpClientFactory;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJarInterface;
 
-class RetrieverHttpClientFactoryTest extends AbstractFunctionalTestCase
+class HttpClientFactoryTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var RetrieverHttpClientFactory
+     * @var HttpClientFactory
      */
-    private $retrieverHttpClientFactory;
+    private $httpClientFactory;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->retrieverHttpClientFactory = self::$container->get(RetrieverHttpClientFactory::class);
+        $this->httpClientFactory = self::$container->get(HttpClientFactory::class);
     }
 
     public function testCreate()
     {
-        $httpClient = $this->retrieverHttpClientFactory->create();
+        $httpClient = $this->httpClientFactory->create();
 
         $this->assertInstanceOf(Client::class, $httpClient);
-        $this->assertEquals(self::$container->get('web_resource_cache.http.client.retriever'), $httpClient);
+        $this->assertEquals(self::$container->get('web_resource_cache.http.client.sender'), $httpClient);
 
         $httpClientCurlOptions = $httpClient->getConfig('curl');
 
@@ -41,9 +40,8 @@ class RetrieverHttpClientFactoryTest extends AbstractFunctionalTestCase
 
         $this->assertFalse($httpClient->getConfig('verify'));
         $this->assertEquals(
-            self::$container->get('web_resource_cache.http.handler_stack.retriever'),
+            self::$container->get('web_resource_cache.http.handler_stack.sender'),
             $httpClient->getConfig('handler')
         );
-        $this->assertEquals(self::$container->get(CookieJarInterface::class), $httpClient->getConfig('cookies'));
     }
 }

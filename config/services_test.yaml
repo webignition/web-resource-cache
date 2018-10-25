@@ -13,7 +13,7 @@ services:
     - '@Kevinrob\GuzzleCache\CacheMiddleware'
     - '@App\Tests\Services\HttpMockHandler'
 
-  App\Services\Http\SenderHttpHandlerStackFactory:
+  App\Services\Http\HttpHandlerStackFactory:
     arguments:
     - '@App\Tests\Services\HttpMockHandler'
 
@@ -26,3 +26,12 @@ services:
   web_resource_cache.http.client.retriever:
     class: GuzzleHttp\Client
     factory: 'App\Services\Http\RetrieverHttpClientFactory:create'
+
+  App\Services\Http\HttpClientFactory:
+    arguments:
+      $curlOptions: '%curl_options%'
+      $handlerStack: '@web_resource_cache.http.handler_stack.sender'
+
+  web_resource_cache.http.client.sender:
+    class: GuzzleHttp\Client
+    factory: 'App\Services\Http\HttpClientFactory:create'
