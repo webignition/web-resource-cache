@@ -2,25 +2,21 @@
 
 namespace App\Services\Http;
 
+use App\Services\ArrayCollection;
 use GuzzleHttp\HandlerStack;
 
 class HttpHandlerStackFactory
 {
-    /**
-     * @var callable|null
-     */
-    private $handler;
-
-    public function __construct(callable $handler = null)
+    public function create(ArrayCollection $middlewareCollection = null, callable $handler = null): HandlerStack
     {
-        $this->handler = $handler;
-    }
+        $handlerStack = HandlerStack::create($handler);
 
-    /**
-     * @return HandlerStack
-     */
-    public function create()
-    {
-        return HandlerStack::create($this->handler);
+        if ($middlewareCollection) {
+            foreach ($middlewareCollection->get() as $name => $middleware) {
+                $handlerStack->push($middleware, $name);
+            }
+        }
+
+        return $handlerStack;
     }
 }

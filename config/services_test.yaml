@@ -6,16 +6,12 @@ services:
 
   App\Tests\Services\HttpMockHandler:
 
-  App\Services\Http\RetrieverHttpHandlerStackFactory:
+  web_resource_cache.http.handler_stack.retriever:
+    class: GuzzleHttp\HandlerStack
+    factory: 'App\Services\Http\HttpHandlerStackFactory:create'
     arguments:
-    - '@webignition\HttpHistoryContainer\Container'
-    - '@App\Services\Http\HttpRetryMiddlewareFactory'
-    - '@Kevinrob\GuzzleCache\CacheMiddleware'
-    - '@App\Tests\Services\HttpMockHandler'
-
-  App\Services\Http\HttpHandlerStackFactory:
-    arguments:
-    - '@App\Tests\Services\HttpMockHandler'
+      $middlewareCollection: '@App\Services\Http\RetrieverHttpHandlerStackMiddlewareCollection'
+      $handler: '@App\Tests\Services\HttpMockHandler'
 
   App\Services\RetryDecider:
     arguments:
