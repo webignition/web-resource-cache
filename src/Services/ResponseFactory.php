@@ -9,7 +9,7 @@ use App\Model\Response\UnknownFailureResponse;
 
 class ResponseFactory
 {
-    public function createFromJson(string $json)
+    public function createFromJson(string $json): ?ResponseInterface
     {
         $data = $this->decodeJson($json);
 
