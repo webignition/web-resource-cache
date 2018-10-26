@@ -145,11 +145,8 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
             new Response(),
         ]);
 
-        $url = 'http://example.com/';
-        $headers = new Headers();
-
         $callbackUrl = 'http://callback.example.com/';
-        $retrieveRequest = $this->createRetrieveRequest($url, $headers, [$callbackUrl]);
+        $retrieveRequest = $this->createRetrieveRequest('http://example.com/', new Headers(), [$callbackUrl]);
         $responseJson = str_replace('{{ requestHash }}', $retrieveRequest->getHash(), $responseJson);
 
         $expectedRequestData['request_id'] = str_replace(
@@ -231,6 +228,53 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testRunSuccessForSuccessResponseVerifyRequestData()
+    {
+        $this->httpMockHandler->appendFixtures([
+            new Response(),
+        ]);
+
+        $callbackUrl = 'http://callback.example.com/';
+        $retrieveRequest = $this->createRetrieveRequest('http://example.com/', new Headers(), [$callbackUrl]);
+        $response = new RebuildableDecoratedResponse(new SuccessResponse($retrieveRequest->getHash()));
+
+        $cachedResource = $this->createCachedResource(
+            [
+                'content-type' => 'text/plain',
+            ],
+            'resource content',
+            $retrieveRequest
+        );
+
+        $expectedRequestData = [
+            'request_id' => $retrieveRequest->getHash(),
+            'status' => SuccessResponse::STATUS_SUCCESS,
+            'headers' => $cachedResource->getHeaders()->toArray(),
+            'content' => $cachedResource->getBody(),
+        ];
+
+        $input = new ArrayInput([
+            'response-json' => json_encode($response),
+        ]);
+
+        $returnCode = $this->command->run($input, new NullOutput());
+
+        $this->assertEquals(SendResponseCommand::RETURN_CODE_OK, $returnCode);
+
+        $lastRequest = $this->httpHistoryContainer->getLastRequest();
+
+        $httpRequestAsserter = self::$container->get(HttpRequestAsserter::class);
+
+        $httpRequestAsserter->assertSenderRequest(
+            $lastRequest,
+            $callbackUrl,
+            $expectedRequestData
+        );
     }
 
     private function createRetrieveRequest(string $url, Headers $headers, array $callbackUrls = []): RetrieveRequest
