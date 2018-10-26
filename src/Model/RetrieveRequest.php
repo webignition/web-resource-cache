@@ -6,6 +6,11 @@ use webignition\HttpHeaders\Headers;
 
 class RetrieveRequest implements \JsonSerializable
 {
+    const JSON_KEY_REQUEST_HASH = 'request_hash';
+    const JSON_KEY_URL = 'url';
+    const JSON_KEY_HEADERS = 'headers';
+    const JSON_KEY_RETRY_COUNT = 'retry_count';
+
     /**
      * @var string
      */
@@ -62,10 +67,30 @@ class RetrieveRequest implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'request_hash' => $this->requestHash,
-            'url' => $this->url,
-            'headers' => $this->headers,
-            'retry_count' => $this->retryCount,
+            self::JSON_KEY_REQUEST_HASH => $this->requestHash,
+            self::JSON_KEY_URL => $this->url,
+            self::JSON_KEY_HEADERS => $this->headers,
+            self::JSON_KEY_RETRY_COUNT => $this->retryCount,
         ];
+    }
+
+    public static function createFromJson(string $json): ?RetrieveRequest
+    {
+        $data = json_decode($json, true);
+
+        if (!is_array($data)) {
+            return null;
+        }
+
+        $requestHash = $data[self::JSON_KEY_REQUEST_HASH] ?? null;
+        $url = $data[self::JSON_KEY_URL] ?? null;
+        $headers = $data[self::JSON_KEY_HEADERS] ?? null;
+        $retryCount = $data[self::JSON_KEY_RETRY_COUNT] ?? null;
+
+        if (empty($requestHash) || empty($url) || !is_array($headers) || null === $retryCount) {
+            return null;
+        }
+
+        return new RetrieveRequest($requestHash, $url, new Headers($headers), $retryCount);
     }
 }

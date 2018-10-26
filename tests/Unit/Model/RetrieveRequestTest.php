@@ -78,10 +78,10 @@ class RetrieveRequestTest extends \PHPUnit\Framework\TestCase
                 'headers' => new Headers(),
                 'retryCount' => null,
                 'expectedArray' => [
-                    'request_hash' => 'request_hash',
-                    'url' => 'http://example.com/',
-                    'headers' => [],
-                    'retry_count' => 0,
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                    RetrieveRequest::JSON_KEY_HEADERS => [],
+                    RetrieveRequest::JSON_KEY_RETRY_COUNT => 0,
                 ],
             ],
             'integer retry count' => [
@@ -90,10 +90,10 @@ class RetrieveRequestTest extends \PHPUnit\Framework\TestCase
                 'headers' => new Headers(),
                 'retryCount' => 1,
                 'expectedArray' => [
-                    'request_hash' => 'request_hash',
-                    'url' => 'http://example.com/',
-                    'headers' => [],
-                    'retry_count' => 1,
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                    RetrieveRequest::JSON_KEY_HEADERS => [],
+                    RetrieveRequest::JSON_KEY_RETRY_COUNT => 1,
                 ],
             ],
             'has headers retry count' => [
@@ -105,9 +105,9 @@ class RetrieveRequestTest extends \PHPUnit\Framework\TestCase
                 ]),
                 'retryCount' => 1,
                 'expectedArray' => [
-                    'request_hash' => 'request_hash',
-                    'url' => 'http://example.com/',
-                    'headers' => [
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                    RetrieveRequest::JSON_KEY_HEADERS => [
                         'foo'=> [
                             'bar',
                         ],
@@ -115,7 +115,116 @@ class RetrieveRequestTest extends \PHPUnit\Framework\TestCase
                             'buzz',
                         ],
                     ],
-                    'retry_count' => 1,
+                    RetrieveRequest::JSON_KEY_RETRY_COUNT => 1,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFromJsonInvalidDataDataProvider
+     *
+     * @param string $json
+     */
+    public function testCreateFromJsonInvalidData(string $json)
+    {
+        $retrieveRequest = RetrieveRequest::createFromJson($json);
+
+        $this->assertNull($retrieveRequest);
+    }
+
+    public function createFromJsonInvalidDataDataProvider(): array
+    {
+        return [
+            'empty string' => [
+                'json' => '',
+            ],
+            'not an array (string)' => [
+                'json' => json_encode('string'),
+            ],
+            'not an array (bool)' => [
+                'json' => json_encode(true),
+            ],
+            'missing request_hash' => [
+                'json' => json_encode([]),
+            ],
+            'missing url' => [
+                'json' => json_encode([
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                ]),
+            ],
+            'missing headers' => [
+                'json' => json_encode([
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                ]),
+            ],
+            'missing retry_count' => [
+                'json' => json_encode([
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                    RetrieveRequest::JSON_KEY_HEADERS => [],
+                ]),
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider createFromJsonValidDataDataProvider
+     *
+     * @param string $json
+     * @param array $expectedArray
+     */
+    public function testCreateFromJsonValidData(string $json, array $expectedArray)
+    {
+        $retrieveRequest = RetrieveRequest::createFromJson($json);
+
+        $this->assertEquals($expectedArray, $retrieveRequest->jsonSerialize());
+    }
+
+    public function createFromJsonValidDataDataProvider(): array
+    {
+        return [
+            'empty headers' => [
+                'json' => json_encode([
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                    RetrieveRequest::JSON_KEY_HEADERS => [],
+                    RetrieveRequest::JSON_KEY_RETRY_COUNT => 0,
+                ]),
+                'expectedArray' => [
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                    RetrieveRequest::JSON_KEY_HEADERS => [],
+                    RetrieveRequest::JSON_KEY_RETRY_COUNT => 0,
+                ],
+            ],
+            'has headers' => [
+                'json' => json_encode([
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                    RetrieveRequest::JSON_KEY_HEADERS => [
+                        'foo'=> [
+                            'bar',
+                        ],
+                        'fizz' => [
+                            'buzz',
+                        ],
+                    ],
+                    RetrieveRequest::JSON_KEY_RETRY_COUNT => 1,
+                ]),
+                'expectedArray' => [
+                    RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
+                    RetrieveRequest::JSON_KEY_URL => 'http://example.com/',
+                    RetrieveRequest::JSON_KEY_HEADERS => [
+                        'foo'=> [
+                            'bar',
+                        ],
+                        'fizz' => [
+                            'buzz',
+                        ],
+                    ],
+                    RetrieveRequest::JSON_KEY_RETRY_COUNT => 1,
                 ],
             ],
         ];
