@@ -6,6 +6,8 @@ services:
 
   App\Tests\Services\HttpMockHandler:
 
+  App\Tests\Services\Asserter\HttpRequestAsserter:
+
   web_resource_cache.http.handler_stack.retriever:
     class: GuzzleHttp\HandlerStack
     factory: 'App\Services\Http\HandlerStackFactory:create'
