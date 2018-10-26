@@ -2,8 +2,8 @@
 
 namespace App\Tests\Functional\Services;
 
-use App\Entity\RetrieveRequest;
 use App\Exception\HttpTransportException;
+use App\Model\RetrieveRequest;
 use App\Services\ResourceRetriever;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
@@ -60,10 +60,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
             'foo' => 'bar',
         ]);
 
-        $retrieveRequest = new RetrieveRequest();
-        $retrieveRequest->setUrl('http://example.com/');
-        $retrieveRequest->addCallbackUrl('http://callback.example.com/');
-        $retrieveRequest->setHeaders($headers);
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', $headers);
 
         $requestResponse = $this->resourceRetriever->retrieve($retrieveRequest);
         $response = $requestResponse->getResponse();
@@ -163,9 +160,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
             $http200Response,
         ]);
 
-        $retrieveRequest = new RetrieveRequest();
-        $retrieveRequest->setUrl('http://example.com/');
-        $retrieveRequest->addCallbackUrl('http://callback.example.com/');
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
 
         $requestResponse = $this->resourceRetriever->retrieve($retrieveRequest);
         $request = $requestResponse->getRequest();
@@ -190,9 +185,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $retrieveRequest = new RetrieveRequest();
-        $retrieveRequest->setUrl('http://example.com/');
-        $retrieveRequest->addCallbackUrl('http://callback.example.com/');
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
 
         try {
             $this->resourceRetriever->retrieve($retrieveRequest);

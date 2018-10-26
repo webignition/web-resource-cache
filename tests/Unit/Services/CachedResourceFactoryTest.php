@@ -3,7 +3,7 @@
 namespace App\Tests\Unit\Services;
 
 use App\Entity\CachedResource;
-use App\Entity\RetrieveRequest;
+use App\Model\RetrieveRequest;
 use App\Services\CachedResourceFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
@@ -30,7 +30,9 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateResponseNotSuccessResponse(HttpResponseInterface $response)
     {
-        $this->assertNull($this->cachedResourceFactory->create(new RetrieveRequest(), $response));
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
+
+        $this->assertNull($this->cachedResourceFactory->create($retrieveRequest, $response));
     }
 
     public function createFromPsr7ResponseNotSuccessResponseDataProvider(): array
@@ -57,9 +59,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         array $expectedCachedResourceHeaders,
         string $expectedCachedResourceBody
     ) {
-        $retrieveRequest = new RetrieveRequest();
-        $retrieveRequest->setUrl('http://example.com/');
-        $retrieveRequest->setHash('request_hash');
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
 
         $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $response);
 
@@ -69,7 +69,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedCachedResourceHeaders, $cachedResourceHeaders->toArray());
         $this->assertSame($expectedCachedResourceBody, $cachedResource->getBody());
         $this->assertSame($retrieveRequest->getUrl(), $cachedResource->getUrl());
-        $this->assertSame($retrieveRequest->getHash(), $cachedResource->getRequestHash());
+        $this->assertSame($retrieveRequest->getRequestHash(), $cachedResource->getRequestHash());
     }
 
     public function createSuccessDataProvider(): array
@@ -96,7 +96,9 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $response = new Response(200, ['foo' => 'bar'], 'response content');
 
-        $cachedResource = $this->cachedResourceFactory->create(new RetrieveRequest(), $response);
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
+
+        $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $response);
 
         $this->assertSame($cachedResource->getHeaders()->toArray(), $response->getHeaders());
         $this->assertSame($cachedResource->getBody(), (string) $response->getBody());

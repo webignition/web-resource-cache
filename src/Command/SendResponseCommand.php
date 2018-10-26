@@ -17,7 +17,6 @@ class SendResponseCommand extends Command
 {
     const RETURN_CODE_OK = 0;
     const RETURN_CODE_RESPONSE_NOT_FOUND = 2;
-    const RETURN_CODE_RESOURCE_NOT_FOUND = 3;
 
     /**
      * @var ResponseFactory
@@ -69,12 +68,6 @@ class SendResponseCommand extends Command
             return self::RETURN_CODE_RESPONSE_NOT_FOUND;
         }
 
-        $retrieveRequest = $this->retrieveRequestManager->find($response->getRequestId());
-
-        if (empty($retrieveRequest)) {
-            return self::RETURN_CODE_RESPONSE_NOT_FOUND;
-        }
-
         if ($response instanceof SuccessResponse) {
             $cachedResource = $this->cachedResourceManager->find($response->getRequestId());
 
@@ -85,9 +78,10 @@ class SendResponseCommand extends Command
             $response = new PresentationDecoratedSuccessResponse($response, $cachedResource);
         }
 
-        foreach ($retrieveRequest->getCallbackUrls() as $callbackUrl) {
-            $this->responseSender->send($callbackUrl, $response);
-        }
+        // Fix in #140
+//        foreach ($retrieveRequest->getCallbackUrls() as $callbackUrl) {
+//            $this->responseSender->send($callbackUrl, $response);
+//        }
 
         return self::RETURN_CODE_OK;
     }

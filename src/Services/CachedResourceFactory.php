@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Entity\CachedResource;
-use App\Entity\RetrieveRequest;
+use App\Model\RetrieveRequest;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 use webignition\HttpHeaders\Headers;
 
@@ -19,7 +19,7 @@ class CachedResourceFactory
 
         $this->updateResponse($cachedResource, $response);
 
-        $cachedResource->setRequestHash($retrieveRequest->getHash());
+        $cachedResource->setRequestHash($retrieveRequest->getRequestHash());
         $cachedResource->setUrl($retrieveRequest->getUrl());
 
         return $cachedResource;
