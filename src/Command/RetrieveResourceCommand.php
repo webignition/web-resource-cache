@@ -132,12 +132,12 @@ class RetrieveResourceCommand extends Command
         $requestHash = $retrieveRequest->getHash();
 
         if ($hasUnknownFailure) {
-            $sendResponseJobArgs = [
+            $sendResponseJob = new SendResponseJob([
                 'response-json' => $this->createResponseJson(new UnknownFailureResponse($requestHash)),
-            ];
+            ]);
 
-            if (!$this->resqueQueueService->contains(SendResponseJob::QUEUE_NAME, $sendResponseJobArgs)) {
-                $this->resqueQueueService->enqueue(new SendResponseJob($sendResponseJobArgs));
+            if (!$this->resqueQueueService->contains($sendResponseJob)) {
+                $this->resqueQueueService->enqueue($sendResponseJob);
             }
 
             return self::RETURN_CODE_OK;
@@ -170,12 +170,12 @@ class RetrieveResourceCommand extends Command
             $response = new KnownFailureResponse($requestHash, $responseType, $statusCode);
         }
 
-        $sendResponseJobArgs = [
+        $sendResponseJob = new SendResponseJob([
             'response-json' => $this->createResponseJson($response),
-        ];
+        ]);
 
-        if (!$this->resqueQueueService->contains(SendResponseJob::QUEUE_NAME, $sendResponseJobArgs)) {
-            $this->resqueQueueService->enqueue(new SendResponseJob($sendResponseJobArgs));
+        if (!$this->resqueQueueService->contains($sendResponseJob)) {
+            $this->resqueQueueService->enqueue($sendResponseJob);
         }
 
         return self::RETURN_CODE_OK;
