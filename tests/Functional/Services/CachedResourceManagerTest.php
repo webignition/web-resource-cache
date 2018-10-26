@@ -3,10 +3,12 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\CachedResource;
-use App\Model\RequestIdentifier;
+use App\Entity\RetrieveRequest;
+use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
+use GuzzleHttp\Psr7\Response;
 use webignition\HttpHeaders\Headers;
 
 class CachedResourceManagerTest extends AbstractFunctionalTestCase
@@ -21,45 +23,23 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
      */
     private $entityManager;
 
+    /**
+     * @var CachedResourceFactory
+     */
+    private $cachedResourceFactory;
+
     protected function setUp()
     {
         parent::setUp();
 
         $this->cachedResourceManager = self::$container->get(CachedResourceManager::class);
         $this->entityManager = self::$container->get(EntityManagerInterface::class);
-    }
-
-    public function testCreate()
-    {
-        $url = 'http://example.com/';
-        $responseHeaders = new Headers([
-            'content-type' => 'text/plain',
-        ]);
-        $body = 'cached response body';
-        $requestIdentifier = new RequestIdentifier($url, new Headers());
-
-        $cachedResource = $this->cachedResourceManager->create($requestIdentifier, $url, $responseHeaders, $body);
-
-        $this->assertInstanceOf(CachedResource::class, $cachedResource);
-        $this->assertEquals((string) $requestIdentifier, $cachedResource->getRequestHash());
-        $this->assertEquals($url, $cachedResource->getUrl());
-        $this->assertEquals($responseHeaders, $cachedResource->getHeaders());
-        $this->assertEquals($body, $cachedResource->getBody());
-        $this->assertNotNull($cachedResource->getLastStored());
-        $this->assertInstanceOf(\DateTime::class, $cachedResource->getLastStored());
+        $this->cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
     }
 
     public function testUpdate()
     {
-        $url = 'http://example.com/';
-        $responseHeaders = new Headers([
-            'content-type' => 'text/plain',
-        ]);
-        $body = 'cached response body';
-        $requestIdentifier = new RequestIdentifier($url, new Headers());
-
-        $cachedResource = $this->cachedResourceManager->create($requestIdentifier, $url, $responseHeaders, $body);
-
+        $cachedResource = $this->createCachedResource('request_hash', 'http://example.com/', [], '');
         $currentLastStored = $cachedResource->getLastStored();
 
         $this->cachedResourceManager->update($cachedResource);
@@ -79,18 +59,36 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
             'content-type' => 'text/plain',
         ]);
         $body = 'cached response body';
-        $requestIdentifier = new RequestIdentifier($url, new Headers());
 
-        $this->cachedResourceManager->create($requestIdentifier, $url, $responseHeaders, $body);
+        $requestHash = 'request_hash';
+
+        $cachedResource = $this->createCachedResource($requestHash, $url, $responseHeaders->toArray(), $body);
+        $this->cachedResourceManager->update($cachedResource);
 
         $this->entityManager->clear();
 
-        $foundCachedResource = $this->cachedResourceManager->find($requestIdentifier);
+        $foundCachedResource = $this->cachedResourceManager->find($requestHash);
 
         $this->assertInstanceOf(CachedResource::class, $foundCachedResource);
-        $this->assertEquals((string) $requestIdentifier, $foundCachedResource->getRequestHash());
+        $this->assertEquals($requestHash, $foundCachedResource->getRequestHash());
         $this->assertEquals($url, $foundCachedResource->getUrl());
         $this->assertEquals($responseHeaders, $foundCachedResource->getHeaders());
         $this->assertEquals($body, $foundCachedResource->getBody());
+    }
+
+    private function createCachedResource(
+        string $requestHash,
+        string $url,
+        array $httpResponseHeaders,
+        string $httpResponseBody
+    ): CachedResource {
+        $retrieveRequest = new RetrieveRequest();
+        $retrieveRequest->setHash($requestHash);
+        $retrieveRequest->setUrl($url);
+        $retrieveRequest->setHeaders(new Headers());
+
+        $httpResponse = new Response(200, $httpResponseHeaders, $httpResponseBody);
+
+        return $this->cachedResourceFactory->create($retrieveRequest, $httpResponse);
     }
 }
