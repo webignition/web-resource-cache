@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Entity;
 
 use App\Entity\Callback;
 use App\Tests\Functional\AbstractFunctionalTestCase;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CallbackTest extends AbstractFunctionalTestCase
@@ -81,5 +82,26 @@ class CallbackTest extends AbstractFunctionalTestCase
 
         $retrievedCallback = $this->entityManager->find(Callback::class, $id);
         $this->assertSame(3, $retrievedCallback->getRetryCount());
+    }
+
+    public function testHashUrlUniqueIndex()
+    {
+        $url = 'http://example.com';
+        $requestHash = 'request_hash';
+
+        $callback1 = new Callback();
+        $callback1->setUrl($url);
+        $callback1->setRequestHash($requestHash);
+
+        $callback2 = new Callback();
+        $callback2->setUrl($url);
+        $callback2->setRequestHash($requestHash);
+
+        $this->entityManager->persist($callback1);
+        $this->entityManager->persist($callback2);
+
+        $this->expectException(UniqueConstraintViolationException::class);
+
+        $this->entityManager->flush();
     }
 }

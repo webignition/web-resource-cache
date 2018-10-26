@@ -6,6 +6,12 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
+ *
+ * @ORM\Table(
+ *    uniqueConstraints={
+ *        @ORM\UniqueConstraint(name="hash_url_unique", columns={"request_hash", "url_hash"})
+ *    }
+ * )
  */
 class Callback
 {
@@ -33,6 +39,13 @@ class Callback
     private $url;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="string", length=32)
+     */
+    private $urlHash;
+
+    /**
      * @var int
      *
      * @ORM\Column(type="smallint")
@@ -57,6 +70,7 @@ class Callback
     public function setUrl(string $url)
     {
         $this->url = $url;
+        $this->urlHash = md5($url);
     }
 
     public function getUrl(): ?string
