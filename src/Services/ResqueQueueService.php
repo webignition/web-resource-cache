@@ -38,7 +38,7 @@ class ResqueQueueService
     public function contains(Job $job): bool
     {
         try {
-            return !is_null($this->findJobInQueue($job->queue, $job->args));
+            return !is_null($this->findJobInQueue($job));
         } catch (\CredisException $credisException) {
             $this->logger->warning(
                 'ResqueQueueService::contains: Redis error ['.$credisException->getMessage().']'
@@ -59,29 +59,31 @@ class ResqueQueueService
         return null;
     }
 
-    private function findJobInQueue(string $queue, ?array $args = []): ?Job
+    private function findJobInQueue(Job $job): ?Job
     {
-        $jobs = $this->resque->getQueue($queue)->getJobs();
+        $jobs = $this->resque->getQueue($job->queue)->getJobs();
 
-        foreach ($jobs as $job) {
-            /* @var $job Job */
+        foreach ($jobs as $foundJob) {
+            /* @var $foundJob Job */
 
-            if ($this->match($job, $args)) {
-                return $job;
+            if ($this->match($foundJob, $job)) {
+                return $foundJob;
             }
         }
 
         return null;
     }
 
-    private function match(Job $job, ?array $args = []): bool
+    private function match(Job $foundJob, Job $comparatorJob): bool
     {
+        $args = $comparatorJob->args;
+
         foreach ($args as $key => $value) {
-            if (!isset($job->args[$key])) {
+            if (!isset($foundJob->args[$key])) {
                 return false;
             }
 
-            if ($job->args[$key] != $value) {
+            if ($foundJob->args[$key] != $value) {
                 return false;
             }
         }
