@@ -277,6 +277,33 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
         );
     }
 
+    /**
+     * @throws \Exception
+     */
+    public function testSendSuccessMultipleCallbackUrls()
+    {
+        $callbackUrls = [
+            'http://callback1.example.com/',
+            'http://callback2.example.com/',
+            'http://callback3.example.com/',
+        ];
+
+        $this->httpMockHandler->appendFixtures(array_fill(0, 3, new Response()));
+
+        $retrieveRequest = $this->createRetrieveRequest('http://example.com/', new Headers(), $callbackUrls);
+
+        $response = new RebuildableDecoratedResponse(new UnknownFailureResponse($retrieveRequest->getHash()));
+
+        $input = new ArrayInput([
+            'response-json' => json_encode($response),
+        ]);
+
+        $returnCode = $this->command->run($input, new NullOutput());
+
+        $this->assertEquals(SendResponseCommand::RETURN_CODE_OK, $returnCode);
+        $this->assertEquals($callbackUrls, $this->httpHistoryContainer->getRequestUrlsAsStrings());
+    }
+
     private function createRetrieveRequest(string $url, Headers $headers, array $callbackUrls = []): RetrieveRequest
     {
         $requestIdentifier = new RequestIdentifier($url, $headers);
