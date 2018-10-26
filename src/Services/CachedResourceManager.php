@@ -3,9 +3,7 @@
 namespace App\Services;
 
 use App\Entity\CachedResource;
-use App\Model\RequestIdentifier;
 use Doctrine\ORM\EntityManagerInterface;
-use webignition\HttpHeaders\Headers;
 
 class CachedResourceManager
 {
@@ -17,25 +15,6 @@ class CachedResourceManager
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-    }
-
-    public function create(
-        RequestIdentifier $requestIdentifier,
-        string $url,
-        Headers $headers,
-        string $body
-    ): CachedResource {
-        $cachedResource = new CachedResource();
-        $cachedResource->setRequestHash($requestIdentifier);
-        $cachedResource->setUrl($url);
-        $cachedResource->setHeaders($headers);
-        $cachedResource->setBody($body);
-        $cachedResource->setLastStored(new \DateTime());
-
-        $this->entityManager->persist($cachedResource);
-        $this->entityManager->flush();
-
-        return $cachedResource;
     }
 
     public function update(CachedResource $cachedResource)
