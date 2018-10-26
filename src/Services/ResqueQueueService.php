@@ -35,10 +35,10 @@ class ResqueQueueService
         $this->logger = $logger;
     }
 
-    public function contains(string $queue, ?array $args = []): bool
+    public function contains(Job $job): bool
     {
         try {
-            return !is_null($this->findJobInQueue($queue, $args));
+            return !is_null($this->findJobInQueue($job->queue, $job->args));
         } catch (\CredisException $credisException) {
             $this->logger->warning(
                 'ResqueQueueService::contains: Redis error ['.$credisException->getMessage().']'
