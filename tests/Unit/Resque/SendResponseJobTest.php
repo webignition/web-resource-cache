@@ -40,9 +40,30 @@ class SendResponseJobTest extends AbstractJobTest
      */
     public function testRunSuccess(AbstractResponse $response)
     {
+        $responseJson = json_encode($response);
+
         $sendResponseJob = new SendResponseJob([
-            'response-json' => json_encode($response),
+            'response-json' => $responseJson,
         ]);
+
+        $sendResponseCommand = $this->createCommand(
+            SendResponseCommand::class,
+            [
+                'response-json' => $responseJson,
+            ],
+            SendResponseCommand::RETURN_CODE_OK
+        );
+
+        $container = \Mockery::mock(ContainerInterface::class);
+        $container
+            ->shouldReceive('get')
+            ->with(SendResponseCommand::class)
+            ->andReturn($sendResponseCommand);
+
+        $reflector = new \ReflectionClass(ContainerAwareJob::class);
+        $property = $reflector->getProperty('kernel');
+        $property->setAccessible(true);
+        $property->setValue($sendResponseJob, $this->createKernel($container));
 
         $this->assertTrue($sendResponseJob->run([]));
     }

@@ -10,6 +10,7 @@ use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 use App\Services\ResponseSender;
 use App\Tests\Functional\AbstractFunctionalTestCase;
+use App\Tests\Services\Asserter\HttpRequestAsserter;
 use App\Tests\Services\HttpMockHandler;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Response;
@@ -99,12 +100,13 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
 
-        $this->assertEquals('POST', $lastRequest->getMethod());
-        $this->assertEquals('application/json', $lastRequest->getHeaderLine('content-type'));
-        $this->assertEquals(strlen(json_encode($response)), $lastRequest->getHeaderLine('content-length'));
+        $httpRequestAsserter = self::$container->get(HttpRequestAsserter::class);
 
-        $requestData = json_decode($lastRequest->getBody()->getContents(), true);
-        $this->assertEquals($expectedRequestData, $requestData);
+        $httpRequestAsserter->assertSenderRequest(
+            $lastRequest,
+            $url,
+            $expectedRequestData
+        );
     }
 
     public function sendSuccessDataProvider()
