@@ -95,10 +95,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
             $this->assertInstanceOf(RetrieveRequest::class, $retrieveRequest);
             $this->assertEquals($expectedRetrieveRequestData['url'], $retrieveRequest->getUrl());
             $this->assertEquals($expectedRetrieveRequestData['callbackUrls'], $retrieveRequest->getCallbackUrls());
-            $this->assertTrue($resqueQueueService->contains(
-                RetrieveResourceJob::QUEUE_NAME,
-                ['request-hash' => $retrieveRequest->getHash()]
-            ));
+
+            $this->assertTrue($resqueQueueService->contains(new RetrieveResourceJob([
+                'request-hash' => $retrieveRequest->getHash()
+            ])));
         }
     }
 

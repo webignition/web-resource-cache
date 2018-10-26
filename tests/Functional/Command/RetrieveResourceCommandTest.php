@@ -109,9 +109,10 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $this->assertEquals(RetrieveResourceCommand::RETURN_CODE_RETRYING, $returnCode);
         $this->assertTrue($this->resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
         $this->assertFalse($this->resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
-        $this->assertTrue($this->resqueQueueService->contains(RetrieveResourceJob::QUEUE_NAME, [
+
+        $this->assertTrue($this->resqueQueueService->contains(new RetrieveResourceJob([
             'request-hash' => $this->retrieveRequest->getHash(),
-        ]));
+        ])));
     }
 
     public function runRetryingDataProvider(): array
@@ -185,9 +186,9 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
             $expectedResqueJobData
         );
 
-        $this->assertTrue($this->resqueQueueService->contains(SendResponseJob::QUEUE_NAME, [
+        $this->assertTrue($this->resqueQueueService->contains(new SendResponseJob([
             'response-json' => $expectedResqueJobData,
-        ]));
+        ])));
     }
 
     public function runSendResponseDataProvider(): array

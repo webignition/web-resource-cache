@@ -30,68 +30,60 @@ class ResqueQueueServiceTest extends AbstractFunctionalTestCase
     /**
      * @dataProvider containsSuccessDataProvider
      *
-     * @param Job[] $jobs
-     * @param string $queue
-     * @param array $args
+     * @param Job[] $jobsToEnqueue
+     * @param Job $job
      * @param bool $expectedContains
      */
-    public function testContainsSuccess(array $jobs, $queue, $args, $expectedContains)
+    public function testContainsSuccess(array $jobsToEnqueue, Job $job, $expectedContains)
     {
         $this->clearRedis();
 
-        foreach ($jobs as $job) {
-            $this->resqueQueueService->enqueue($job);
+        foreach ($jobsToEnqueue as $jobToEnqueue) {
+            $this->resqueQueueService->enqueue($jobToEnqueue);
         }
 
-        $this->assertEquals($expectedContains, $this->resqueQueueService->contains($queue, $args));
+        $this->assertEquals($expectedContains, $this->resqueQueueService->contains($job));
     }
 
-    /**
-     * @return array
-     */
-    public function containsSuccessDataProvider()
+    public function containsSuccessDataProvider(): array
     {
         return [
             'empty queue' => [
-                'jobs' => [],
-                'queue' => RetrieveResourceJob::QUEUE_NAME,
-                'args' => [],
+                'jobsToEnqueue' => [],
+                'job' => new RetrieveResourceJob(),
                 'expectedContains' => false,
             ],
             'non-matching args (no keys)' => [
-                'jobs' => [
+                'jobsToEnqueue' => [
                     new RetrieveResourceJob([
                         'id' => 'example-id',
                     ]),
                 ],
-                'queue' => RetrieveResourceJob::QUEUE_NAME,
-                'args' => [
+                'job' => new RetrieveResourceJob([
                     'foo' => 'bar',
-                ],
+                ]),
                 'expectedContains' => false,
             ],
             'non-matching args (no matching values)' => [
-                'jobs' => [
+                'jobsToEnqueue' => [
                     new RetrieveResourceJob([
                         'id' => 'example-id',
                     ]),
                 ],
-                'queue' => RetrieveResourceJob::QUEUE_NAME,
-                'args' => [
+                'job' => new RetrieveResourceJob([
                     'id' => 'non-matching-id',
-                ],
+                ]),
                 'expectedContains' => false,
             ],
             'matching args' => [
-                'jobs' => [
+                'jobsToEnqueue' => [
                     new RetrieveResourceJob([
                         'id' => 'example-id',
                     ]),
                 ],
-                'queue' => RetrieveResourceJob::QUEUE_NAME,
-                'args' => [
+                'job' => new RetrieveResourceJob([
                     'id' => 'example-id',
-                ],
+                ]),
                 'expectedContains' => true,
             ],
         ];
@@ -101,13 +93,13 @@ class ResqueQueueServiceTest extends AbstractFunctionalTestCase
     {
         $credisException = \Mockery::mock(\CredisException::class);
 
-        $queue = 'tasks-notify';
+        $job = new RetrieveResourceJob();
 
         /* @var Mock|Resque $resque */
         $resque = \Mockery::mock(Resque::class);
         $resque
             ->shouldReceive('getQueue')
-            ->with($queue)
+            ->with($job::QUEUE_NAME)
             ->andThrow($credisException);
 
         /* @var LoggerInterface|Mock $logger */
@@ -118,7 +110,7 @@ class ResqueQueueServiceTest extends AbstractFunctionalTestCase
 
         $resqueQueueService = $this->createQueueService($resque, $logger);
 
-        $this->assertFalse($resqueQueueService->contains($queue));
+        $this->assertFalse($resqueQueueService->contains($job));
     }
 
     public function testEnqueueSuccess()
