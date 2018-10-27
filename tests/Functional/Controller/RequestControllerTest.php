@@ -3,13 +3,16 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\RequestController;
+use App\Entity\CachedResource;
 use App\Entity\Callback;
 use App\Model\RequestIdentifier;
 use App\Model\RetrieveRequest;
 use App\Resque\Job\RetrieveResourceJob;
+use App\Resque\Job\SendResponseJob;
 use App\Services\CallbackManager;
 use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -353,10 +356,108 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         ];
     }
 
+    /**
+     * @dataProvider successfulRequestWithCachedResourcesDataProvider
+     *
+     * @param CachedResource[] $cachedResourceCollection
+     * @param array $requestData
+     * @param bool $expectedHasSendResponseJob
+     * @param bool $expectedHasRetrieveResourceJob
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function testSuccessfulRequestWithCachedResources(
+        array $cachedResourceCollection,
+        array $requestData,
+        bool $expectedHasSendResponseJob,
+        bool $expectedHasRetrieveResourceJob
+    ) {
+        $this->clearRedis();
+
+        $resqueQueueService = self::$container->get(ResqueQueueService::class);
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+
+        $this->assertTrue($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
+        $this->assertTrue($resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
+
+        foreach ($cachedResourceCollection as $cachedResource) {
+            $entityManager->persist($cachedResource);
+            $entityManager->flush();
+        }
+
+        $controller = self::$container->get(RequestController::class);
+        $controller->requestAction(new Request([], $requestData));
+
+        $this->assertEquals(
+            !$expectedHasSendResponseJob,
+            $resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME)
+        );
+
+        $this->assertEquals(
+            !$expectedHasRetrieveResourceJob,
+            $resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME)
+        );
+    }
+
+    public function successfulRequestWithCachedResourcesDataProvider(): array
+    {
+        return [
+            'request not matches existing cached resource' => [
+                'cachedResourceCollection' => [
+                    $this->createCachedResource('non-matching-hash', new \DateTime()),
+                ],
+                'requestData' => [
+                    'url' => 'http://example.com/',
+                    'callback' => 'http://callback.example.com/',
+                ],
+                'expectedHasSendResponseJob' => false,
+                'expectedHasRetrieveResourceJob' => true,
+            ],
+            'request matches existing cached resource; resource is stale' => [
+                'cachedResourceCollection' => [
+                    $this->createCachedResource(
+                        $this->createRequestHash('http://example.com/'),
+                        new \DateTime('-1 year')
+                    ),
+                ],
+                'requestData' => [
+                    'url' => 'http://example.com/',
+                    'callback' => 'http://callback.example.com/',
+                ],
+                'expectedHasSendResponseJob' => false,
+                'expectedHasRetrieveResourceJob' => true,
+            ],
+            'request matches existing cached resource; resource is fresh' => [
+                'cachedResourceCollection' => [
+                    $this->createCachedResource(
+                        $this->createRequestHash('http://example.com/'),
+                        new \DateTime()
+                    ),
+                ],
+                'requestData' => [
+                    'url' => 'http://example.com/',
+                    'callback' => 'http://callback.example.com/',
+                ],
+                'expectedHasSendResponseJob' => true,
+                'expectedHasRetrieveResourceJob' => false,
+            ],
+        ];
+    }
+
     private function createRequestHash(string $url, array $headers = []): string
     {
         $identifier = new RequestIdentifier($url, new Headers($headers));
 
         return $identifier->getHash();
+    }
+
+    private function createCachedResource(string $requestHash, \DateTime $lastStored): CachedResource
+    {
+        $cachedResource = new CachedResource();
+        $cachedResource->setRequestHash($requestHash);
+        $cachedResource->setLastStored($lastStored);
+
+        return $cachedResource;
     }
 }

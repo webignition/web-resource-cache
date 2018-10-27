@@ -81,6 +81,12 @@ class RequestController
         $requestIdentifier = new RequestIdentifier($url, $headers);
         $requestHash = $requestIdentifier->getHash();
 
+        $callback = $this->callbackManager->findByRequestHashAndUrl($requestHash, $callbackUrl);
+        if (!$callback) {
+            $callback = $this->callbackFactory->create($requestHash, $callbackUrl);
+            $this->callbackManager->persist($callback);
+        }
+
         $cachedResource = $this->cachedResourceManager->find($requestHash);
         if ($cachedResource && $this->cachedResourceValidator->isFresh($cachedResource)) {
             $sendResponseJob = new SendResponseJob([
@@ -90,22 +96,16 @@ class RequestController
             if (!$this->resqueQueueService->contains($sendResponseJob)) {
                 $this->resqueQueueService->enqueue($sendResponseJob);
             }
-        }
+        } else {
+            $retrieveRequest = new RetrieveRequest($requestHash, $url, $headers);
 
-        $callback = $this->callbackManager->findByRequestHashAndUrl($requestHash, $callbackUrl);
-        if (!$callback) {
-            $callback = $this->callbackFactory->create($requestHash, $callbackUrl);
-            $this->callbackManager->persist($callback);
-        }
+            $retrieveResourceJob = new RetrieveResourceJob([
+                'request-json' => json_encode($retrieveRequest),
+            ]);
 
-        $retrieveRequest = new RetrieveRequest($requestHash, $url, $headers);
-
-        $retrieveResourceJob = new RetrieveResourceJob([
-            'request-json' => json_encode($retrieveRequest),
-        ]);
-
-        if (!$this->resqueQueueService->contains($retrieveResourceJob)) {
-            $this->resqueQueueService->enqueue($retrieveResourceJob);
+            if (!$this->resqueQueueService->contains($retrieveResourceJob)) {
+                $this->resqueQueueService->enqueue($retrieveResourceJob);
+            }
         }
 
         return new JsonResponse((string) $requestIdentifier, 200);
