@@ -56,11 +56,9 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $this->resqueQueueService = self::$container->get(ResqueQueueService::class);
 
         $url = 'http://example.com/';
-        $headers = new Headers();
+        $requestIdentifier = new RequestIdentifier($url, new Headers());
 
-        $requestIdentifier = new RequestIdentifier($url, $headers);
-
-        $this->retrieveRequest = new RetrieveRequest($requestIdentifier->getHash(), $url, $headers);
+        $this->retrieveRequest = new RetrieveRequest($requestIdentifier->getHash(), $url);
     }
 
     /**

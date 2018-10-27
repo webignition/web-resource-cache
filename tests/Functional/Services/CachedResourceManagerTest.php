@@ -82,7 +82,7 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
         array $httpResponseHeaders,
         string $httpResponseBody
     ): CachedResource {
-        $retrieveRequest = new RetrieveRequest($requestHash, $url, new Headers());
+        $retrieveRequest = new RetrieveRequest($requestHash, $url);
         $httpResponse = new Response(200, $httpResponseHeaders, $httpResponseBody);
 
         return $this->cachedResourceFactory->create($retrieveRequest, $httpResponse);

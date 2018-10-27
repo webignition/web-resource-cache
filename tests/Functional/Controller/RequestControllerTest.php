@@ -149,8 +149,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     new RetrieveResourceJob([
                         'request-json' => json_encode(new RetrieveRequest(
                             $requestHashes['r1.example.com headers=[]'],
-                            $urls['r1.example.com'],
-                            new Headers()
+                            $urls['r1.example.com']
                         )),
                     ]),
                 ],
@@ -186,15 +185,13 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     new RetrieveResourceJob([
                         'request-json' => json_encode(new RetrieveRequest(
                             $requestHashes['r1.example.com headers=[]'],
-                            $urls['r1.example.com'],
-                            new Headers()
+                            $urls['r1.example.com']
                         )),
                     ]),
                     new RetrieveResourceJob([
                         'request-json' => json_encode(new RetrieveRequest(
                             $requestHashes['r2.example.com headers=[]'],
-                            $urls['r2.example.com'],
-                            new Headers()
+                            $urls['r2.example.com']
                         )),
                     ]),
                 ],
@@ -314,8 +311,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     new RetrieveResourceJob([
                         'request-json' => json_encode(new RetrieveRequest(
                             $requestHashes['r1.example.com headers=[]'],
-                            $urls['r1.example.com'],
-                            new Headers()
+                            $urls['r1.example.com']
                         )),
                     ]),
                 ],
