@@ -160,7 +160,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
             $http200Response,
         ]);
 
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
 
         $requestResponse = $this->resourceRetriever->retrieve($retrieveRequest);
         $request = $requestResponse->getRequest();
@@ -185,7 +185,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
 
         try {
             $this->resourceRetriever->retrieve($retrieveRequest);

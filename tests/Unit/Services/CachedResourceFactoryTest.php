@@ -30,7 +30,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateResponseNotSuccessResponse(HttpResponseInterface $response)
     {
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
 
         $this->assertNull($this->cachedResourceFactory->create($retrieveRequest, $response));
     }
@@ -59,7 +59,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         array $expectedCachedResourceHeaders,
         string $expectedCachedResourceBody
     ) {
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
 
         $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $response);
 
@@ -96,7 +96,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $response = new Response(200, ['foo' => 'bar'], 'response content');
 
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', new Headers());
+        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
 
         $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $response);
 
