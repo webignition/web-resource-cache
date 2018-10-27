@@ -13,6 +13,7 @@ use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
 use App\Services\CallbackManager;
 use App\Services\ResqueQueueService;
+use App\Services\RetrieveResourceJobManager;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,13 +52,19 @@ class RequestController
      */
     private $callbackManager;
 
+    /**
+     * @var RetrieveResourceJobManager
+     */
+    private $retrieveResourceJobManager;
+
     public function __construct(
         Whitelist $callbackUrlWhitelist,
         ResqueQueueService $resqueQueueService,
         CachedResourceManager $cachedResourceManager,
         CachedResourceValidator $cachedResourceValidator,
         CallbackFactory $callbackFactory,
-        CallbackManager $callbackManager
+        CallbackManager $callbackManager,
+        RetrieveResourceJobManager $retrieveResourceJobManager
     ) {
         $this->callbackUrlWhitelist = $callbackUrlWhitelist;
         $this->resqueQueueService = $resqueQueueService;
@@ -65,6 +72,7 @@ class RequestController
         $this->cachedResourceValidator = $cachedResourceValidator;
         $this->callbackFactory = $callbackFactory;
         $this->callbackManager = $callbackManager;
+        $this->retrieveResourceJobManager = $retrieveResourceJobManager;
     }
 
     public function requestAction(Request $request): Response
@@ -103,8 +111,8 @@ class RequestController
                 'request-json' => json_encode($retrieveRequest),
             ]);
 
-            if (!$this->resqueQueueService->contains($retrieveResourceJob)) {
-                $this->resqueQueueService->enqueue($retrieveResourceJob);
+            if (!$this->retrieveResourceJobManager->contains($retrieveResourceJob)) {
+                $this->retrieveResourceJobManager->enqueue($retrieveResourceJob);
             }
         }
 
