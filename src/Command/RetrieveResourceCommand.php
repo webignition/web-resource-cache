@@ -2,20 +2,19 @@
 
 namespace App\Command;
 
-use App\Entity\RetrieveRequest;
 use App\Exception\HttpTransportException;
 use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
+use App\Model\RetrieveRequest;
 use App\Resque\Job\RetrieveResourceJob;
 use App\Resque\Job\SendResponseJob;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\ResourceRetriever;
 use App\Services\ResqueQueueService;
-use App\Services\RetrieveRequestManager;
 use App\Services\RetryDecider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,11 +27,6 @@ class RetrieveResourceCommand extends Command
     const RETURN_CODE_OK = 0;
     const RETURN_CODE_RETRIEVE_REQUEST_NOT_FOUND = 2;
     const RETURN_CODE_RETRYING = 3;
-
-    /**
-     * @var RetrieveRequestManager
-     */
-    private $retrieveRequestManager;
 
     /**
      * @var ResourceRetriever
@@ -65,7 +59,6 @@ class RetrieveResourceCommand extends Command
     private $maxRetries;
 
     public function __construct(
-        RetrieveRequestManager $retrieveRequestManager,
         ResourceRetriever $resourceRetriever,
         RetryDecider $retryDecider,
         CachedResourceManager $cachedResourceManager,
@@ -75,7 +68,6 @@ class RetrieveResourceCommand extends Command
     ) {
         parent::__construct();
 
-        $this->retrieveRequestManager = $retrieveRequestManager;
         $this->resourceRetriever = $resourceRetriever;
         $this->retryDecider = $retryDecider;
         $this->cachedResourceManager = $cachedResourceManager;
@@ -89,13 +81,12 @@ class RetrieveResourceCommand extends Command
         $this
             ->setName('web-resource-cache:get-resource')
             ->setDescription('Retrieve a resource')
-            ->addArgument('request-hash', InputArgument::REQUIRED);
+            ->addArgument('request-json', InputArgument::REQUIRED);
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        /* @var RetrieveRequest $retrieveRequest */
-        $retrieveRequest = $this->retrieveRequestManager->find(trim($input->getArgument('request-hash')));
+        $retrieveRequest = RetrieveRequest::createFromJson(trim($input->getArgument('request-json')));
         if (empty($retrieveRequest)) {
             return self::RETURN_CODE_RETRIEVE_REQUEST_NOT_FOUND;
         }
@@ -129,7 +120,7 @@ class RetrieveResourceCommand extends Command
             }
         }
 
-        $requestHash = $retrieveRequest->getHash();
+        $requestHash = $retrieveRequest->getRequestHash();
 
         if ($hasUnknownFailure) {
             $sendResponseJob = new SendResponseJob([
@@ -146,17 +137,16 @@ class RetrieveResourceCommand extends Command
         $hasRetryableResponse = $this->retryDecider->isRetryable($responseType, $statusCode);
         if ($hasRetryableResponse && $retrieveRequest->getRetryCount() <= $this->maxRetries) {
             $retrieveRequest->incrementRetryCount();
-            $this->retrieveRequestManager->persist($retrieveRequest);
 
             $this->resqueQueueService->enqueue(new RetrieveResourceJob([
-                'request-hash' => $retrieveRequest->getHash(),
+                'request-json' => json_encode($retrieveRequest),
             ]));
 
             return self::RETURN_CODE_RETRYING;
         }
 
         if (200 === $statusCode) {
-            $cachedResource = $this->cachedResourceManager->find($retrieveRequest->getHash());
+            $cachedResource = $this->cachedResourceManager->find($requestHash);
             if ($cachedResource) {
                 $this->cachedResourceFactory->updateResponse($cachedResource, $httpResponse);
             } else {

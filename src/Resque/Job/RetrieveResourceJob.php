@@ -25,12 +25,12 @@ class RetrieveResourceJob extends AbstractCommandJob
     protected function getCommandArgs(): array
     {
         return [
-            'request-hash' => $this->args['request-hash']
+            'request-json' => $this->args['request-json']
         ];
     }
 
     protected function getIdentifier(): string
     {
-        return $this->args['request-hash'];
+        return $this->args['request-json'];
     }
 }

@@ -49,3 +49,7 @@ services:
   App\Services\ResponseSender:
     arguments:
       $httpClient: '@web_resource_cache.http.client.sender'
+
+  App\Services\CallbackManager:
+
+  App\Services\CallbackFactory:

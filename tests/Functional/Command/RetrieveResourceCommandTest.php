@@ -3,17 +3,16 @@
 namespace App\Tests\Functional\Command;
 
 use App\Command\RetrieveResourceCommand;
-use App\Entity\RetrieveRequest;
 use App\Model\RequestIdentifier;
 use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
+use App\Model\RetrieveRequest;
 use App\Resque\Job\RetrieveResourceJob;
 use App\Resque\Job\SendResponseJob;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\ResqueQueueService;
-use App\Services\RetrieveRequestManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\UnhandledGuzzleException;
@@ -56,20 +55,10 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->resqueQueueService = self::$container->get(ResqueQueueService::class);
 
-        $retrieveRequestManager = self::$container->get(RetrieveRequestManager::class);
-
         $url = 'http://example.com/';
-        $headers = new Headers();
+        $requestIdentifier = new RequestIdentifier($url, new Headers());
 
-        $requestIdentifier = new RequestIdentifier($url, $headers);
-
-        $this->retrieveRequest = new RetrieveRequest();
-        $this->retrieveRequest->setUrl($url);
-        $this->retrieveRequest->setHeaders($headers);
-        $this->retrieveRequest->setHash($requestIdentifier);
-        $this->retrieveRequest->addCallbackUrl('http://callback.example.com/');
-
-        $retrieveRequestManager->persist($this->retrieveRequest);
+        $this->retrieveRequest = new RetrieveRequest($requestIdentifier->getHash(), $url);
     }
 
     /**
@@ -78,7 +67,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
     public function testRunInvalidRequestHash()
     {
         $input = new ArrayInput([
-            'request-hash' => 'invalid-request-hash',
+            'request-json' => 'invalid-request-hash',
         ]);
 
         $returnCode = $this->command->run($input, new NullOutput());
@@ -101,7 +90,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $this->assertTrue($this->resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
 
         $input = new ArrayInput([
-            'request-hash' => $this->retrieveRequest->getHash(),
+            'request-json' => json_encode($this->retrieveRequest),
         ]);
 
         $returnCode = $this->command->run($input, new NullOutput());
@@ -110,8 +99,11 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $this->assertTrue($this->resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
         $this->assertFalse($this->resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
 
+        $expectedUpdatedRetrieveRequest = clone $this->retrieveRequest;
+        $expectedUpdatedRetrieveRequest->incrementRetryCount();
+
         $this->assertTrue($this->resqueQueueService->contains(new RetrieveResourceJob([
-            'request-hash' => $this->retrieveRequest->getHash(),
+            'request-json' => json_encode($expectedUpdatedRetrieveRequest),
         ])));
     }
 
@@ -171,7 +163,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $this->assertTrue($this->resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
 
         $input = new ArrayInput([
-            'request-hash' => $this->retrieveRequest->getHash(),
+            'request-json' => json_encode($this->retrieveRequest),
         ]);
 
         $returnCode = $this->command->run($input, new NullOutput());
@@ -182,7 +174,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
 
         $expectedResqueJobData = str_replace(
             '{{ requestHash }}',
-            $this->retrieveRequest->getHash(),
+            $this->retrieveRequest->getRequestHash(),
             $expectedResqueJobData
         );
 
@@ -281,7 +273,7 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         ]);
 
         $input = new ArrayInput([
-            'request-hash' => $this->retrieveRequest->getHash(),
+            'request-json' => json_encode($this->retrieveRequest),
         ]);
 
         $returnCode = $this->command->run($input, new NullOutput());

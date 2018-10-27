@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Entity\RetrieveRequest;
 use App\Exception\HttpTransportException;
 use App\Model\RequestResponse;
+use App\Model\RetrieveRequest;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
