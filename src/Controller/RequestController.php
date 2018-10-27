@@ -2,10 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\RetrieveRequest;
 use App\Model\RequestIdentifier;
+use App\Model\Response\RebuildableDecoratedResponse;
+use App\Model\Response\SuccessResponse;
+use App\Model\RetrieveRequest;
 use App\Resque\Job\RetrieveResourceJob;
-use App\Services\RetrieveRequestManager;
+use App\Resque\Job\SendResponseJob;
+use App\Services\CachedResourceManager;
+use App\Services\CachedResourceValidator;
+use App\Services\CallbackFactory;
+use App\Services\CallbackManager;
 use App\Services\ResqueQueueService;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,23 +27,44 @@ class RequestController
     private $callbackUrlWhitelist;
 
     /**
-     * @var RetrieveRequestManager
-     */
-    private $retrieveRequestManager;
-
-    /**
      * @var ResqueQueueService
      */
     private $resqueQueueService;
 
+    /**
+     * @var CachedResourceManager
+     */
+    private $cachedResourceManager;
+
+    /**
+     * @var CachedResourceValidator
+     */
+    private $cachedResourceValidator;
+
+    /**
+     * @var CallbackFactory
+     */
+    private $callbackFactory;
+
+    /**
+     * @var CallbackManager
+     */
+    private $callbackManager;
+
     public function __construct(
         Whitelist $callbackUrlWhitelist,
-        RetrieveRequestManager $retrieveRequestManager,
-        ResqueQueueService $resqueQueueService
+        ResqueQueueService $resqueQueueService,
+        CachedResourceManager $cachedResourceManager,
+        CachedResourceValidator $cachedResourceValidator,
+        CallbackFactory $callbackFactory,
+        CallbackManager $callbackManager
     ) {
         $this->callbackUrlWhitelist = $callbackUrlWhitelist;
-        $this->retrieveRequestManager = $retrieveRequestManager;
         $this->resqueQueueService = $resqueQueueService;
+        $this->cachedResourceManager = $cachedResourceManager;
+        $this->cachedResourceValidator = $cachedResourceValidator;
+        $this->callbackFactory = $callbackFactory;
+        $this->callbackManager = $callbackManager;
     }
 
     public function requestAction(Request $request): Response
@@ -52,20 +79,29 @@ class RequestController
 
         $headers = new Headers($requestData->get('headers') ?? []);
         $requestIdentifier = new RequestIdentifier($url, $headers);
-        $retrieveRequest = $this->retrieveRequestManager->find((string) $requestIdentifier);
+        $requestHash = $requestIdentifier->getHash();
 
-        if (empty($retrieveRequest)) {
-            $retrieveRequest = new RetrieveRequest();
-            $retrieveRequest->setUrl($url);
-            $retrieveRequest->setHeaders($headers);
-            $retrieveRequest->setHash($requestIdentifier);
+        $cachedResource = $this->cachedResourceManager->find($requestHash);
+        if ($cachedResource && $this->cachedResourceValidator->isFresh($cachedResource)) {
+            $sendResponseJob = new SendResponseJob([
+                'response-json' => json_encode(new RebuildableDecoratedResponse(new SuccessResponse($requestHash))),
+            ]);
+
+            if (!$this->resqueQueueService->contains($sendResponseJob)) {
+                $this->resqueQueueService->enqueue($sendResponseJob);
+            }
         }
 
-        $retrieveRequest->addCallbackUrl($callbackUrl);
-        $this->retrieveRequestManager->persist($retrieveRequest);
+        $callback = $this->callbackManager->findByRequestHashAndUrl($requestHash, $callbackUrl);
+        if (!$callback) {
+            $callback = $this->callbackFactory->create($requestHash, $callbackUrl);
+            $this->callbackManager->persist($callback);
+        }
+
+        $retrieveRequest = new RetrieveRequest($requestHash, $url, $headers);
 
         $retrieveResourceJob = new RetrieveResourceJob([
-            'request-hash' => $retrieveRequest->getHash(),
+            'request-json' => json_encode($retrieveRequest),
         ]);
 
         if (!$this->resqueQueueService->contains($retrieveResourceJob)) {
