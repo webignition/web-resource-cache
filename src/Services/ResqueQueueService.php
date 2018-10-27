@@ -22,7 +22,7 @@ class ResqueQueueService
     /**
      * @var Resque
      */
-    private $resque;
+    protected $resque;
 
     /**
      * @var LoggerInterface

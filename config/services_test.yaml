@@ -53,3 +53,5 @@ services:
   App\Services\CallbackManager:
 
   App\Services\CallbackFactory:
+
+  App\Services\RetrieveResourceJobManager:
