@@ -3,12 +3,13 @@
 namespace App\Tests\Functional\Controller;
 
 use App\Controller\RequestController;
-use App\Entity\RetrieveRequest;
+use App\Entity\Callback;
 use App\Model\RequestIdentifier;
+use App\Model\RetrieveRequest;
 use App\Resque\Job\RetrieveResourceJob;
+use App\Services\CallbackManager;
 use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,22 +52,23 @@ class RequestControllerTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @dataProvider successfulRequestsDataProvider
+     * @dataProvider successfulRequestsFromEmptyDataProvider
      *
      * @param array $requestDataCollection
      * @param array $expectedResponseDataCollection
-     * @param array $expectedRetrieveRequestDataCollection
+     * @param array $expectedCallbacks
+     * @param array $expectedRetrieveResourceJobs
      */
-    public function testSuccessfulRequests(
+    public function testSuccessfulRequestsFromEmpty(
         array $requestDataCollection,
         array $expectedResponseDataCollection,
-        array $expectedRetrieveRequestDataCollection
+        array $expectedCallbacks,
+        array $expectedRetrieveResourceJobs
     ) {
         $this->clearRedis();
 
-        $entityManager = self::$container->get(EntityManagerInterface::class);
         $resqueQueueService = self::$container->get(ResqueQueueService::class);
-        $retrieveRequestRepository = $entityManager->getRepository(RetrieveRequest::class);
+        $callbackManager = self::$container->get(CallbackManager::class);
 
         $this->assertTrue($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
 
@@ -83,227 +85,278 @@ class RequestControllerTest extends AbstractFunctionalTestCase
             $this->assertEquals($expectedResponseData, json_decode($response->getContent()));
         }
 
+        $this->assertNotEmpty($expectedCallbacks);
+
+        foreach ($expectedCallbacks as $expectedCallback) {
+            $requestHash = $expectedCallback['requestHash'];
+            $url = $expectedCallback['url'];
+
+            $callback = $callbackManager->findByRequestHashAndUrl($requestHash, $url);
+            $this->assertInstanceOf(Callback::class, $callback);
+        }
+
+        $this->assertNotEmpty($expectedRetrieveResourceJobs);
         $this->assertFalse($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
-        $this->assertNotEmpty($expectedRetrieveRequestDataCollection);
 
-        foreach ($expectedRetrieveRequestDataCollection as $hash => $expectedRetrieveRequestData) {
-            /* @var RetrieveRequest $retrieveRequest */
-            $retrieveRequest = $retrieveRequestRepository->findOneBy([
-                'hash' => $hash,
-            ]);
-
-            $this->assertInstanceOf(RetrieveRequest::class, $retrieveRequest);
-            $this->assertEquals($expectedRetrieveRequestData['url'], $retrieveRequest->getUrl());
-            $this->assertEquals($expectedRetrieveRequestData['callbackUrls'], $retrieveRequest->getCallbackUrls());
-
-            $this->assertTrue($resqueQueueService->contains(new RetrieveResourceJob([
-                'request-hash' => $retrieveRequest->getHash()
-            ])));
+        foreach ($expectedRetrieveResourceJobs as $expectedRetrieveResourceJob) {
+            $this->assertTrue($resqueQueueService->contains($expectedRetrieveResourceJob));
         }
     }
 
-    public function successfulRequestsDataProvider(): array
+    public function successfulRequestsFromEmptyDataProvider(): array
     {
+        $urls = [
+            'r1.example.com' => 'http://r1.example.com/',
+            'r2.example.com' => 'http://r2.example.com/',
+        ];
+
+        $headers = [
+            'a=b' => ['a' => 'b'],
+            'c=d' => ['c' => 'd'],
+        ];
+
+        $requestHashes = [
+            'r1.example.com headers=[]' => $this->createRequestHash($urls['r1.example.com']),
+            'r2.example.com headers=[]' => $this->createRequestHash($urls['r2.example.com']),
+            'r1.example.com headers=[a=b]' => $this->createRequestHash($urls['r1.example.com'], $headers['a=b']),
+            'r1.example.com headers=[c=d]' => $this->createRequestHash($urls['r1.example.com'], $headers['c=d']),
+            'r2.example.com headers=[a=b]' => $this->createRequestHash($urls['r2.example.com'], $headers['c=d']),
+            'r2.example.com headers=[c=d]' => $this->createRequestHash($urls['r2.example.com'], $headers['c=d']),
+        ];
+
         return [
             'single request' => [
                 'requestDataCollection' => [
                     [
-                        'url' => 'http://example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://callback.example.com/',
                         'headers' => [],
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', new Headers()),
+                    $requestHashes['r1.example.com headers=[]'],
                 ],
-                'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', new Headers()) => [
-                        'url' => 'http://example.com/',
-                        'callbackUrls' => [
-                            'http://callback.example.com/',
-                        ],
-                        'headers' => [],
+                'expectedCallbacks' => [
+                    [
+                        'requestHash' => $requestHashes['r1.example.com headers=[]'],
+                        'url' => 'http://callback.example.com/',
                     ],
                 ],
+                'expectedRetrieveResourceJobs' => [
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r1.example.com headers=[]'],
+                            $urls['r1.example.com'],
+                            new Headers()
+                        )),
+                    ]),
+                ],
             ],
-            'two non-identical requests (different url, no headers)' => [
+            'r2.example.com non-identical requests (different url, no headers)' => [
                 'requestDataCollection' => [
                     [
-                        'url' => 'http://one.example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://foo.example.com/',
                         'headers' => [],
                     ],
                     [
-                        'url' => 'http://two.example.com/',
+                        'url' => $urls['r2.example.com'],
                         'callback' => 'http://bar.example.com/',
                         'headers' => [],
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', new Headers()),
-                    (string)new RequestIdentifier('http://two.example.com/', new Headers()),
+                    $requestHashes['r1.example.com headers=[]'],
+                    $requestHashes['r2.example.com headers=[]'],
                 ],
-                'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', new Headers()) => [
-                        'url' => 'http://one.example.com/',
-                        'callbackUrls' => [
-                            'http://foo.example.com/',
-                        ],
-                        'headers' => [],
+                'expectedCallbacks' => [
+                    [
+                        'requestHash' => $requestHashes['r1.example.com headers=[]'],
+                        'url' => 'http://foo.example.com/',
                     ],
-                    (string)new RequestIdentifier('http://two.example.com/', new Headers()) => [
-                        'url' => 'http://two.example.com/',
-                        'callbackUrls' => [
-                            'http://bar.example.com/',
-                        ],
-                        'headers' => [],
+                    [
+                        'requestHash' => $requestHashes['r2.example.com headers=[]'],
+                        'url' => 'http://bar.example.com/',
                     ],
+                ],
+                'expectedRetrieveResourceJobs' => [
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r1.example.com headers=[]'],
+                            $urls['r1.example.com'],
+                            new Headers()
+                        )),
+                    ]),
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r2.example.com headers=[]'],
+                            $urls['r2.example.com'],
+                            new Headers()
+                        )),
+                    ]),
                 ],
             ],
             'two non-identical requests (same url, different headers)' => [
                 'requestDataCollection' => [
                     [
-                        'url' => 'http://one.example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://foo.example.com/',
-                        'headers' => [
-                            'foo' => 'bar',
-                        ],
+                        'headers' => $headers['a=b'],
                     ],
                     [
-                        'url' => 'http://one.example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://bar.example.com/',
-                        'headers' => [
-                            'fizz' => 'buzz',
-                        ],
+                        'headers' => $headers['c=d'],
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])),
-                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['fizz' => 'buzz'])),
+                    $requestHashes['r1.example.com headers=[a=b]'],
+                    $requestHashes['r1.example.com headers=[c=d]'],
                 ],
-                'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])) => [
-                        'url' => 'http://one.example.com/',
-                        'callbackUrls' => [
-                            'http://foo.example.com/',
-                        ],
-                        'headers' => [
-                            'foo' => 'bar',
-                        ],
+                'expectedCallbacks' => [
+                    [
+                        'requestHash' => $requestHashes['r1.example.com headers=[a=b]'],
+                        'url' => 'http://foo.example.com/',
                     ],
-                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['fizz' => 'buzz'])) => [
-                        'url' => 'http://one.example.com/',
-                        'callbackUrls' => [
-                            'http://bar.example.com/',
-                        ],
-                        'headers' => [
-                            'fizz' => 'buzz',
-                        ],
+                    [
+                        'requestHash' => $requestHashes['r1.example.com headers=[c=d]'],
+                        'url' => 'http://bar.example.com/',
                     ],
+                ],
+                'expectedRetrieveResourceJobs' => [
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r1.example.com headers=[a=b]'],
+                            $urls['r1.example.com'],
+                            new Headers($headers['a=b'])
+                        )),
+                    ]),
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r1.example.com headers=[c=d]'],
+                            $urls['r1.example.com'],
+                            new Headers($headers['c=d'])
+                        )),
+                    ]),
                 ],
             ],
             'two non-identical requests (different url, different headers)' => [
                 'requestDataCollection' => [
                     [
-                        'url' => 'http://one.example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://foo.example.com/',
-                        'headers' => [
-                            'foo' => 'bar',
-                        ],
+                        'headers' => $headers['a=b'],
                     ],
                     [
-                        'url' => 'http://two.example.com/',
+                        'url' => $urls['r2.example.com'],
                         'callback' => 'http://bar.example.com/',
-                        'headers' => [
-                            'fizz' => 'buzz',
-                        ],
+                        'headers' => $headers['c=d'],
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])),
-                    (string)new RequestIdentifier('http://two.example.com/', new Headers(['fizz' => 'buzz'])),
+                    $requestHashes['r1.example.com headers=[a=b]'],
+                    $requestHashes['r2.example.com headers=[c=d]'],
                 ],
-                'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://one.example.com/', new Headers(['foo' => 'bar'])) => [
-                        'url' => 'http://one.example.com/',
-                        'callbackUrls' => [
-                            'http://foo.example.com/',
-                        ],
-                        'headers' => [
-                            'foo' => 'bar',
-                        ],
+                'expectedCallbacks' => [
+                    [
+                        'requestHash' => $requestHashes['r1.example.com headers=[a=b]'],
+                        'url' => 'http://foo.example.com/',
                     ],
-                    (string)new RequestIdentifier('http://two.example.com/', new Headers(['fizz' => 'buzz'])) => [
-                        'url' => 'http://two.example.com/',
-                        'callbackUrls' => [
-                            'http://bar.example.com/',
-                        ],
-                        'headers' => [
-                            'fizz' => 'buzz',
-                        ],
+                    [
+                        'requestHash' => $requestHashes['r2.example.com headers=[c=d]'],
+                        'url' => 'http://bar.example.com/',
                     ],
+                ],
+                'expectedRetrieveResourceJobs' => [
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r1.example.com headers=[a=b]'],
+                            $urls['r1.example.com'],
+                            new Headers($headers['a=b'])
+                        )),
+                    ]),
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r2.example.com headers=[c=d]'],
+                            $urls['r2.example.com'],
+                            new Headers($headers['c=d'])
+                        )),
+                    ]),
                 ],
             ],
             'two identical requests (same url, no headers)' => [
                 'requestDataCollection' => [
                     [
-                        'url' => 'http://example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://callback.example.com/',
                         'headers' => [],
                     ],
                     [
-                        'url' => 'http://example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://callback.example.com/',
                         'headers' => [],
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', new Headers()),
-                    (string)new RequestIdentifier('http://example.com/', new Headers()),
+                    $requestHashes['r1.example.com headers=[]'],
+                    $requestHashes['r1.example.com headers=[]'],
                 ],
-                'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', new Headers()) => [
-                        'url' => 'http://example.com/',
-                        'callbackUrls' => [
-                            'http://callback.example.com/',
-                        ],
-                        'headers' => [],
+                'expectedCallbacks' => [
+                    [
+                        'requestHash' => $requestHashes['r1.example.com headers=[]'],
+                        'url' => 'http://callback.example.com/',
                     ],
+                ],
+                'expectedRetrieveResourceJobs' => [
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r1.example.com headers=[]'],
+                            $urls['r1.example.com'],
+                            new Headers()
+                        )),
+                    ]),
                 ],
             ],
             'two identical requests (same url, same headers)' => [
                 'requestDataCollection' => [
                     [
-                        'url' => 'http://example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://callback.example.com/',
-                        'headers' => [
-                            'foo' => 'bar',
-                        ],
+                        'headers' => $headers['a=b'],
                     ],
                     [
-                        'url' => 'http://example.com/',
+                        'url' => $urls['r1.example.com'],
                         'callback' => 'http://callback.example.com/',
-                        'headers' => [
-                            'foo' => 'bar',
-                        ],
+                        'headers' => $headers['a=b'],
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', new Headers(['foo' => 'bar'])),
-                    (string)new RequestIdentifier('http://example.com/', new Headers(['foo' => 'bar'])),
+                    $requestHashes['r1.example.com headers=[a=b]'],
+                    $requestHashes['r1.example.com headers=[a=b]'],
                 ],
-                'expectedRetrieveRequestDataCollection' => [
-                    (string)new RequestIdentifier('http://example.com/', new Headers(['foo' => 'bar'])) => [
-                        'url' => 'http://example.com/',
-                        'callbackUrls' => [
-                            'http://callback.example.com/',
-                        ],
-                        'headers' => [
-                            'foo' => 'bar',
-                        ],
+                'expectedCallbacks' => [
+                    [
+                        'requestHash' => $requestHashes['r1.example.com headers=[a=b]'],
+                        'url' => 'http://callback.example.com/',
                     ],
+                ],
+                'expectedRetrieveResourceJobs' => [
+                    new RetrieveResourceJob([
+                        'request-json' => json_encode(new RetrieveRequest(
+                            $requestHashes['r1.example.com headers=[a=b]'],
+                            $urls['r1.example.com'],
+                            new Headers($headers['a=b'])
+                        )),
+                    ]),
                 ],
             ],
         ];
+    }
+
+    private function createRequestHash(string $url, array $headers = []): string
+    {
+        $identifier = new RequestIdentifier($url, new Headers($headers));
+
+        return $identifier->getHash();
     }
 }
