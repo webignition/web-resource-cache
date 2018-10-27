@@ -13,7 +13,6 @@ use App\Model\RetrieveRequest;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\ResqueQueueService;
-use App\Services\RetrieveRequestManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
 use GuzzleHttp\Psr7\Response as HttpResponse;
@@ -41,11 +40,6 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
     private $resqueQueueService;
 
     /**
-     * @var RetrieveRequestManager
-     */
-    private $retrieveRequestManager;
-
-    /**
      * @var CachedResourceFactory
      */
     private $cachedResourceFactory;
@@ -69,7 +63,6 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
         $this->command = self::$container->get(SendResponseCommand::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->resqueQueueService = self::$container->get(ResqueQueueService::class);
-        $this->retrieveRequestManager = self::$container->get(RetrieveRequestManager::class);
         $this->cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
         $this->cachedResourceManager = self::$container->get(CachedResourceManager::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
