@@ -55,15 +55,17 @@ class RetrieveRequestTest extends \PHPUnit\Framework\TestCase
     public function testJsonSerialize(
         string $requestHash,
         string $url,
-        Headers $headers,
+        ?Headers $headers,
         ?int $retryCount,
         array $expectedArray
     ) {
         $retrieveRequest = new RetrieveRequest($requestHash, $url, $headers, $retryCount);
 
+        $expectedHeaders = $headers ?? new Headers();
+
         $this->assertEquals($requestHash, $retrieveRequest->getRequestHash());
         $this->assertEquals($url, $retrieveRequest->getUrl());
-        $this->assertEquals($headers, $retrieveRequest->getHeaders());
+        $this->assertEquals($expectedHeaders, $retrieveRequest->getHeaders());
         $this->assertEquals($retryCount, $retrieveRequest->getRetryCount());
 
         $this->assertEquals($expectedArray, $retrieveRequest->jsonSerialize());
@@ -72,10 +74,10 @@ class RetrieveRequestTest extends \PHPUnit\Framework\TestCase
     public function jsonSerializeDataProvider(): array
     {
         return [
-            'null retry count' => [
+            'null headers, null retry count' => [
                 'requestHash' => 'request_hash',
                 'url' => 'http://example.com/',
-                'headers' => new Headers(),
+                'headers' => null,
                 'retryCount' => null,
                 'expectedArray' => [
                     RetrieveRequest::JSON_KEY_REQUEST_HASH => 'request_hash',
