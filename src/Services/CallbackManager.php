@@ -31,9 +31,14 @@ class CallbackManager
      */
     public function findByRequestHash(string $requestHash): array
     {
-        return $this->repository->findBy([
-            'requestHash' => $requestHash,
-        ]);
+        return $this->repository->findBy(
+            [
+                'requestHash' => $requestHash,
+            ],
+            [
+                'url' => 'ASC',
+            ]
+        );
     }
 
     public function findByRequestHashAndUrl(string $requestHash, string $url): ?CallbackEntity
