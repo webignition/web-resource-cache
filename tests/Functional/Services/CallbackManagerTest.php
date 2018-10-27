@@ -88,8 +88,8 @@ class CallbackManagerTest extends AbstractFunctionalTestCase
             'many matching' => [
                 'requestHash' => 'foo',
                 'expectedCallUrls' => [
-                    'http://foo2.example.com',
                     'http://foo1.example.com',
+                    'http://foo2.example.com',
                 ],
             ],
         ];
