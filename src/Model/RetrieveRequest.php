@@ -31,8 +31,10 @@ class RetrieveRequest implements \JsonSerializable
      */
     private $retryCount = 0;
 
-    public function __construct(string $requestHash, string $url, Headers $headers, ?int $retryCount = 0)
+    public function __construct(string $requestHash, string $url, ?Headers $headers = null, ?int $retryCount = 0)
     {
+        $headers = $headers ?? new Headers();
+
         $this->requestHash = $requestHash;
         $this->url = $url;
         $this->headers = $headers->toArray();
