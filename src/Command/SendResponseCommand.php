@@ -7,7 +7,6 @@ use App\Model\Response\SuccessResponse;
 use App\Services\CachedResourceManager;
 use App\Services\ResponseFactory;
 use App\Services\ResponseSender;
-use App\Services\RetrieveRequestManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,11 +23,6 @@ class SendResponseCommand extends Command
     private $responseFactory;
 
     /**
-     * @var RetrieveRequestManager
-     */
-    private $retrieveRequestManager;
-
-    /**
      * @var CachedResourceManager
      */
     private $cachedResourceManager;
@@ -40,14 +34,12 @@ class SendResponseCommand extends Command
 
     public function __construct(
         ResponseFactory $responseFactory,
-        RetrieveRequestManager $retrieveRequestManager,
         CachedResourceManager $cachedResourceManager,
         ResponseSender $responseSender
     ) {
         parent::__construct();
 
         $this->responseFactory = $responseFactory;
-        $this->retrieveRequestManager = $retrieveRequestManager;
         $this->cachedResourceManager =$cachedResourceManager;
         $this->responseSender = $responseSender;
     }

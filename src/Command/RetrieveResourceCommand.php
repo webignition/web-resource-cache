@@ -15,7 +15,6 @@ use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\ResourceRetriever;
 use App\Services\ResqueQueueService;
-use App\Services\RetrieveRequestManager;
 use App\Services\RetryDecider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,11 +27,6 @@ class RetrieveResourceCommand extends Command
     const RETURN_CODE_OK = 0;
     const RETURN_CODE_RETRIEVE_REQUEST_NOT_FOUND = 2;
     const RETURN_CODE_RETRYING = 3;
-
-    /**
-     * @var RetrieveRequestManager
-     */
-    private $retrieveRequestManager;
 
     /**
      * @var ResourceRetriever
@@ -65,7 +59,6 @@ class RetrieveResourceCommand extends Command
     private $maxRetries;
 
     public function __construct(
-        RetrieveRequestManager $retrieveRequestManager,
         ResourceRetriever $resourceRetriever,
         RetryDecider $retryDecider,
         CachedResourceManager $cachedResourceManager,
@@ -75,7 +68,6 @@ class RetrieveResourceCommand extends Command
     ) {
         parent::__construct();
 
-        $this->retrieveRequestManager = $retrieveRequestManager;
         $this->resourceRetriever = $resourceRetriever;
         $this->retryDecider = $retryDecider;
         $this->cachedResourceManager = $cachedResourceManager;
