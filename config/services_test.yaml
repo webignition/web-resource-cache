@@ -26,8 +26,6 @@ services:
     arguments:
     - '%retryable_statuses%'
 
-  App\Services\CachedResourceManager:
-
   web_resource_cache.http.client.retriever:
     public: true
     class: GuzzleHttp\Client
@@ -49,7 +47,3 @@ services:
   App\Services\ResponseSender:
     arguments:
       $httpClient: '@web_resource_cache.http.client.sender'
-
-  App\Services\CallbackManager:
-
-  App\Services\CallbackFactory:

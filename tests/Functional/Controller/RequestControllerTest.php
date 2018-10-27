@@ -441,6 +441,39 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         ];
     }
 
+    public function testSuccessfulRequestWithExistingRetrieveResourceJob()
+    {
+        $this->clearRedis();
+
+        $resqueQueueService = self::$container->get(ResqueQueueService::class);
+
+        $this->assertTrue($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
+
+        $url = 'http://example.com/';
+        $requestHash = $this->createRequestHash($url);
+        $retryCount = 2;
+        $existingRetrieveRequest = new RetrieveRequest($requestHash, $url, null, $retryCount);
+
+        $existingRetrieveResourceJob = new RetrieveResourceJob([
+            'request-json' => json_encode($existingRetrieveRequest),
+        ]);
+
+        $resqueQueueService->enqueue($existingRetrieveResourceJob);
+        $this->assertTrue($resqueQueueService->contains($existingRetrieveResourceJob));
+        $this->assertEquals(1, $resqueQueueService->getQueueLength(RetrieveResourceJob::QUEUE_NAME));
+
+        $requestData = [
+            'url' => $url,
+            'callback' => 'http://callback.example.com/',
+        ];
+
+        $controller = self::$container->get(RequestController::class);
+        $controller->requestAction(new Request([], $requestData));
+
+        $this->assertTrue($resqueQueueService->contains($existingRetrieveResourceJob));
+        $this->assertEquals(1, $resqueQueueService->getQueueLength(RetrieveResourceJob::QUEUE_NAME));
+    }
+
     private function createRequestHash(string $url, array $headers = []): string
     {
         $identifier = new RequestIdentifier($url, new Headers($headers));
