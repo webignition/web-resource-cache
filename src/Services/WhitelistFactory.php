@@ -6,7 +6,9 @@ class WhitelistFactory
 {
     public function create(string $patternsString)
     {
-        $patterns = explode(',', $patternsString);
+        $patternsString = trim($patternsString);
+
+        $patterns = empty($patternsString) ? [] : explode(',', $patternsString);
 
         return new Whitelist($patterns);
     }
