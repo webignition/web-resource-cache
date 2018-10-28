@@ -81,7 +81,7 @@ class RequestController
         $url = trim($requestData->get('url'));
         $callbackUrl = trim($requestData->get('callback'));
 
-        if (empty($url) || !$this->callbackUrlWhitelist->matches($callbackUrl)) {
+        if (empty($url) || empty($callbackUrl) || !$this->callbackUrlWhitelist->matches($callbackUrl)) {
             return new Response('', 400);
         }
 
