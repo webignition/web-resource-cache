@@ -25,6 +25,9 @@ class WhitelistFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($whitelistItems);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testPatternsAreWrappedInRegexDelimiters()
     {
         $whitelistFactory = new WhitelistFactory();
