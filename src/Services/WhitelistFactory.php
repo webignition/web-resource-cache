@@ -10,6 +10,10 @@ class WhitelistFactory
 
         $patterns = empty($patternsString) ? [] : explode(',', $patternsString);
 
+        foreach ($patterns as $patterIndex => $pattern) {
+            $patterns[$patterIndex] = '/' . trim($pattern) . '/';
+        }
+
         return new Whitelist($patterns);
     }
 }
