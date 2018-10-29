@@ -7,7 +7,6 @@ use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
 use App\Services\CallbackManager;
-use App\Services\RetrieveResourceJobManager;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +26,7 @@ class RequestControllerTest extends \PHPUnit\Framework\TestCase
             \Mockery::mock(CachedResourceManager::class),
             \Mockery::mock(CachedResourceValidator::class),
             \Mockery::mock(CallbackFactory::class),
-            \Mockery::mock(CallbackManager::class),
-            \Mockery::mock(RetrieveResourceJobManager::class)
+            \Mockery::mock(CallbackManager::class)
         );
 
         $request = new Request([], $requestData);
