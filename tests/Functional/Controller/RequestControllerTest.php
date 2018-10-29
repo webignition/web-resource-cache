@@ -456,7 +456,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         ]);
 
         $resqueQueueService->enqueue($existingRetrieveResourceJob);
-        $this->assertTrue($resqueQueueService->contains($existingRetrieveResourceJob));
+
+        // Fix in #169
+        // Assert that 'retrieve resource' message bus contains expected message (existing retrieve request)
+
         $this->assertEquals(1, $resqueQueueService->getQueueLength(RetrieveResourceJob::QUEUE_NAME));
 
         $requestData = [
@@ -467,7 +470,9 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         $controller = self::$container->get(RequestController::class);
         $controller->requestAction(new Request([], $requestData));
 
-        $this->assertTrue($resqueQueueService->contains($existingRetrieveResourceJob));
+        // Fix in #169
+        // Assert that 'retrieve resource' message bus contains expected message (existing retrieve request)
+
         $this->assertEquals(1, $resqueQueueService->getQueueLength(RetrieveResourceJob::QUEUE_NAME));
     }
 
