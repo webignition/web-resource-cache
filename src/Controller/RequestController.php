@@ -3,17 +3,11 @@
 namespace App\Controller;
 
 use App\Model\RequestIdentifier;
-use App\Model\Response\RebuildableDecoratedResponse;
-use App\Model\Response\SuccessResponse;
 use App\Model\RetrieveRequest;
-use App\Resque\Job\RetrieveResourceJob;
-use App\Resque\Job\SendResponseJob;
 use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
 use App\Services\CallbackManager;
-use App\Services\ResqueQueueService;
-use App\Services\RetrieveResourceJobManager;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,11 +20,6 @@ class RequestController
      * @var Whitelist
      */
     private $callbackUrlWhitelist;
-
-    /**
-     * @var ResqueQueueService
-     */
-    private $resqueQueueService;
 
     /**
      * @var CachedResourceManager
@@ -52,27 +41,18 @@ class RequestController
      */
     private $callbackManager;
 
-    /**
-     * @var RetrieveResourceJobManager
-     */
-    private $retrieveResourceJobManager;
-
     public function __construct(
         Whitelist $callbackUrlWhitelist,
-        ResqueQueueService $resqueQueueService,
         CachedResourceManager $cachedResourceManager,
         CachedResourceValidator $cachedResourceValidator,
         CallbackFactory $callbackFactory,
-        CallbackManager $callbackManager,
-        RetrieveResourceJobManager $retrieveResourceJobManager
+        CallbackManager $callbackManager
     ) {
         $this->callbackUrlWhitelist = $callbackUrlWhitelist;
-        $this->resqueQueueService = $resqueQueueService;
         $this->cachedResourceManager = $cachedResourceManager;
         $this->cachedResourceValidator = $cachedResourceValidator;
         $this->callbackFactory = $callbackFactory;
         $this->callbackManager = $callbackManager;
-        $this->retrieveResourceJobManager = $retrieveResourceJobManager;
     }
 
     public function requestAction(Request $request): Response
@@ -97,23 +77,19 @@ class RequestController
 
         $cachedResource = $this->cachedResourceManager->find($requestHash);
         if ($cachedResource && $this->cachedResourceValidator->isFresh($cachedResource)) {
-            $sendResponseJob = new SendResponseJob([
-                'response-json' => json_encode(new RebuildableDecoratedResponse(new SuccessResponse($requestHash))),
-            ]);
+            // response-json => json_encode(new RebuildableDecoratedResponse(new SuccessResponse($requestHash)))
 
-            if (!$this->resqueQueueService->contains($sendResponseJob)) {
-                $this->resqueQueueService->enqueue($sendResponseJob);
-            }
+            // Fix in #168
+            // Implement dispatching 'send response' message
+            // using above success response as the data object
         } else {
             $retrieveRequest = new RetrieveRequest($requestHash, $url, $headers);
 
-            $retrieveResourceJob = new RetrieveResourceJob([
-                'request-json' => json_encode($retrieveRequest),
-            ]);
+            // 'request-json' => json_encode($retrieveRequest),
 
-            if (!$this->retrieveResourceJobManager->contains($retrieveResourceJob)) {
-                $this->retrieveResourceJobManager->enqueue($retrieveResourceJob);
-            }
+            // Fix in #168
+            // Implement dispatching 'retrieve resource' message
+            // using the retrieve request as the data object
         }
 
         return new JsonResponse((string) $requestIdentifier, 200);

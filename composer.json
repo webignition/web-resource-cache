@@ -1,10 +1,4 @@
 {
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/webignition/resque"
-        }
-    ],
     "type": "project",
     "license": "proprietary",
     "require": {
@@ -20,7 +14,6 @@
         "symfony/yaml": "*",
         "webignition/http-history-container": ">=0.3,<1",
         "webignition/guzzle-curl-exception":"^1",
-        "webignition/resque-bundle": "dev-master",
         "webignition/http-headers": ">=0.1,<1"
     },
     "require-dev": {
