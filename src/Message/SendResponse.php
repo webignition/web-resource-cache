@@ -2,21 +2,22 @@
 
 namespace App\Message;
 
+use App\Model\Response\ResponseInterface;
+
 class SendResponse
 {
     /**
-     * @var string
+     * @var ResponseInterface
      */
-    private $requestHash;
+    private $response;
 
-
-    public function __construct(string $requestHash)
+    public function __construct(ResponseInterface $response)
     {
-        $this->requestHash = $requestHash;
+        $this->response = $response;
     }
 
-    public function getRequestHash(): string
+    public function getResponse(): ResponseInterface
     {
-        return $this->requestHash;
+        return $this->response;
     }
 }
