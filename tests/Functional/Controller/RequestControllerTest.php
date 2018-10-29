@@ -65,8 +65,6 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         array $expectedCallbacks,
         array $expectedRetrieveResourceJobs
     ) {
-        $this->clearRedis();
-
         $callbackManager = self::$container->get(CallbackManager::class);
 
         // Fix in #169
@@ -308,8 +306,6 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         // Perform assertions
         $this->assertTrue(true);
 
-        $this->clearRedis();
-
         $entityManager = self::$container->get(EntityManagerInterface::class);
 
         // Fix in #169
@@ -381,8 +377,6 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         // Fix in #169
         // Perform assertions
         $this->assertTrue(true);
-
-        $this->clearRedis();
 
         // Fix in #169
         // Assert that 'retrieve resource' message bus is empty

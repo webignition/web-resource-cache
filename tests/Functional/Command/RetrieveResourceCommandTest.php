@@ -41,8 +41,6 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->clearRedis();
-
         $this->command = self::$container->get(RetrieveResourceCommand::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
 

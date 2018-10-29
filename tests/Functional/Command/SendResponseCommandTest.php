@@ -70,8 +70,6 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->clearRedis();
-
         $this->command = self::$container->get(SendResponseCommand::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
