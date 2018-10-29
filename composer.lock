@@ -4,140 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "52bdc68c4dc3ae09daa94dce57f03f7a",
+    "content-hash": "2cddc917d89acd9b0d9ecd92074f4924",
     "packages": [
-        {
-            "name": "chrisboulton/php-resque",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/chrisboulton/php-resque.git",
-                "reference": "968b7e6a307a2079051dfc571d2fc2be0546209f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/chrisboulton/php-resque/zipball/968b7e6a307a2079051dfc571d2fc2be0546209f",
-                "reference": "968b7e6a307a2079051dfc571d2fc2be0546209f",
-                "shasum": ""
-            },
-            "require": {
-                "colinmollenhour/credis": "~1.7",
-                "ext-pcntl": "*",
-                "php": ">=5.3.0",
-                "psr/log": "~1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "3.7.*"
-            },
-            "suggest": {
-                "ext-proctitle": "Allows php-resque to rename the title of UNIX processes to show the status of a worker.",
-                "ext-redis": "Native PHP extension for Redis connectivity. Credis will automatically utilize when available."
-            },
-            "bin": [
-                "bin/resque"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Resque": "lib"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Boulton",
-                    "email": "chris@bigcommerce.com"
-                }
-            ],
-            "description": "Redis backed library for creating background jobs and processing them later. Based on resque for Ruby.",
-            "homepage": "http://www.github.com/chrisboulton/php-resque/",
-            "keywords": [
-                "background",
-                "job",
-                "redis",
-                "resque"
-            ],
-            "time": "2017-04-12T21:58:19+00:00"
-        },
-        {
-            "name": "chrisboulton/php-resque-scheduler",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/chrisboulton/php-resque-scheduler.git",
-                "reference": "5954c989026f1bbc6443c02078a655333e152242"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/chrisboulton/php-resque-scheduler/zipball/5954c989026f1bbc6443c02078a655333e152242",
-                "reference": "5954c989026f1bbc6443c02078a655333e152242",
-                "shasum": ""
-            },
-            "require": {
-                "chrisboulton/php-resque": "dev-master"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "ResqueScheduler": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Boulton",
-                    "email": "chris@bgigcommerce.com"
-                }
-            ],
-            "description": "php-resque-scheduler is a PHP port of resque-scheduler, which adds support for scheduling items in the future to Resque.",
-            "time": "2016-11-28T22:38:06+00:00"
-        },
-        {
-            "name": "colinmollenhour/credis",
-            "version": "1.10.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/colinmollenhour/credis.git",
-                "reference": "8ab6db707c821055f9856b8cf76d5f44beb6fd8a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/colinmollenhour/credis/zipball/8ab6db707c821055f9856b8cf76d5f44beb6fd8a",
-                "reference": "8ab6db707c821055f9856b8cf76d5f44beb6fd8a",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "Client.php",
-                    "Cluster.php",
-                    "Sentinel.php",
-                    "Module.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Colin Mollenhour",
-                    "email": "colin@mollenhour.com"
-                }
-            ],
-            "description": "Credis is a lightweight interface to the Redis key-value store which wraps the phpredis library when available for better performance.",
-            "homepage": "https://github.com/colinmollenhour/credis",
-            "time": "2018-05-07T14:45:04+00:00"
-        },
         {
             "name": "doctrine/annotations",
             "version": "v1.6.0",
@@ -2377,63 +2245,6 @@
             "time": "2018-10-02T12:40:59+00:00"
         },
         {
-            "name": "symfony/dotenv",
-            "version": "v4.1.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/dotenv.git",
-                "reference": "22ca63c46e252b8a8f37b8f9e6da66bff5b3d3e7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dotenv/zipball/22ca63c46e252b8a8f37b8f9e6da66bff5b3d3e7",
-                "reference": "22ca63c46e252b8a8f37b8f9e6da66bff5b3d3e7",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1.3"
-            },
-            "require-dev": {
-                "symfony/process": "~3.4|~4.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Dotenv\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Registers environment variables from a .env file",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "dotenv",
-                "env",
-                "environment"
-            ],
-            "time": "2018-07-26T11:24:31+00:00"
-        },
-        {
             "name": "symfony/event-dispatcher",
             "version": "v4.1.6",
             "source": {
@@ -2988,55 +2799,6 @@
             "time": "2018-08-06T14:22:27+00:00"
         },
         {
-            "name": "symfony/process",
-            "version": "v4.1.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/process.git",
-                "reference": "ee33c0322a8fee0855afcc11fff81e6b1011b529"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/ee33c0322a8fee0855afcc11fff81e6b1011b529",
-                "reference": "ee33c0322a8fee0855afcc11fff81e6b1011b529",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1.3"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "4.1-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\Process\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony Process Component",
-            "homepage": "https://symfony.com",
-            "time": "2018-10-02T12:40:59+00:00"
-        },
-        {
             "name": "symfony/routing",
             "version": "v4.1.6",
             "source": {
@@ -3361,87 +3123,6 @@
                 "psr-7"
             ],
             "time": "2018-05-15T12:07:58+00:00"
-        },
-        {
-            "name": "webignition/resque-bundle",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webignition/resque.git",
-                "reference": "97d83005d4c5a2471a422774dd2ec6c1741ac2af"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webignition/resque/zipball/97d83005d4c5a2471a422774dd2ec6c1741ac2af",
-                "reference": "97d83005d4c5a2471a422774dd2ec6c1741ac2af",
-                "shasum": ""
-            },
-            "require": {
-                "chrisboulton/php-resque": "dev-master",
-                "chrisboulton/php-resque-scheduler": "dev-master",
-                "php": ">=7.2",
-                "symfony/console": "^4.0",
-                "symfony/dotenv": "^4.0",
-                "symfony/framework-bundle": "^4.0",
-                "symfony/process": "~4.0"
-            },
-            "require-dev": {
-                "mockery/mockery": "^1.0",
-                "phpunit/phpunit": "^7"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-4": {
-                    "ResqueBundle\\Resque\\": ""
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "ResqueBundle\\Resque\\Tests\\": "Tests/"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "./vendor/bin/phpunit --colors=always"
-                ],
-                "ci": [
-                    "@composer test"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Matthew Clarkson",
-                    "email": "mpclarkson@gmail.com",
-                    "homepage": "https://github.com/mpclarkson"
-                },
-                {
-                    "name": "Michel Salib",
-                    "email": "michelsalib@hotmail.com",
-                    "homepage": "http://michelsalib.com"
-                },
-                {
-                    "name": "Phil E Taylor",
-                    "email": "phil@phil-taylor.com",
-                    "homepage": "https://www.phil-taylor.com/"
-                }
-            ],
-            "description": "A Symfony bundle to manage Resque job queues",
-            "homepage": "https://github.com/webignition/resque/",
-            "keywords": [
-                "job queue",
-                "queue",
-                "redis",
-                "resque",
-                "symfony"
-            ],
-            "support": {
-                "source": "https://github.com/webignition/resque/tree/master",
-                "issues": "https://github.com/webignition/resque/issues"
-            },
-            "time": "2018-07-17T08:32:09+00:00"
         },
         {
             "name": "zendframework/zend-code",
@@ -5095,6 +4776,63 @@
             "time": "2018-10-02T12:40:59+00:00"
         },
         {
+            "name": "symfony/dotenv",
+            "version": "v4.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/dotenv.git",
+                "reference": "22ca63c46e252b8a8f37b8f9e6da66bff5b3d3e7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/dotenv/zipball/22ca63c46e252b8a8f37b8f9e6da66bff5b3d3e7",
+                "reference": "22ca63c46e252b8a8f37b8f9e6da66bff5b3d3e7",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "require-dev": {
+                "symfony/process": "~3.4|~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Dotenv\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Registers environment variables from a .env file",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "dotenv",
+                "env",
+                "environment"
+            ],
+            "time": "2018-07-26T11:24:31+00:00"
+        },
+        {
             "name": "symfony/phpunit-bridge",
             "version": "v4.1.6",
             "source": {
@@ -5253,9 +4991,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "webignition/resque-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
