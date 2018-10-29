@@ -455,12 +455,14 @@ class RequestControllerTest extends AbstractFunctionalTestCase
             'request-json' => json_encode($existingRetrieveRequest),
         ]);
 
-        $resqueQueueService->enqueue($existingRetrieveResourceJob);
+        // Fix in #169
+        // Add existing retrieve request to 'retrieve resource' message bus
 
         // Fix in #169
         // Assert that 'retrieve resource' message bus contains expected message (existing retrieve request)
 
-        $this->assertEquals(1, $resqueQueueService->getQueueLength(RetrieveResourceJob::QUEUE_NAME));
+        // Fix in #169
+        // Assert that 'retrieve resource' message bus contains just one message
 
         $requestData = [
             'url' => $url,
@@ -473,7 +475,8 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         // Fix in #169
         // Assert that 'retrieve resource' message bus contains expected message (existing retrieve request)
 
-        $this->assertEquals(1, $resqueQueueService->getQueueLength(RetrieveResourceJob::QUEUE_NAME));
+        // Fix in #169
+        // Assert that 'retrieve resource' message bus contains just one message
     }
 
     private function createRequestHash(string $url, array $headers = []): string

@@ -35,17 +35,6 @@ class ResqueQueueService
         $this->logger = $logger;
     }
 
-    public function enqueue(Job $job, bool $trackStatus = false): ?\Resque_Job_Status
-    {
-        try {
-            return $this->resque->enqueue($job, $trackStatus);
-        } catch (\CredisException $credisException) {
-            $this->logger->warning('ResqueQueueService::enqueue: Redis error ['.$credisException->getMessage().']');
-        }
-
-        return null;
-    }
-
     public function getQueueLength(string $queue): int
     {
         return \Resque::redis()->llen(self::QUEUE_KEY . ':' . $queue);
