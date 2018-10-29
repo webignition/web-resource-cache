@@ -3,7 +3,6 @@
 namespace App\Tests\Unit\Services;
 
 use App\Entity\CachedResource;
-use App\Model\RetrieveRequest;
 use App\Services\CachedResourceFactory;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
@@ -30,9 +29,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
      */
     public function testCreateResponseNotSuccessResponse(HttpResponseInterface $response)
     {
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
-
-        $this->assertNull($this->cachedResourceFactory->create($retrieveRequest, $response));
+        $this->assertNull($this->cachedResourceFactory->create('request_hash', 'http://example.com/', $response));
     }
 
     public function createFromPsr7ResponseNotSuccessResponseDataProvider(): array
@@ -59,17 +56,18 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         array $expectedCachedResourceHeaders,
         string $expectedCachedResourceBody
     ) {
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
+        $requestHash = 'request_hash';
+        $url = 'http://example.com/';
 
-        $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $response);
+        $cachedResource = $this->cachedResourceFactory->create($requestHash, $url, $response);
 
         $cachedResourceHeaders = $cachedResource->getHeaders();
 
         $this->assertInstanceOf(Headers::class, $cachedResourceHeaders);
         $this->assertSame($expectedCachedResourceHeaders, $cachedResourceHeaders->toArray());
         $this->assertSame($expectedCachedResourceBody, $cachedResource->getBody());
-        $this->assertSame($retrieveRequest->getUrl(), $cachedResource->getUrl());
-        $this->assertSame($retrieveRequest->getRequestHash(), $cachedResource->getRequestHash());
+        $this->assertSame($url, $cachedResource->getUrl());
+        $this->assertSame($requestHash, $cachedResource->getRequestHash());
     }
 
     public function createSuccessDataProvider(): array
@@ -96,9 +94,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $response = new Response(200, ['foo' => 'bar'], 'response content');
 
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
-
-        $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $response);
+        $cachedResource = $this->cachedResourceFactory->create('request_hash', 'http://example.com/', $response);
 
         $this->assertSame($cachedResource->getHeaders()->toArray(), $response->getHeaders());
         $this->assertSame($cachedResource->getBody(), (string) $response->getBody());

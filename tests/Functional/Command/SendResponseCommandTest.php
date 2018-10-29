@@ -416,7 +416,11 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
     ): CachedResource {
         $httpResponse = new HttpResponse(200, $httpResponseHeaders, $httpResponseBody);
 
-        $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $httpResponse);
+        $cachedResource = $this->cachedResourceFactory->create(
+            $retrieveRequest->getRequestHash(),
+            $retrieveRequest->getUrl(),
+            $httpResponse
+        );
         $this->cachedResourceManager->update($cachedResource);
 
         return $cachedResource;
