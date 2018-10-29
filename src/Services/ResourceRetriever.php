@@ -4,13 +4,13 @@ namespace App\Services;
 
 use App\Exception\HttpTransportException;
 use App\Model\RequestResponse;
-use App\Model\RetrieveRequest;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\TransferStats;
+use webignition\HttpHeaders\Headers;
 
 class ResourceRetriever
 {
@@ -31,15 +31,18 @@ class ResourceRetriever
     }
 
     /**
-     * @param RetrieveRequest $retrieveRequest
+     * @param string $url
+     * @param Headers $headers
      *
      * @return RequestResponse
      *
      * @throws HttpTransportException
      */
-    public function retrieve(RetrieveRequest $retrieveRequest): RequestResponse
+    public function retrieve(string $url, ?Headers $headers = null): RequestResponse
     {
-        $request = new Request('GET', $retrieveRequest->getUrl(), $retrieveRequest->getHeaders()->toArray());
+        $headers = $headers ?? new Headers();
+
+        $request = new Request('GET', $url, $headers->toArray());
 
         $requestUri = $request->getUri();
         $response = null;

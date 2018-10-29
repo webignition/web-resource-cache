@@ -86,7 +86,10 @@ class RetrieveResourceCommand extends Command
         $hasUnknownFailure = true;
 
         try {
-            $requestResponse = $this->resourceRetriever->retrieve($retrieveRequest);
+            $requestResponse = $this->resourceRetriever->retrieve(
+                $retrieveRequest->getUrl(),
+                $retrieveRequest->getHeaders()
+            );
 
             $httpResponse = $requestResponse->getResponse();
             $responseType = RetryDecider::TYPE_HTTP;
