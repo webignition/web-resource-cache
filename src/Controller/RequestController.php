@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Model\RequestIdentifier;
 use App\Model\RetrieveRequest;
-use App\Resque\Job\RetrieveResourceJob;
 use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
@@ -86,9 +85,7 @@ class RequestController
         } else {
             $retrieveRequest = new RetrieveRequest($requestHash, $url, $headers);
 
-            $retrieveResourceJob = new RetrieveResourceJob([
-                'request-json' => json_encode($retrieveRequest),
-            ]);
+            // 'request-json' => json_encode($retrieveRequest),
 
             // Fix in #168
             // Implement dispatching 'retrieve resource' message

@@ -8,7 +8,6 @@ use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 use App\Model\RetrieveRequest;
-use App\Resque\Job\RetrieveResourceJob;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
