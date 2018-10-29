@@ -79,7 +79,7 @@ class RequestController
         if ($cachedResource && $this->cachedResourceValidator->isFresh($cachedResource)) {
             // response-json => json_encode(new RebuildableDecoratedResponse(new SuccessResponse($requestHash)))
 
-            // Fix in #168
+            // Fix in #173
             // Implement dispatching 'send response' message
             // using above success response as the data object
         } else {
@@ -87,7 +87,7 @@ class RequestController
 
             // 'request-json' => json_encode($retrieveRequest),
 
-            // Fix in #168
+            // Fix in #174
             // Implement dispatching 'retrieve resource' message
             // using the retrieve request as the data object
         }

@@ -110,7 +110,7 @@ class RetrieveResourceCommand extends Command
         $requestHash = $retrieveRequest->getRequestHash();
 
         if ($hasUnknownFailure) {
-            // Fix in #168
+            // Fix in #175
             // Implement dispatching 'send response' message
             // using UnknownFailureResponse as the data object
 
@@ -121,7 +121,7 @@ class RetrieveResourceCommand extends Command
         if ($hasRetryableResponse && $retrieveRequest->getRetryCount() <= $this->maxRetries) {
             $retrieveRequest->incrementRetryCount();
 
-            // Fix in #168
+            // Fix in #176
             // Implement dispatching 'retrieve resource' message
             // using the retrieve request as the data object
 
@@ -145,7 +145,7 @@ class RetrieveResourceCommand extends Command
 
         // response-json => json_encode(new RebuildableDecoratedResponse($response))
 
-        // Fix in #168
+        // Fix in #175
         // Implement dispatching 'send response' message
         // using $response as the data object
 
