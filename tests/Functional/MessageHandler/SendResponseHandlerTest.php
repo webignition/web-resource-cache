@@ -2,7 +2,6 @@
 
 namespace App\Tests\Functional\MessageHandler;
 
-use App\Command\SendResponseCommand;
 use App\Entity\CachedResource;
 use App\Message\SendResponse;
 use App\MessageHandler\SendResponseHandler;
@@ -272,9 +271,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
             'content' => $cachedResource->getBody(),
         ];
 
-        $returnCode = $this->handler->__invoke($sendResponseMessage);
-
-        $this->assertEquals(SendResponseCommand::RETURN_CODE_OK, $returnCode);
+        $this->handler->__invoke($sendResponseMessage);
 
         $this->httpRequestAsserter->assertSenderRequest(
             $this->httpHistoryContainer->getLastRequest(),
@@ -318,9 +315,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
         $successResponse = new SuccessResponse($requestHash);
         $sendResponseMessage = new SendResponse($successResponse);
 
-        $returnCode = $this->handler->__invoke($sendResponseMessage);
-
-        $this->assertEquals(SendResponseCommand::RETURN_CODE_OK, $returnCode);
+        $this->handler->__invoke($sendResponseMessage);
 
         $requests = $this->httpHistoryContainer->getRequests();
 
