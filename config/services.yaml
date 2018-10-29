@@ -104,12 +104,3 @@ services:
     App\Services\ResponseSender:
         arguments:
             $httpClient: '@web_resource_cache.http.client.sender'
-
-    # public commands required for retrieval from resque container
-    App\Command\RetrieveResourceCommand:
-        public: true
-        arguments:
-            $maxRetries: '%max_retries%'
-
-    App\Command\SendResponseCommand:
-        public: true
