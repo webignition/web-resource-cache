@@ -10,6 +10,7 @@ use App\Services\CallbackManager;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class RequestControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,7 +27,8 @@ class RequestControllerTest extends \PHPUnit\Framework\TestCase
             \Mockery::mock(CachedResourceManager::class),
             \Mockery::mock(CachedResourceValidator::class),
             \Mockery::mock(CallbackFactory::class),
-            \Mockery::mock(CallbackManager::class)
+            \Mockery::mock(CallbackManager::class),
+            \Mockery::mock(MessageBusInterface::class)
         );
 
         $request = new Request([], $requestData);
