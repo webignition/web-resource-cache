@@ -7,7 +7,6 @@ use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
 use App\Services\CallbackManager;
-use App\Services\ResqueQueueService;
 use App\Services\RetrieveResourceJobManager;
 use App\Services\Whitelist;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +24,6 @@ class RequestControllerTest extends \PHPUnit\Framework\TestCase
     {
         $controller = new RequestController(
             $callbackUrlWhitelist,
-            \Mockery::mock(ResqueQueueService::class),
             \Mockery::mock(CachedResourceManager::class),
             \Mockery::mock(CachedResourceValidator::class),
             \Mockery::mock(CallbackFactory::class),

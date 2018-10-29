@@ -126,7 +126,7 @@ class RetrieveResourceCommand extends Command
 
             // Fix in #168
             // Implement dispatching 'retrieve resource' message
-            // using the retieve request as the data object
+            // using the retrieve request as the data object
 
             return self::RETURN_CODE_RETRYING;
         }
