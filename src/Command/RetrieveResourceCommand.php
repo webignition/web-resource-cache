@@ -4,11 +4,8 @@ namespace App\Command;
 
 use App\Exception\HttpTransportException;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse;
-use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\RetrieveRequest;
-use App\Resque\Job\SendResponseJob;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\ResourceRetriever;
@@ -146,19 +143,12 @@ class RetrieveResourceCommand extends Command
             $response = new KnownFailureResponse($requestHash, $responseType, $statusCode);
         }
 
-        $sendResponseJob = new SendResponseJob([
-            'response-json' => $this->createResponseJson($response),
-        ]);
+        // response-json => json_encode(new RebuildableDecoratedResponse($response))
 
         // Fix in #168
         // Implement dispatching 'send response' message
         // using $response as the data object
 
         return self::RETURN_CODE_OK;
-    }
-
-    private function createResponseJson(ResponseInterface $response): string
-    {
-        return json_encode(new RebuildableDecoratedResponse($response));
     }
 }

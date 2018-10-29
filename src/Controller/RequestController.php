@@ -3,11 +3,8 @@
 namespace App\Controller;
 
 use App\Model\RequestIdentifier;
-use App\Model\Response\RebuildableDecoratedResponse;
-use App\Model\Response\SuccessResponse;
 use App\Model\RetrieveRequest;
 use App\Resque\Job\RetrieveResourceJob;
-use App\Resque\Job\SendResponseJob;
 use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
@@ -81,9 +78,7 @@ class RequestController
 
         $cachedResource = $this->cachedResourceManager->find($requestHash);
         if ($cachedResource && $this->cachedResourceValidator->isFresh($cachedResource)) {
-            $sendResponseJob = new SendResponseJob([
-                'response-json' => json_encode(new RebuildableDecoratedResponse(new SuccessResponse($requestHash))),
-            ]);
+            // response-json => json_encode(new RebuildableDecoratedResponse(new SuccessResponse($requestHash)))
 
             // Fix in #168
             // Implement dispatching 'send response' message

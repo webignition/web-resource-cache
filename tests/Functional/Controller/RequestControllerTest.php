@@ -8,7 +8,6 @@ use App\Entity\Callback;
 use App\Model\RequestIdentifier;
 use App\Model\RetrieveRequest;
 use App\Resque\Job\RetrieveResourceJob;
-use App\Resque\Job\SendResponseJob;
 use App\Services\CallbackManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
