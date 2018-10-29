@@ -28,6 +28,10 @@
         <!-- ###- doctrine/doctrine-bundle ### -->
 
         <server name="DOTENV_PATH" value="../../../.env.test" />
+
+        <!-- ###+ symfony/messenger ### -->
+        <!-- MESSENGER_TRANSPORT_DSN=amqp://guest:guest@localhost:5672/%2f/messages -->
+        <!-- ###- symfony/messenger ### -->
     </php>
 
     <testsuites>
