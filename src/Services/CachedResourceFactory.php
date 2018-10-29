@@ -3,13 +3,12 @@
 namespace App\Services;
 
 use App\Entity\CachedResource;
-use App\Model\RetrieveRequest;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 use webignition\HttpHeaders\Headers;
 
 class CachedResourceFactory
 {
-    public function create(RetrieveRequest $retrieveRequest, HttpResponseInterface $response): ?CachedResource
+    public function create(string $requestHash, string $url, HttpResponseInterface $response): ?CachedResource
     {
         if (200 !== $response->getStatusCode()) {
             return null;
@@ -19,8 +18,8 @@ class CachedResourceFactory
 
         $this->updateResponse($cachedResource, $response);
 
-        $cachedResource->setRequestHash($retrieveRequest->getRequestHash());
-        $cachedResource->setUrl($retrieveRequest->getUrl());
+        $cachedResource->setRequestHash($requestHash);
+        $cachedResource->setUrl($url);
 
         return $cachedResource;
     }

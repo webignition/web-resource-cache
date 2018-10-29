@@ -244,7 +244,8 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $currentBody = 'current body content';
 
         $cachedResource = $cachedResourceFactory->create(
-            $this->retrieveRequest,
+            $this->retrieveRequest->getRequestHash(),
+            $this->retrieveRequest->getUrl(),
             new Response(200, $currentHeaders, $currentBody)
         );
 

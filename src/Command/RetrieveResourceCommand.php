@@ -136,7 +136,11 @@ class RetrieveResourceCommand extends Command
             if ($cachedResource) {
                 $this->cachedResourceFactory->updateResponse($cachedResource, $httpResponse);
             } else {
-                $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $httpResponse);
+                $cachedResource = $this->cachedResourceFactory->create(
+                    $retrieveRequest->getRequestHash(),
+                    $retrieveRequest->getUrl(),
+                    $httpResponse
+                );
             }
 
             $this->cachedResourceManager->update($cachedResource);
