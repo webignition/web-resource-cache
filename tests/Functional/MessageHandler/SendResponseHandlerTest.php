@@ -69,8 +69,6 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->clearRedis();
-
         $this->handler = self::$container->get(SendResponseHandler::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
         $this->cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
