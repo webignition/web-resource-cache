@@ -14,7 +14,6 @@ use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\CallbackFactory;
 use App\Services\CallbackManager;
-use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\Asserter\HttpRequestAsserter;
 use App\Tests\Services\HttpMockHandler;
@@ -36,11 +35,6 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
      * @var HttpMockHandler
      */
     private $httpMockHandler;
-
-    /**
-     * @var ResqueQueueService
-     */
-    private $resqueQueueService;
 
     /**
      * @var CachedResourceFactory
@@ -80,7 +74,6 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
 
         $this->command = self::$container->get(SendResponseCommand::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
-        $this->resqueQueueService = self::$container->get(ResqueQueueService::class);
         $this->cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
         $this->cachedResourceManager = self::$container->get(CachedResourceManager::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);

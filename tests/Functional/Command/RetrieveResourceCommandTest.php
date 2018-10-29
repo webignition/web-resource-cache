@@ -12,7 +12,6 @@ use App\Resque\Job\RetrieveResourceJob;
 use App\Resque\Job\SendResponseJob;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
-use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
 use App\Tests\UnhandledGuzzleException;
@@ -36,11 +35,6 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
     private $httpMockHandler;
 
     /**
-     * @var ResqueQueueService
-     */
-    private $resqueQueueService;
-
-    /**
      * @var RetrieveRequest
      */
     private $retrieveRequest;
@@ -53,7 +47,6 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
 
         $this->command = self::$container->get(RetrieveResourceCommand::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
-        $this->resqueQueueService = self::$container->get(ResqueQueueService::class);
 
         $url = 'http://example.com/';
         $requestIdentifier = new RequestIdentifier($url, new Headers());
@@ -86,8 +79,9 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $this->assertTrue($this->resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
-        $this->assertTrue($this->resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
+        // Fix in #169
+        // Assert that 'retrieve resource' message bus is empty
+        // Assert that 'send response' message bus is empty
 
         $input = new ArrayInput([
             'request-json' => json_encode($this->retrieveRequest),
@@ -96,9 +90,9 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $returnCode = $this->command->run($input, new NullOutput());
 
         $this->assertEquals(RetrieveResourceCommand::RETURN_CODE_RETRYING, $returnCode);
-        $this->assertTrue($this->resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
 
         // Fix in #169
+        // Assert that 'retrieve resource' message bus is empty
         // Assert that 'send response' message bus is not empty
 
         $expectedUpdatedRetrieveRequest = clone $this->retrieveRequest;
@@ -160,8 +154,9 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $this->assertTrue($this->resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
-        $this->assertTrue($this->resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
+        // Fix in #169
+        // Assert that 'retrieve resource' message bus is empty
+        // Assert that 'send response' message bus is empty
 
         $input = new ArrayInput([
             'request-json' => json_encode($this->retrieveRequest),
@@ -170,9 +165,9 @@ class RetrieveResourceCommandTest extends AbstractFunctionalTestCase
         $returnCode = $this->command->run($input, new NullOutput());
 
         $this->assertEquals(RetrieveResourceCommand::RETURN_CODE_OK, $returnCode);
-        $this->assertTrue($this->resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
 
         // Fix in #169
+        // Assert that 'retrieve resource' message bus is empty
         // Assert that 'send response' message bus is not empty
 
         $expectedResqueJobData = str_replace(
