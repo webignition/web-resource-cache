@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Controller;
 use App\Controller\RequestController;
 use App\Entity\CachedResource;
 use App\Entity\Callback;
+use App\Message\SendResponse;
 use App\Model\RequestIdentifier;
 use App\Model\RetrieveRequest;
 use App\Services\CallbackManager;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\RouterInterface;
 use webignition\HttpHeaders\Headers;
 
@@ -58,6 +60,8 @@ class RequestControllerTest extends AbstractFunctionalTestCase
      * @param array $expectedResponseDataCollection
      * @param array $expectedCallbacks
      * @param array $expectedRetrieveResourceJobs
+     *
+     * @throws \ReflectionException
      */
     public function testSuccessfulRequestsFromEmpty(
         array $requestDataCollection,
@@ -69,7 +73,6 @@ class RequestControllerTest extends AbstractFunctionalTestCase
 
         // Fix in #169
         // Assert that 'retrieve resource' message bus is empty
-
 
         $controller = self::$container->get(RequestController::class);
 
@@ -286,7 +289,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @dataProvider successfulRequestWithCachedResourcesDataProvider
+     * @dataProvider successfulRequestWithNonMatchingCachedResourcesDataProvider
      *
      * @param CachedResource[] $cachedResourceCollection
      * @param array $requestData
@@ -296,29 +299,30 @@ class RequestControllerTest extends AbstractFunctionalTestCase
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function testSuccessfulRequestWithCachedResources(
+    public function testSuccessfulRequestWithNonMatchingCachedResources(
         array $cachedResourceCollection,
         array $requestData,
         bool $expectedHasSendResponseJob,
         bool $expectedHasRetrieveResourceJob
     ) {
-        // Fix in #169
-        // Perform assertions
-        $this->assertTrue(true);
-
         $entityManager = self::$container->get(EntityManagerInterface::class);
-
-        // Fix in #169
-        // Assert that 'retrieve resource' message bus is empty
-        // Assert that 'send response' message bus is empty
 
         foreach ($cachedResourceCollection as $cachedResource) {
             $entityManager->persist($cachedResource);
             $entityManager->flush();
         }
 
+        $messageBus = \Mockery::mock(MessageBusInterface::class);
+        $messageBus
+            ->shouldReceive('dispatch')
+            ->never();
+
         $controller = self::$container->get(RequestController::class);
+        $this->setControllerMessageBus($controller, $messageBus);
+
         $controller->requestAction(new Request([], $requestData));
+
+        $this->assertEquals(1, \Mockery::getContainer()->mockery_getExpectationCount());
 
         // Fix in #169
         // Assert that 'send response' message bus is/isn't empty
@@ -327,10 +331,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         // Assert that 'retrieve resource' message bus is/isn't empty
     }
 
-    public function successfulRequestWithCachedResourcesDataProvider(): array
+    public function successfulRequestWithNonMatchingCachedResourcesDataProvider(): array
     {
         return [
-            'request not matches existing cached resource' => [
+            'no matching existing cached resource' => [
                 'cachedResourceCollection' => [
                     $this->createCachedResource('non-matching-hash', new \DateTime()),
                 ],
@@ -341,7 +345,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                 'expectedHasSendResponseJob' => false,
                 'expectedHasRetrieveResourceJob' => true,
             ],
-            'request matches existing cached resource; resource is stale' => [
+            'matches existing cached resource; resource is stale' => [
                 'cachedResourceCollection' => [
                     $this->createCachedResource(
                         $this->createRequestHash('http://example.com/'),
@@ -355,21 +359,40 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                 'expectedHasSendResponseJob' => false,
                 'expectedHasRetrieveResourceJob' => true,
             ],
-            'request matches existing cached resource; resource is fresh' => [
-                'cachedResourceCollection' => [
-                    $this->createCachedResource(
-                        $this->createRequestHash('http://example.com/'),
-                        new \DateTime()
-                    ),
-                ],
-                'requestData' => [
-                    'url' => 'http://example.com/',
-                    'callback' => 'http://callback.example.com/',
-                ],
-                'expectedHasSendResponseJob' => true,
-                'expectedHasRetrieveResourceJob' => false,
-            ],
         ];
+    }
+
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function testSuccessfulRequestWithMatchingCachedResource()
+    {
+        $entityManager = self::$container->get(EntityManagerInterface::class);
+
+        $requestHash = $this->createRequestHash('http://example.com/');
+
+        $cachedResource = $this->createCachedResource($requestHash, new \DateTime());
+        $entityManager->persist($cachedResource);
+        $entityManager->flush();
+
+        $messageBus = \Mockery::spy(MessageBusInterface::class);
+
+        $controller = self::$container->get(RequestController::class);
+        $this->setControllerMessageBus($controller, $messageBus);
+
+        $controller->requestAction(new Request([], [
+            'url' => 'http://example.com/',
+            'callback' => 'http://callback.example.com/',
+        ]));
+
+        $messageBus
+            ->shouldHaveReceived('dispatch')
+            ->withArgs(function (SendResponse $sendResponseMessage) use ($requestHash) {
+                $this->assertEquals($requestHash, $sendResponseMessage->getResponse()->getRequestId());
+
+                return true;
+            });
     }
 
     public function testSuccessfulRequestWithExistingRetrieveResourceJob()
@@ -428,5 +451,16 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         $cachedResource->setLastStored($lastStored);
 
         return $cachedResource;
+    }
+
+    private function setControllerMessageBus(RequestController $controller, MessageBusInterface $messageBus)
+    {
+        try {
+            $reflector = new \ReflectionClass(RequestController::class);
+            $property = $reflector->getProperty('messageBus');
+            $property->setAccessible(true);
+            $property->setValue($controller, $messageBus);
+        } catch (\ReflectionException $exception) {
+        }
     }
 }
