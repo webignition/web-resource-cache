@@ -46,7 +46,7 @@ class SendResponseHandler implements MessageHandlerInterface
             $cachedResource = $this->cachedResourceManager->find($requestHash);
 
             if (empty($cachedResource)) {
-                return null;
+                return;
             }
 
             $response = new PresentationDecoratedSuccessResponse($response, $cachedResource);

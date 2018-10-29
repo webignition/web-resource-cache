@@ -79,11 +79,6 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
         $this->httpRequestAsserter = self::$container->get(HttpRequestAsserter::class);
     }
 
-    public function testFoo()
-    {
-        $this->assertTrue(true);
-    }
-
     public function testInvokeNoCachedResource()
     {
         $successResponse = new SuccessResponse('invalid-request-hash');
