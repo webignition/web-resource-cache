@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
+use App\Message\RetrieveResource;
 use App\Message\SendResponse;
 use App\Model\RequestIdentifier;
 use App\Model\Response\SuccessResponse;
-use App\Model\RetrieveRequest;
 use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
@@ -87,23 +87,9 @@ class RequestController
 
         $cachedResource = $this->cachedResourceManager->find($requestHash);
         if ($cachedResource && $this->cachedResourceValidator->isFresh($cachedResource)) {
-            $sendResponseMessage = new SendResponse(new SuccessResponse($requestHash));
-
-            // response-json => json_encode(new RebuildableDecoratedResponse(new SuccessResponse($requestHash)))
-
-            // Fix in #173
-            // Implement dispatching 'send response' message
-            // using above success response as the data object
-
-            $this->messageBus->dispatch($sendResponseMessage);
+            $this->messageBus->dispatch(new SendResponse(new SuccessResponse($requestHash)));
         } else {
-            $retrieveRequest = new RetrieveRequest($requestHash, $url, $headers);
-
-            // 'request-json' => json_encode($retrieveRequest),
-
-            // Fix in #174
-            // Implement dispatching 'retrieve resource' message
-            // using the retrieve request as the data object
+            $this->messageBus->dispatch(new RetrieveResource($requestHash, $url, $headers));
         }
 
         return new JsonResponse((string) $requestIdentifier, 200);
