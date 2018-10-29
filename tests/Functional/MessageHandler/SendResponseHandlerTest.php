@@ -5,11 +5,9 @@ namespace App\Tests\Functional\MessageHandler;
 use App\Entity\CachedResource;
 use App\Message\SendResponse;
 use App\MessageHandler\SendResponseHandler;
-use App\Model\RequestIdentifier;
 use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
-use App\Model\RetrieveRequest;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\CallbackFactory;
@@ -19,7 +17,6 @@ use App\Tests\Services\Asserter\HttpRequestAsserter;
 use App\Tests\Services\HttpMockHandler;
 use GuzzleHttp\Psr7\Response as HttpResponse;
 use GuzzleHttp\Psr7\Response;
-use webignition\HttpHeaders\Headers;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class SendResponseHandlerTest extends AbstractFunctionalTestCase
@@ -247,8 +244,8 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
             new Response(),
         ]);
 
-        $retrieveRequest = $this->createRetrieveRequest('http://example.com/', new Headers());
-        $requestHash = $retrieveRequest->getRequestHash();
+        $url = 'http://example.com/';
+        $requestHash = 'request_hash';
 
         $callbackUrl = 'http://callback.example.com/';
         $this->createCallback($requestHash, $callbackUrl);
@@ -261,11 +258,12 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
                 'content-type' => 'text/plain',
             ],
             'resource content',
-            $retrieveRequest
+            $requestHash,
+            $url
         );
 
         $expectedRequestData = [
-            'request_id' => $retrieveRequest->getRequestHash(),
+            'request_id' => $requestHash,
             'status' => SuccessResponse::STATUS_SUCCESS,
             'headers' => $cachedResource->getHeaders()->toArray(),
             'content' => $cachedResource->getBody(),
@@ -290,8 +288,8 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
 
         $this->httpMockHandler->appendFixtures(array_fill(0, count($callbackUrls), new Response()));
 
-        $retrieveRequest = $this->createRetrieveRequest('http://example.com/', new Headers());
-        $requestHash = $retrieveRequest->getRequestHash();
+        $url = 'http://example.com/';
+        $requestHash = 'request_hash';
 
         foreach ($callbackUrls as $callbackUrl) {
             $this->createCallback($requestHash, $callbackUrl);
@@ -302,11 +300,12 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
                 'content-type' => 'text/plain',
             ],
             'resource content',
-            $retrieveRequest
+            $requestHash,
+            $url
         );
 
         $expectedRequestData = [
-            'request_id' => $retrieveRequest->getRequestHash(),
+            'request_id' => $requestHash,
             'status' => SuccessResponse::STATUS_SUCCESS,
             'headers' => $cachedResource->getHeaders()->toArray(),
             'content' => $cachedResource->getBody(),
@@ -330,24 +329,17 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
         }
     }
 
-    private function createRetrieveRequest(string $url, Headers $headers): RetrieveRequest
-    {
-        $requestIdentifier = new RequestIdentifier($url, $headers);
-        $retrieveRequest = new RetrieveRequest($requestIdentifier->getHash(), $url, $headers);
-
-        return $retrieveRequest;
-    }
-
     private function createCachedResource(
         array $httpResponseHeaders,
         string $httpResponseBody,
-        RetrieveRequest $retrieveRequest
+        string $requestHash,
+        string $url
     ): CachedResource {
         $httpResponse = new HttpResponse(200, $httpResponseHeaders, $httpResponseBody);
 
         $cachedResource = $this->cachedResourceFactory->create(
-            $retrieveRequest->getRequestHash(),
-            $retrieveRequest->getUrl(),
+            $requestHash,
+            $url,
             $httpResponse
         );
         $this->cachedResourceManager->update($cachedResource);
