@@ -7,14 +7,11 @@ use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
-use App\Model\Response\UnknownFailureResponse;
 use App\Model\RetrieveRequest;
-use App\Resque\Job\RetrieveResourceJob;
 use App\Resque\Job\SendResponseJob;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\ResourceRetriever;
-use App\Services\ResqueQueueService;
 use App\Services\RetryDecider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -44,11 +41,6 @@ class RetrieveResourceCommand extends Command
     private $cachedResourceManager;
 
     /**
-     * @var ResqueQueueService
-     */
-    private $resqueQueueService;
-
-    /**
      * @var CachedResourceFactory
      */
     private $cachedResourceFactory;
@@ -62,7 +54,6 @@ class RetrieveResourceCommand extends Command
         ResourceRetriever $resourceRetriever,
         RetryDecider $retryDecider,
         CachedResourceManager $cachedResourceManager,
-        ResqueQueueService $resqueQueueService,
         CachedResourceFactory $cachedResourceFactory,
         int $maxRetries
     ) {
@@ -71,7 +62,6 @@ class RetrieveResourceCommand extends Command
         $this->resourceRetriever = $resourceRetriever;
         $this->retryDecider = $retryDecider;
         $this->cachedResourceManager = $cachedResourceManager;
-        $this->resqueQueueService = $resqueQueueService;
         $this->cachedResourceFactory = $cachedResourceFactory;
         $this->maxRetries = $maxRetries;
     }
@@ -123,13 +113,9 @@ class RetrieveResourceCommand extends Command
         $requestHash = $retrieveRequest->getRequestHash();
 
         if ($hasUnknownFailure) {
-            $sendResponseJob = new SendResponseJob([
-                'response-json' => $this->createResponseJson(new UnknownFailureResponse($requestHash)),
-            ]);
-
-            if (!$this->resqueQueueService->contains($sendResponseJob)) {
-                $this->resqueQueueService->enqueue($sendResponseJob);
-            }
+            // Fix in #168
+            // Implement dispatching 'send response' message
+            // using UnknownFailureResponse as the data object
 
             return self::RETURN_CODE_OK;
         }
@@ -138,9 +124,9 @@ class RetrieveResourceCommand extends Command
         if ($hasRetryableResponse && $retrieveRequest->getRetryCount() <= $this->maxRetries) {
             $retrieveRequest->incrementRetryCount();
 
-            $this->resqueQueueService->enqueue(new RetrieveResourceJob([
-                'request-json' => json_encode($retrieveRequest),
-            ]));
+            // Fix in #168
+            // Implement dispatching 'retrieve resource' message
+            // using the retieve request as the data object
 
             return self::RETURN_CODE_RETRYING;
         }
@@ -164,9 +150,9 @@ class RetrieveResourceCommand extends Command
             'response-json' => $this->createResponseJson($response),
         ]);
 
-        if (!$this->resqueQueueService->contains($sendResponseJob)) {
-            $this->resqueQueueService->enqueue($sendResponseJob);
-        }
+        // Fix in #168
+        // Implement dispatching 'send response' message
+        // using $response as the data object
 
         return self::RETURN_CODE_OK;
     }
