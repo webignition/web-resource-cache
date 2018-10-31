@@ -27,6 +27,10 @@
         <!-- Configure your db driver and server_version in config/packages/doctrine.yaml -->
         <env name="DATABASE_URL" value="mysql://root:@localhost:3306/myapp_test"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
+
+        <!-- ###+ symfony/messenger ### -->
+        <env name="MESSENGER_TRANSPORT_DSN" value="amqp://guest:guest@localhost:5672/%2f/messages" />
+        <!-- ###- symfony/messenger ### -->
     </php>
 
     <testsuites>
