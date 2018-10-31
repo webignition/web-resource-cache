@@ -100,6 +100,7 @@ services:
     App\Services\ResourceRetriever:
         arguments:
             $httpClient: '@web_resource_cache.http.client.retriever'
+            $requestTimeout: '%env(RETRIEVER_TIMEOUT_SECONDS)%'
 
     App\Services\ResponseSender:
         arguments:
