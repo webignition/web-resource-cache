@@ -27,8 +27,6 @@
         <!-- Configure your db driver and server_version in config/packages/doctrine.yaml -->
         <env name="DATABASE_URL" value="mysql://root:@localhost:3306/myapp_test"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
-
-        <server name="DOTENV_PATH" value="../../../.env.test" />
     </php>
 
     <testsuites>
