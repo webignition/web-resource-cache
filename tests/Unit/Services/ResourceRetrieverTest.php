@@ -3,7 +3,6 @@
 namespace App\Tests\Unit\Services;
 
 use App\Exception\HttpTransportException;
-use App\Model\RetrieveRequest;
 use App\Services\ResourceRetriever;
 use GuzzleHttp\Client;
 use Psr\Http\Message\RequestInterface;
@@ -33,8 +32,6 @@ class ResourceRetrieverTest extends \PHPUnit\Framework\TestCase
 
         $resourceRetriever = new ResourceRetriever($httpClient, $timeout);
 
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com');
-
-        $resourceRetriever->retrieve($retrieveRequest);
+        $resourceRetriever->retrieve('http://example.com');
     }
 }
