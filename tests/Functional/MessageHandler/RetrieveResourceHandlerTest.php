@@ -275,6 +275,9 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
             new Response(200, $updatedHeaders, $updatedBody),
         ]);
 
+        $messageBus = \Mockery::spy(MessageBusInterface::class);
+        $this->setHandlerMessageBus($this->handler, $messageBus);
+
         $this->handler->__invoke($this->retrieveResourceMessage);
 
         $cachedResourceHeaders = $cachedResource->getHeaders()->toArray();
