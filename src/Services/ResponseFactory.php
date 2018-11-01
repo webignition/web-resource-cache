@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Model\Response\AbstractFailureResponse;
+use App\Model\Response\AbstractResponse;
 use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
@@ -9,27 +11,52 @@ use App\Model\Response\UnknownFailureResponse;
 
 class ResponseFactory
 {
+    private $allowedStatus = [
+        AbstractResponse::STATUS_SUCCESS,
+        AbstractResponse::STATUS_FAILED,
+    ];
+
+    private $allowedFailureType = [
+        AbstractFailureResponse::TYPE_HTTP,
+        AbstractFailureResponse::TYPE_CONNECTION,
+        AbstractFailureResponse::TYPE_UNKNOWN,
+    ];
+
     public function createFromArray(array $data): ?ResponseInterface
     {
-        $modelClass = $data['class'] ?? null;
+        $requestId = $data['request_id'] ?? null;
 
-        if (empty($modelClass)) {
+        if (empty($requestId)) {
             return null;
         }
 
-        if (!$this->validateData($data, $modelClass)) {
+        $status = $data['status'] ?? null;
+
+        if (!in_array($status, $this->allowedStatus)) {
             return null;
         }
 
-        if (KnownFailureResponse::class === $modelClass) {
-            return new KnownFailureResponse($data['request_id'], $data['failure_type'], $data['status_code']);
+        if (AbstractResponse::STATUS_SUCCESS === $status) {
+            return new SuccessResponse($requestId);
         }
 
-        if (UnknownFailureResponse::class === $modelClass) {
-            return new UnknownFailureResponse($data['request_id']);
+        $failureType = $data['failure_type'] ?? null;
+
+        if (!in_array($failureType, $this->allowedFailureType)) {
+            return null;
         }
 
-        return new SuccessResponse($data['request_id']);
+        if (AbstractFailureResponse::TYPE_UNKNOWN === $failureType) {
+            return new UnknownFailureResponse($requestId);
+        }
+
+        $statusCode = $data['status_code'] ?? null;
+
+        if (null === $statusCode) {
+            return null;
+        }
+
+        return new KnownFailureResponse($requestId, $failureType, $statusCode);
     }
 
     public function createFromJson(string $json): ?ResponseInterface
@@ -49,35 +76,6 @@ class ResponseFactory
 
         if (!is_array($data)) {
             return null;
-        }
-
-        return $data;
-    }
-
-    private function validateData(array $data, string $modelClass)
-    {
-        if (!class_exists($modelClass)) {
-            return null;
-        }
-
-        if (!in_array(ResponseInterface::class, class_implements($modelClass))) {
-            return null;
-        }
-
-        $requestId = $data['request_id'] ?? null;
-
-        if (empty($requestId)) {
-            return null;
-        }
-
-        if (KnownFailureResponse::class === $modelClass) {
-            $requestId = $data['request_id'] ?? null;
-            $type = $data['failure_type'] ?? null;
-            $statusCode = $data['status_code'] ?? null;
-
-            if (empty($requestId) || empty($type) || null === $statusCode) {
-                return null;
-            }
         }
 
         return $data;
