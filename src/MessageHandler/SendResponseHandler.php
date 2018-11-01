@@ -4,7 +4,7 @@ namespace App\MessageHandler;
 
 use App\Exception\InvalidResponseDataException;
 use App\Message\SendResponse;
-use App\Model\Response\PresentationDecoratedSuccessResponse;
+use App\Model\Response\DecoratedSuccessResponse;
 use App\Model\Response\SuccessResponse;
 use App\Services\CachedResourceManager;
 use App\Services\CallbackManager;
@@ -69,7 +69,7 @@ class SendResponseHandler implements MessageHandlerInterface
                 return;
             }
 
-            $response = new PresentationDecoratedSuccessResponse($response, $cachedResource);
+            $response = new DecoratedSuccessResponse($response, $cachedResource);
         }
 
         $callbacks = $this->callbackManager->findByRequestHash($requestHash);

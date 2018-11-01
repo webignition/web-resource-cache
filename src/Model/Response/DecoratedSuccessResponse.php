@@ -4,7 +4,7 @@ namespace App\Model\Response;
 
 use App\Entity\CachedResource;
 
-class PresentationDecoratedSuccessResponse implements ResponseInterface
+class DecoratedSuccessResponse implements ResponseInterface
 {
     /**
      * @var SuccessResponse
