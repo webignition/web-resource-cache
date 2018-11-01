@@ -4,7 +4,7 @@ namespace App\Tests\Functional\Services;
 
 use App\Entity\CachedResource;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\PresentationDecoratedSuccessResponse;
+use App\Model\Response\DecoratedSuccessResponse;
 use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
@@ -157,7 +157,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                 ],
             ],
             'success response, text/plain, no additional headers' => [
-                'response' => new PresentationDecoratedSuccessResponse(
+                'response' => new DecoratedSuccessResponse(
                     new SuccessResponse('request_hash'),
                     $this->createCachedResource(['content-type' => 'text/plain'], 'response content')
                 ),
@@ -173,7 +173,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                 ],
             ],
             'success response, text/plain, has additional headers' => [
-                'response' => new PresentationDecoratedSuccessResponse(
+                'response' => new DecoratedSuccessResponse(
                     new SuccessResponse('request_hash'),
                     $this->createCachedResource(
                         [
@@ -198,7 +198,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                 ],
             ],
             'success response, text/html, no additional headers' => [
-                'response' => new PresentationDecoratedSuccessResponse(
+                'response' => new DecoratedSuccessResponse(
                     new SuccessResponse('request_hash'),
                     $this->createCachedResource(['content-type' => 'text/html'], '<!doctype><html></html>')
                 ),

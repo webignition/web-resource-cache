@@ -2,8 +2,10 @@
 
 namespace App\Tests\Unit\Services;
 
+use App\Model\Response\AbstractFailureResponse;
+use App\Model\Response\AbstractResponse;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse;
+use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 use App\Services\ResponseFactory;
@@ -23,142 +25,102 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider createFromJsonInvalidDataDataProvider
+     * @dataProvider createFromArrayInvalidDataDataProvider
      *
-     * @param string $json
+     * @param array $data
      */
-    public function testCreateFromJsonInvalidData(string $json)
+    public function testCreateFromArrayInvalidData(array $data)
     {
-        $this->assertNull($this->responseFactory->createFromJson($json));
+        $this->assertNull($this->responseFactory->createFromArray($data));
     }
 
-    public function createFromJsonInvalidDataDataProvider(): array
+    public function createFromArrayInvalidDataDataProvider(): array
     {
         return [
-            'empty json' => [
-                'json' => '',
-            ],
-            'whitespace' => [
-                'json' => '  ',
-            ],
-            'not an array' => [
-                'json' => json_encode(true),
-            ],
             'missing request_id' => [
-                'json' => json_encode([
+                'data' => [
                     'foo' => 'bar',
-                ]),
+                ],
             ],
-            'missing class' => [
-                'json' => json_encode([
+            'missing status' => [
+                'data' => [
                     'request_id' => 'request_hash',
-                ]),
+                ],
             ],
-            'invalid class' => [
-                'json' => json_encode([
+            'invalid status' => [
+                'data' => [
                     'request_id' => 'request_hash',
-                    'class' => 'Foo',
-                ]),
+                    'status' => 'foo',
+                ],
             ],
-            'class not implements ResponseInterface' => [
-                'json' => json_encode([
+            'missing failure_type' => [
+                'data' => [
                     'request_id' => 'request_hash',
-                    'class' => get_class($this),
-                ]),
+                    'status' => AbstractResponse::STATUS_FAILED,
+                ],
             ],
-            'success response missing request_id' => [
-                'json' => json_encode([
-                    'class' => SuccessResponse::class,
-                ]),
-            ],
-            'unknown failure response missing request_id' => [
-                'json' => json_encode([
-                    'class' => UnknownFailureResponse::class,
-                ]),
-            ],
-            'known failure response missing request_id' => [
-                'json' => json_encode([
-                    'class' => KnownFailureResponse::class,
-                ]),
-            ],
-            'known failure response missing failure_type' => [
-                'json' => json_encode([
-                    'class' => KnownFailureResponse::class,
+            'invalid failure_type' => [
+                'data' => [
                     'request_id' => 'request_hash',
-                ]),
+                    'status' => AbstractResponse::STATUS_FAILED,
+                    'failure_type' => 'foo',
+                ],
             ],
-            'known failure response missing status_code' => [
-                'json' => json_encode([
-                    'class' => KnownFailureResponse::class,
+            'missing status_code' => [
+                'data' => [
                     'request_id' => 'request_hash',
-                    'failure_type' => KnownFailureResponse::TYPE_HTTP,
-                ]),
+                    'status' => AbstractResponse::STATUS_FAILED,
+                    'failure_type' => AbstractFailureResponse::TYPE_HTTP,
+                ],
             ],
         ];
     }
 
     /**
-     * @dataProvider createFromJsonSuccessDataProvider
+     * @dataProvider successDataProvider
      *
-     * @param string $responseJson
+     * @param ResponseInterface $response
      * @param string $expectedClass
-     * @param array $expectedResponseData
+     * @param ResponseInterface $expectedResponse
      */
-    public function testCreateFromJsonSuccess(string $responseJson, string $expectedClass, array $expectedResponseData)
-    {
-        $response = $this->responseFactory->createFromJson($responseJson);
+    public function testCreateFromArraySuccess(
+        ResponseInterface $response,
+        string $expectedClass,
+        ResponseInterface $expectedResponse
+    ) {
+        $response = $this->responseFactory->createFromArray($response->jsonSerialize());
 
         $this->assertInstanceOf($expectedClass, $response);
-        $this->assertEquals(json_encode($expectedResponseData), json_encode($response));
+        $this->assertEquals($expectedResponse, $response);
     }
 
-    public function createFromJsonSuccessDataProvider(): array
+    public function successDataProvider(): array
     {
+        $successResponse = new SuccessResponse('request_hash');
+        $unknownFailureResponse = new UnknownFailureResponse('request_hash');
+        $http404KnownFailureResponse = new KnownFailureResponse('request_hash', KnownFailureResponse::TYPE_HTTP, 404);
+        $curl28FailureResponse = new KnownFailureResponse('request_hash', KnownFailureResponse::TYPE_CONNECTION, 28);
+
         return [
             'success response' => [
-                'json' => json_encode(new RebuildableDecoratedResponse(
-                    new SuccessResponse('request_hash')
-                )),
+                'response' => $successResponse,
                 'expectedClass' => SuccessResponse::class,
-                'expectedResponseData' => [
-                    'request_id' => 'request_hash',
-                    'status' => SuccessResponse::STATUS_SUCCESS,
-                ],
+                'expectedResponse' => $successResponse,
             ],
             'unknown failure response' => [
-                'json' => json_encode(new RebuildableDecoratedResponse(
-                    new UnknownFailureResponse('request_hash')
-                )),
+                'response' => $unknownFailureResponse,
                 'expectedClass' => UnknownFailureResponse::class,
-                'expectedResponseData' => [
-                    'request_id' => 'request_hash',
-                    'status' => UnknownFailureResponse::STATUS_FAILED,
-                    'failure_type' => UnknownFailureResponse::TYPE_UNKNOWN,
-                ],
+                'expectedResponse' => $unknownFailureResponse,
             ],
             'http 404 failure response' => [
-                'json' => json_encode(new RebuildableDecoratedResponse(
-                    new KnownFailureResponse('request_hash', KnownFailureResponse::TYPE_HTTP, 404)
-                )),
+                'response' => $http404KnownFailureResponse,
                 'expectedClass' => KnownFailureResponse::class,
-                'expectedResponseData' => [
-                    'request_id' => 'request_hash',
-                    'status' => 'failed',
-                    'failure_type' => KnownFailureResponse::TYPE_HTTP,
-                    'status_code' => 404,
-                ],
+                'expectedResponse' => $http404KnownFailureResponse,
             ],
             'curl 28 failure response' => [
-                'json' => json_encode(new RebuildableDecoratedResponse(
-                    new KnownFailureResponse('request_hash', KnownFailureResponse::TYPE_CONNECTION, 28)
-                )),
+                'response' => $curl28FailureResponse,
                 'expectedClass' => KnownFailureResponse::class,
-                'expectedResponseData' => [
-                    'request_id' => 'request_hash',
-                    'status' => 'failed',
-                    'failure_type' => KnownFailureResponse::TYPE_CONNECTION,
-                    'status_code' => 28,
-                ],
+                'expectedResponse' => $curl28FailureResponse,
             ],
         ];
     }

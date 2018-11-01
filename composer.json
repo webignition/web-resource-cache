@@ -1,10 +1,4 @@
 {
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/webignition/resque"
-        }
-    ],
     "type": "project",
     "license": "proprietary",
     "require": {
@@ -13,23 +7,25 @@
         "ext-iconv": "*",
         "guzzlehttp/guzzle": "^6",
         "kevinrob/guzzle-cache-middleware": "^3",
+        "symfony/amqp-pack": "^1.0",
         "symfony/console": "*",
         "symfony/flex": "^1.1",
         "symfony/framework-bundle": "*",
+        "symfony/messenger": "*",
         "symfony/orm-pack": "^1.0",
         "symfony/yaml": "*",
-        "webignition/http-history-container": ">=0.3,<1",
-        "webignition/guzzle-curl-exception":"^1",
-        "webignition/resque-bundle": "dev-master",
-        "webignition/http-headers": ">=0.1,<1"
+        "webignition/guzzle-curl-exception": "^1",
+        "webignition/http-headers": ">=0.1,<1",
+        "webignition/http-history-container": ">=0.3,<1"
     },
     "require-dev": {
+        "mockery/mockery": "^1",
         "phpunit/phpunit": "~7.0",
         "squizlabs/php_codesniffer": "3.*",
         "symfony/browser-kit": "*",
         "symfony/dotenv": "*",
         "symfony/phpunit-bridge": "^4.0.0",
-        "mockery/mockery": "^1"
+        "symfony/web-server-bundle": "*"
     },
     "config": {
         "preferred-install": {

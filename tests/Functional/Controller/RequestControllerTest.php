@@ -5,18 +5,17 @@ namespace App\Tests\Functional\Controller;
 use App\Controller\RequestController;
 use App\Entity\CachedResource;
 use App\Entity\Callback;
+use App\Message\RetrieveResource;
+use App\Message\SendResponse;
 use App\Model\RequestIdentifier;
-use App\Model\RetrieveRequest;
-use App\Resque\Job\RetrieveResourceJob;
-use App\Resque\Job\SendResponseJob;
 use App\Services\CallbackManager;
-use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\RouterInterface;
 use webignition\HttpHeaders\Headers;
 
@@ -28,6 +27,11 @@ class RequestControllerTest extends AbstractFunctionalTestCase
      * @var string
      */
     private $routeUrl;
+
+    /**
+     * @var int
+     */
+    private $messageIndex;
 
     protected function setUp()
     {
@@ -60,22 +64,20 @@ class RequestControllerTest extends AbstractFunctionalTestCase
      * @param array $requestDataCollection
      * @param array $expectedResponseDataCollection
      * @param array $expectedCallbacks
-     * @param array $expectedRetrieveResourceJobs
+     * @param array $expectedRetrieveResourceMessages
      */
     public function testSuccessfulRequestsFromEmpty(
         array $requestDataCollection,
         array $expectedResponseDataCollection,
         array $expectedCallbacks,
-        array $expectedRetrieveResourceJobs
+        array $expectedRetrieveResourceMessages
     ) {
-        $this->clearRedis();
-
-        $resqueQueueService = self::$container->get(ResqueQueueService::class);
         $callbackManager = self::$container->get(CallbackManager::class);
 
-        $this->assertTrue($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
+        $messageBus = \Mockery::spy(MessageBusInterface::class);
 
         $controller = self::$container->get(RequestController::class);
+        $this->setControllerMessageBus($controller, $messageBus);
 
         foreach ($requestDataCollection as $requestIndex => $requestData) {
             $expectedResponseData = $expectedResponseDataCollection[$requestIndex];
@@ -98,12 +100,20 @@ class RequestControllerTest extends AbstractFunctionalTestCase
             $this->assertInstanceOf(Callback::class, $callback);
         }
 
-        $this->assertNotEmpty($expectedRetrieveResourceJobs);
-        $this->assertFalse($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
+        $this->messageIndex = 0;
+        $expectedDispatchCallCount = count($expectedRetrieveResourceMessages);
 
-        foreach ($expectedRetrieveResourceJobs as $expectedRetrieveResourceJob) {
-            $this->assertTrue($resqueQueueService->contains($expectedRetrieveResourceJob));
-        }
+        $messageBus
+            ->shouldHaveReceived('dispatch')
+            ->times($expectedDispatchCallCount)
+            ->withArgs(function (RetrieveResource $retrieveResourceMessage) use ($expectedRetrieveResourceMessages) {
+                $expectedRetrieveResourceMessage = $expectedRetrieveResourceMessages[$this->messageIndex];
+                $this->messageIndex++;
+
+                $this->assertEquals($expectedRetrieveResourceMessage, $retrieveResourceMessage);
+
+                return true;
+            });
     }
 
     public function successfulRequestsFromEmptyDataProvider(): array
@@ -133,7 +143,6 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     [
                         'url' => $urls['r1.example.com'],
                         'callback' => 'http://callback.example.com/',
-                        'headers' => [],
                     ],
                 ],
                 'expectedResponseDataCollection' => [
@@ -145,26 +154,19 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'url' => 'http://callback.example.com/',
                     ],
                 ],
-                'expectedRetrieveResourceJobs' => [
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r1.example.com headers=[]'],
-                            $urls['r1.example.com']
-                        )),
-                    ]),
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource($requestHashes['r1.example.com headers=[]'], $urls['r1.example.com']),
                 ],
             ],
-            'r2.example.com non-identical requests (different url, no headers)' => [
+            'two non-identical requests (different url, no headers)' => [
                 'requestDataCollection' => [
                     [
                         'url' => $urls['r1.example.com'],
                         'callback' => 'http://foo.example.com/',
-                        'headers' => [],
                     ],
                     [
                         'url' => $urls['r2.example.com'],
                         'callback' => 'http://bar.example.com/',
-                        'headers' => [],
                     ],
                 ],
                 'expectedResponseDataCollection' => [
@@ -181,19 +183,9 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'url' => 'http://bar.example.com/',
                     ],
                 ],
-                'expectedRetrieveResourceJobs' => [
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r1.example.com headers=[]'],
-                            $urls['r1.example.com']
-                        )),
-                    ]),
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r2.example.com headers=[]'],
-                            $urls['r2.example.com']
-                        )),
-                    ]),
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource($requestHashes['r1.example.com headers=[]'], $urls['r1.example.com']),
+                    new RetrieveResource($requestHashes['r2.example.com headers=[]'], $urls['r2.example.com']),
                 ],
             ],
             'two non-identical requests (same url, different headers)' => [
@@ -223,21 +215,17 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'url' => 'http://bar.example.com/',
                     ],
                 ],
-                'expectedRetrieveResourceJobs' => [
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r1.example.com headers=[a=b]'],
-                            $urls['r1.example.com'],
-                            new Headers($headers['a=b'])
-                        )),
-                    ]),
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r1.example.com headers=[c=d]'],
-                            $urls['r1.example.com'],
-                            new Headers($headers['c=d'])
-                        )),
-                    ]),
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource(
+                        $requestHashes['r1.example.com headers=[a=b]'],
+                        $urls['r1.example.com'],
+                        new Headers($headers['a=b'])
+                    ),
+                    new RetrieveResource(
+                        $requestHashes['r1.example.com headers=[c=d]'],
+                        $urls['r1.example.com'],
+                        new Headers($headers['c=d'])
+                    ),
                 ],
             ],
             'two non-identical requests (different url, different headers)' => [
@@ -267,21 +255,17 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'url' => 'http://bar.example.com/',
                     ],
                 ],
-                'expectedRetrieveResourceJobs' => [
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r1.example.com headers=[a=b]'],
-                            $urls['r1.example.com'],
-                            new Headers($headers['a=b'])
-                        )),
-                    ]),
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r2.example.com headers=[c=d]'],
-                            $urls['r2.example.com'],
-                            new Headers($headers['c=d'])
-                        )),
-                    ]),
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource(
+                        $requestHashes['r1.example.com headers=[a=b]'],
+                        $urls['r1.example.com'],
+                        new Headers($headers['a=b'])
+                    ),
+                    new RetrieveResource(
+                        $requestHashes['r2.example.com headers=[c=d]'],
+                        $urls['r2.example.com'],
+                        new Headers($headers['c=d'])
+                    ),
                 ],
             ],
             'two identical requests (same url, no headers)' => [
@@ -307,13 +291,9 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'url' => 'http://callback.example.com/',
                     ],
                 ],
-                'expectedRetrieveResourceJobs' => [
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r1.example.com headers=[]'],
-                            $urls['r1.example.com']
-                        )),
-                    ]),
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource($requestHashes['r1.example.com headers=[]'], $urls['r1.example.com']),
+                    new RetrieveResource($requestHashes['r1.example.com headers=[]'], $urls['r1.example.com']),
                 ],
             ],
             'two identical requests (same url, same headers)' => [
@@ -339,139 +319,115 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                         'url' => 'http://callback.example.com/',
                     ],
                 ],
-                'expectedRetrieveResourceJobs' => [
-                    new RetrieveResourceJob([
-                        'request-json' => json_encode(new RetrieveRequest(
-                            $requestHashes['r1.example.com headers=[a=b]'],
-                            $urls['r1.example.com'],
-                            new Headers($headers['a=b'])
-                        )),
-                    ]),
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource(
+                        $requestHashes['r1.example.com headers=[a=b]'],
+                        $urls['r1.example.com'],
+                        new Headers($headers['a=b'])
+                    ),
+                    new RetrieveResource(
+                        $requestHashes['r1.example.com headers=[a=b]'],
+                        $urls['r1.example.com'],
+                        new Headers($headers['a=b'])
+                    ),
                 ],
             ],
         ];
     }
 
     /**
-     * @dataProvider successfulRequestWithCachedResourcesDataProvider
+     * @dataProvider successfulRequestWithNonMatchingCachedResourcesDataProvider
      *
      * @param CachedResource[] $cachedResourceCollection
-     * @param array $requestData
-     * @param bool $expectedHasSendResponseJob
-     * @param bool $expectedHasRetrieveResourceJob
      *
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function testSuccessfulRequestWithCachedResources(
-        array $cachedResourceCollection,
-        array $requestData,
-        bool $expectedHasSendResponseJob,
-        bool $expectedHasRetrieveResourceJob
-    ) {
-        $this->clearRedis();
-
-        $resqueQueueService = self::$container->get(ResqueQueueService::class);
+    public function testSuccessfulRequestWithNonMatchingCachedResources(array $cachedResourceCollection)
+    {
         $entityManager = self::$container->get(EntityManagerInterface::class);
-
-        $this->assertTrue($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
-        $this->assertTrue($resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME));
 
         foreach ($cachedResourceCollection as $cachedResource) {
             $entityManager->persist($cachedResource);
             $entityManager->flush();
         }
 
+        $messageBus = \Mockery::spy(MessageBusInterface::class);
+
         $controller = self::$container->get(RequestController::class);
-        $controller->requestAction(new Request([], $requestData));
+        $this->setControllerMessageBus($controller, $messageBus);
 
-        $this->assertEquals(
-            !$expectedHasSendResponseJob,
-            $resqueQueueService->isEmpty(SendResponseJob::QUEUE_NAME)
-        );
+        $url = 'http://example.com/';
+        $requestHash = $this->createRequestHash($url);
 
-        $this->assertEquals(
-            !$expectedHasRetrieveResourceJob,
-            $resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME)
-        );
+        $controller->requestAction(new Request([], [
+            'url' => $url,
+            'callback' => 'http://callback.example.com/',
+        ]));
+
+        $expectedRetrieveResourceMessage = new RetrieveResource($requestHash, $url);
+
+        $messageBus
+            ->shouldHaveReceived('dispatch')
+            ->withArgs(function (RetrieveResource $retrieveResourceMessage) use ($expectedRetrieveResourceMessage) {
+                $this->assertEquals($expectedRetrieveResourceMessage, $retrieveResourceMessage);
+
+                return true;
+            });
     }
 
-    public function successfulRequestWithCachedResourcesDataProvider(): array
+    public function successfulRequestWithNonMatchingCachedResourcesDataProvider(): array
     {
         return [
-            'request not matches existing cached resource' => [
+            'no matching existing cached resource' => [
                 'cachedResourceCollection' => [
                     $this->createCachedResource('non-matching-hash', new \DateTime()),
                 ],
-                'requestData' => [
-                    'url' => 'http://example.com/',
-                    'callback' => 'http://callback.example.com/',
-                ],
-                'expectedHasSendResponseJob' => false,
-                'expectedHasRetrieveResourceJob' => true,
             ],
-            'request matches existing cached resource; resource is stale' => [
+            'matches existing cached resource; resource is stale' => [
                 'cachedResourceCollection' => [
                     $this->createCachedResource(
                         $this->createRequestHash('http://example.com/'),
                         new \DateTime('-1 year')
                     ),
                 ],
-                'requestData' => [
-                    'url' => 'http://example.com/',
-                    'callback' => 'http://callback.example.com/',
-                ],
-                'expectedHasSendResponseJob' => false,
-                'expectedHasRetrieveResourceJob' => true,
-            ],
-            'request matches existing cached resource; resource is fresh' => [
-                'cachedResourceCollection' => [
-                    $this->createCachedResource(
-                        $this->createRequestHash('http://example.com/'),
-                        new \DateTime()
-                    ),
-                ],
-                'requestData' => [
-                    'url' => 'http://example.com/',
-                    'callback' => 'http://callback.example.com/',
-                ],
-                'expectedHasSendResponseJob' => true,
-                'expectedHasRetrieveResourceJob' => false,
             ],
         ];
     }
 
-    public function testSuccessfulRequestWithExistingRetrieveResourceJob()
+    /**
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function testSuccessfulRequestWithMatchingCachedResource()
     {
-        $this->clearRedis();
+        $entityManager = self::$container->get(EntityManagerInterface::class);
 
-        $resqueQueueService = self::$container->get(ResqueQueueService::class);
+        $requestHash = $this->createRequestHash('http://example.com/');
 
-        $this->assertTrue($resqueQueueService->isEmpty(RetrieveResourceJob::QUEUE_NAME));
+        $cachedResource = $this->createCachedResource($requestHash, new \DateTime());
+        $entityManager->persist($cachedResource);
+        $entityManager->flush();
 
-        $url = 'http://example.com/';
-        $requestHash = $this->createRequestHash($url);
-        $retryCount = 2;
-        $existingRetrieveRequest = new RetrieveRequest($requestHash, $url, null, $retryCount);
-
-        $existingRetrieveResourceJob = new RetrieveResourceJob([
-            'request-json' => json_encode($existingRetrieveRequest),
-        ]);
-
-        $resqueQueueService->enqueue($existingRetrieveResourceJob);
-        $this->assertTrue($resqueQueueService->contains($existingRetrieveResourceJob));
-        $this->assertEquals(1, $resqueQueueService->getQueueLength(RetrieveResourceJob::QUEUE_NAME));
-
-        $requestData = [
-            'url' => $url,
-            'callback' => 'http://callback.example.com/',
-        ];
+        $messageBus = \Mockery::spy(MessageBusInterface::class);
 
         $controller = self::$container->get(RequestController::class);
-        $controller->requestAction(new Request([], $requestData));
+        $this->setControllerMessageBus($controller, $messageBus);
 
-        $this->assertTrue($resqueQueueService->contains($existingRetrieveResourceJob));
-        $this->assertEquals(1, $resqueQueueService->getQueueLength(RetrieveResourceJob::QUEUE_NAME));
+        $controller->requestAction(new Request([], [
+            'url' => 'http://example.com/',
+            'callback' => 'http://callback.example.com/',
+        ]));
+
+        $messageBus
+            ->shouldHaveReceived('dispatch')
+            ->withArgs(function (SendResponse $sendResponseMessage) use ($requestHash) {
+                $responseData = $sendResponseMessage->getResponseData();
+
+                $this->assertEquals($requestHash, $responseData['request_id']);
+
+                return true;
+            });
     }
 
     private function createRequestHash(string $url, array $headers = []): string
@@ -488,5 +444,16 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         $cachedResource->setLastStored($lastStored);
 
         return $cachedResource;
+    }
+
+    private function setControllerMessageBus(RequestController $controller, MessageBusInterface $messageBus)
+    {
+        try {
+            $reflector = new \ReflectionClass(RequestController::class);
+            $property = $reflector->getProperty('messageBus');
+            $property->setAccessible(true);
+            $property->setValue($controller, $messageBus);
+        } catch (\ReflectionException $exception) {
+        }
     }
 }

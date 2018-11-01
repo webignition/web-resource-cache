@@ -3,7 +3,6 @@
 namespace App\Tests\Functional\Services;
 
 use App\Exception\HttpTransportException;
-use App\Model\RetrieveRequest;
 use App\Services\ResourceRetriever;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
@@ -60,9 +59,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
             'foo' => 'bar',
         ]);
 
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/', $headers);
-
-        $requestResponse = $this->resourceRetriever->retrieve($retrieveRequest);
+        $requestResponse = $this->resourceRetriever->retrieve('http://example.com/', $headers);
         $response = $requestResponse->getResponse();
         $this->assertSame($expectedResponseStatusCode, $response->getStatusCode());
 
@@ -160,9 +157,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
             $http200Response,
         ]);
 
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
-
-        $requestResponse = $this->resourceRetriever->retrieve($retrieveRequest);
+        $requestResponse = $this->resourceRetriever->retrieve('http://example.com/');
         $request = $requestResponse->getRequest();
 
         $this->assertEquals('http://example.com/foo', $request->getUri());
@@ -185,10 +180,8 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $retrieveRequest = new RetrieveRequest('request_hash', 'http://example.com/');
-
         try {
-            $this->resourceRetriever->retrieve($retrieveRequest);
+            $this->resourceRetriever->retrieve('http://example.com/');
             $this->fail('HttpTransportException not thrown');
         } catch (HttpTransportException $transportException) {
             $this->assertSame($expectedTransportErrorCode, $transportException->getTransportErrorCode());

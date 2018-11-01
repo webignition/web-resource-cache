@@ -28,7 +28,9 @@
         <env name="DATABASE_URL" value="mysql://root:@localhost:3306/myapp_test"/>
         <!-- ###- doctrine/doctrine-bundle ### -->
 
-        <server name="DOTENV_PATH" value="../../../.env.test" />
+        <!-- ###+ symfony/messenger ### -->
+        <env name="MESSENGER_TRANSPORT_DSN" value="amqp://guest:guest@localhost:5672/%2f/messages" />
+        <!-- ###- symfony/messenger ### -->
     </php>
 
     <testsuites>

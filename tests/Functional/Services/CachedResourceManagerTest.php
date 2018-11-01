@@ -3,7 +3,6 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\CachedResource;
-use App\Model\RetrieveRequest;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
@@ -82,9 +81,8 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
         array $httpResponseHeaders,
         string $httpResponseBody
     ): CachedResource {
-        $retrieveRequest = new RetrieveRequest($requestHash, $url);
         $httpResponse = new Response(200, $httpResponseHeaders, $httpResponseBody);
 
-        return $this->cachedResourceFactory->create($retrieveRequest, $httpResponse);
+        return $this->cachedResourceFactory->create($requestHash, $url, $httpResponse);
     }
 }

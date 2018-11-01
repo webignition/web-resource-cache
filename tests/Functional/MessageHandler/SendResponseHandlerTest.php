@@ -1,46 +1,36 @@
 <?php
 
-namespace App\Tests\Functional\Command;
+namespace App\Tests\Functional\MessageHandler;
 
-use App\Command\SendResponseCommand;
 use App\Entity\CachedResource;
-use App\Model\RequestIdentifier;
+use App\Exception\InvalidResponseDataException;
+use App\Message\SendResponse;
+use App\MessageHandler\SendResponseHandler;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
-use App\Model\RetrieveRequest;
 use App\Services\CachedResourceFactory;
 use App\Services\CachedResourceManager;
 use App\Services\CallbackFactory;
 use App\Services\CallbackManager;
-use App\Services\ResqueQueueService;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\Asserter\HttpRequestAsserter;
 use App\Tests\Services\HttpMockHandler;
 use GuzzleHttp\Psr7\Response as HttpResponse;
 use GuzzleHttp\Psr7\Response;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
-use webignition\HttpHeaders\Headers;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
-class SendResponseCommandTest extends AbstractFunctionalTestCase
+class SendResponseHandlerTest extends AbstractFunctionalTestCase
 {
     /**
-     * @var SendResponseCommand
+     * @var SendResponseHandler
      */
-    private $command;
+    private $handler;
 
     /**
      * @var HttpMockHandler
      */
     private $httpMockHandler;
-
-    /**
-     * @var ResqueQueueService
-     */
-    private $resqueQueueService;
 
     /**
      * @var CachedResourceFactory
@@ -76,11 +66,8 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
     {
         parent::setUp();
 
-        $this->clearRedis();
-
-        $this->command = self::$container->get(SendResponseCommand::class);
+        $this->handler = self::$container->get(SendResponseHandler::class);
         $this->httpMockHandler = self::$container->get(HttpMockHandler::class);
-        $this->resqueQueueService = self::$container->get(ResqueQueueService::class);
         $this->cachedResourceFactory = self::$container->get(CachedResourceFactory::class);
         $this->cachedResourceManager = self::$container->get(CachedResourceManager::class);
         $this->httpHistoryContainer = self::$container->get(HttpHistoryContainer::class);
@@ -90,78 +77,42 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws InvalidResponseDataException
      */
-    public function testRunResponseInvalid()
+    public function testInvokeNoCachedResource()
     {
-        $input = new ArrayInput([
-            'response-json' => '',
-        ]);
+        $successResponse = new SuccessResponse('invalid-request-hash');
 
-        $returnCode = $this->command->run($input, new NullOutput());
+        $message = new SendResponse($successResponse->jsonSerialize());
 
-        $this->assertEquals(SendResponseCommand::RETURN_CODE_RESPONSE_INVALID, $returnCode);
-    }
+        $this->handler->__invoke($message);
 
-    /**
-     * @throws \Exception
-     */
-    public function testRunResourceNotFound()
-    {
-        $input = new ArrayInput([
-            'response-json' => json_encode(
-                new RebuildableDecoratedResponse(new SuccessResponse('invalid-request-hash'))
-            ),
-        ]);
-
-        $returnCode = $this->command->run($input, new NullOutput());
-
-        $this->assertEquals(SendResponseCommand::RETURN_CODE_RESOURCE_NOT_FOUND, $returnCode);
+        $this->assertCount(0, $this->httpHistoryContainer);
     }
 
     /**
      * @dataProvider runSuccessForFailureResponseDataProvider
      *
      * @param array $callbacks
-     * @param string $responseJson
+     * @param SendResponse $sendResponseMessage
      * @param array $expectedRequestUrls
      * @param array $expectedRequestData
      *
-     * @throws \Exception
+     * @throws InvalidResponseDataException
      */
     public function testRunSuccessForFailureResponseVerifyRequestData(
         array $callbacks,
-        string $responseJson,
+        SendResponse $sendResponseMessage,
         array $expectedRequestUrls,
         array $expectedRequestData
     ) {
         $this->httpMockHandler->appendFixtures(array_fill(0, count($expectedRequestUrls), new Response()));
 
-        $retrieveRequest = $this->createRetrieveRequest('http://example.com/', new Headers());
-        $requestHash = $retrieveRequest->getRequestHash();
-
         foreach ($callbacks as $callbackData) {
-            $callbackData['requestHash'] = str_replace('{{ requestHash }}', $requestHash, $callbackData['requestHash']);
             $this->createCallback($callbackData['requestHash'], $callbackData['url']);
         }
 
-        $responseJson = str_replace('{{ requestHash }}', $requestHash, $responseJson);
-
-        if (!empty($expectedRequestData)) {
-            $expectedRequestData['request_id'] = str_replace(
-                '{{ requestHash }}',
-                $retrieveRequest->getRequestHash(),
-                $expectedRequestData['request_id']
-            );
-        }
-
-        $input = new ArrayInput([
-            'response-json' => $responseJson,
-        ]);
-
-        $returnCode = $this->command->run($input, new NullOutput());
-
-        $this->assertEquals(SendResponseCommand::RETURN_CODE_OK, $returnCode);
+        $this->handler->__invoke($sendResponseMessage);
 
         $requestUrls = $this->httpHistoryContainer->getRequestUrlsAsStrings();
         $this->assertEquals($expectedRequestUrls, $requestUrls);
@@ -185,12 +136,12 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
 
     public function runSuccessForFailureResponseDataProvider(): array
     {
+        $unknownFailureResponse = new UnknownFailureResponse('request_hash');
+
         return [
             'unknown failure response, no callbacks' => [
                 'callbacks' => [],
-                'responseJson' => json_encode(
-                    new RebuildableDecoratedResponse(new UnknownFailureResponse('{{ requestHash }}'))
-                ),
+                'sendResponseMessage' => new SendResponse($unknownFailureResponse->jsonSerialize()),
                 'expectedRequestUrls' => [],
                 'expectedRequestData' => [],
             ],
@@ -201,9 +152,7 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
                         'requestHash' => 'no-matching-request-hash',
                     ],
                 ],
-                'responseJson' => json_encode(
-                    new RebuildableDecoratedResponse(new UnknownFailureResponse('{{ requestHash }}'))
-                ),
+                'sendResponseMessage' => new SendResponse($unknownFailureResponse->jsonSerialize()),
                 'expectedRequestUrls' => [],
                 'expectedRequestData' => [],
             ],
@@ -211,17 +160,15 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
                 'callbacks' => [
                     [
                         'url' => 'http://callback1.example.com',
-                        'requestHash' => '{{ requestHash }}',
+                        'requestHash' => 'request_hash',
                     ],
                 ],
-                'responseJson' => json_encode(
-                    new RebuildableDecoratedResponse(new UnknownFailureResponse('{{ requestHash }}'))
-                ),
+                'sendResponseMessage' => new SendResponse($unknownFailureResponse->jsonSerialize()),
                 'expectedRequestUrls' => [
                     'http://callback1.example.com',
                 ],
                 'expectedRequestData' => [
-                    'request_id' => '{{ requestHash }}',
+                    'request_id' => 'request_hash',
                     'status' => 'failed',
                     'failure_type' => 'unknown',
                 ],
@@ -230,21 +177,19 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
                 'callbacks' => [
                     [
                         'url' => 'http://callback1.example.com',
-                        'requestHash' => '{{ requestHash }}',
+                        'requestHash' => 'request_hash',
                     ],
                 ],
-                'responseJson' => json_encode(
-                    new RebuildableDecoratedResponse(new KnownFailureResponse(
-                        '{{ requestHash }}',
-                        KnownFailureResponse::TYPE_HTTP,
-                        404
-                    ))
-                ),
+                'sendResponseMessage' => new SendResponse((new KnownFailureResponse(
+                    'request_hash',
+                    KnownFailureResponse::TYPE_HTTP,
+                    404
+                ))->jsonSerialize()),
                 'expectedRequestUrls' => [
                     'http://callback1.example.com',
                 ],
                 'expectedRequestData' => [
-                    'request_id' => '{{ requestHash }}',
+                    'request_id' => 'request_hash',
                     'status' => 'failed',
                     'failure_type' => KnownFailureResponse::TYPE_HTTP,
                     'status_code' => 404,
@@ -254,21 +199,19 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
                 'callbacks' => [
                     [
                         'url' => 'http://callback1.example.com',
-                        'requestHash' => '{{ requestHash }}',
+                        'requestHash' => 'request_hash',
                     ],
                 ],
-                'responseJson' => json_encode(
-                    new RebuildableDecoratedResponse(new KnownFailureResponse(
-                        '{{ requestHash }}',
-                        KnownFailureResponse::TYPE_CONNECTION,
-                        28
-                    ))
-                ),
+                'sendResponseMessage' => new SendResponse((new KnownFailureResponse(
+                    'request_hash',
+                    KnownFailureResponse::TYPE_CONNECTION,
+                    28
+                ))->jsonSerialize()),
                 'expectedRequestUrls' => [
                     'http://callback1.example.com',
                 ],
                 'expectedRequestData' => [
-                    'request_id' => '{{ requestHash }}',
+                    'request_id' => 'request_hash',
                     'status' => 'failed',
                     'failure_type' => KnownFailureResponse::TYPE_CONNECTION,
                     'status_code' => 28,
@@ -278,26 +221,24 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
                 'callbacks' => [
                     [
                         'url' => 'http://callback1.example.com',
-                        'requestHash' => '{{ requestHash }}',
+                        'requestHash' => 'request_hash',
                     ],
                     [
                         'url' => 'http://callback2.example.com',
-                        'requestHash' => '{{ requestHash }}',
+                        'requestHash' => 'request_hash',
                     ],
                     [
                         'url' => 'http://callback3.example.com',
                         'requestHash' => 'non-matching-request-hash',
                     ],
                 ],
-                'responseJson' => json_encode(
-                    new RebuildableDecoratedResponse(new UnknownFailureResponse('{{ requestHash }}'))
-                ),
+                'sendResponseMessage' => new SendResponse($unknownFailureResponse->jsonSerialize()),
                 'expectedRequestUrls' => [
                     'http://callback1.example.com',
                     'http://callback2.example.com',
                 ],
                 'expectedRequestData' => [
-                    'request_id' => '{{ requestHash }}',
+                    'request_id' => 'request_hash',
                     'status' => 'failed',
                     'failure_type' => 'unknown',
                 ],
@@ -306,7 +247,7 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws InvalidResponseDataException
      */
     public function testRunSuccessForSuccessResponseVerifyRequestData()
     {
@@ -314,36 +255,32 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
             new Response(),
         ]);
 
-        $retrieveRequest = $this->createRetrieveRequest('http://example.com/', new Headers());
-        $requestHash = $retrieveRequest->getRequestHash();
+        $url = 'http://example.com/';
+        $requestHash = 'request_hash';
 
         $callbackUrl = 'http://callback.example.com/';
         $this->createCallback($requestHash, $callbackUrl);
 
-        $response = new RebuildableDecoratedResponse(new SuccessResponse($requestHash));
+        $successResponse = new SuccessResponse($requestHash);
+        $sendResponseMessage = new SendResponse($successResponse->jsonSerialize());
 
         $cachedResource = $this->createCachedResource(
             [
                 'content-type' => 'text/plain',
             ],
             'resource content',
-            $retrieveRequest
+            $requestHash,
+            $url
         );
 
         $expectedRequestData = [
-            'request_id' => $retrieveRequest->getRequestHash(),
+            'request_id' => $requestHash,
             'status' => SuccessResponse::STATUS_SUCCESS,
             'headers' => $cachedResource->getHeaders()->toArray(),
             'content' => $cachedResource->getBody(),
         ];
 
-        $input = new ArrayInput([
-            'response-json' => json_encode($response),
-        ]);
-
-        $returnCode = $this->command->run($input, new NullOutput());
-
-        $this->assertEquals(SendResponseCommand::RETURN_CODE_OK, $returnCode);
+        $this->handler->__invoke($sendResponseMessage);
 
         $this->httpRequestAsserter->assertSenderRequest(
             $this->httpHistoryContainer->getLastRequest(),
@@ -353,7 +290,7 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws InvalidResponseDataException
      */
     public function testSendSuccessMultipleCallbackUrls()
     {
@@ -365,37 +302,33 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
 
         $this->httpMockHandler->appendFixtures(array_fill(0, count($callbackUrls), new Response()));
 
-        $retrieveRequest = $this->createRetrieveRequest('http://example.com/', new Headers());
-        $requestHash = $retrieveRequest->getRequestHash();
+        $url = 'http://example.com/';
+        $requestHash = 'request_hash';
 
         foreach ($callbackUrls as $callbackUrl) {
             $this->createCallback($requestHash, $callbackUrl);
         }
-
-        $response = new RebuildableDecoratedResponse(new SuccessResponse($requestHash));
 
         $cachedResource = $this->createCachedResource(
             [
                 'content-type' => 'text/plain',
             ],
             'resource content',
-            $retrieveRequest
+            $requestHash,
+            $url
         );
 
         $expectedRequestData = [
-            'request_id' => $retrieveRequest->getRequestHash(),
+            'request_id' => $requestHash,
             'status' => SuccessResponse::STATUS_SUCCESS,
             'headers' => $cachedResource->getHeaders()->toArray(),
             'content' => $cachedResource->getBody(),
         ];
 
-        $input = new ArrayInput([
-            'response-json' => json_encode($response),
-        ]);
+        $successResponse = new SuccessResponse($requestHash);
+        $sendResponseMessage = new SendResponse($successResponse->jsonSerialize());
 
-        $returnCode = $this->command->run($input, new NullOutput());
-
-        $this->assertEquals(SendResponseCommand::RETURN_CODE_OK, $returnCode);
+        $this->handler->__invoke($sendResponseMessage);
 
         $requests = $this->httpHistoryContainer->getRequests();
 
@@ -410,22 +343,19 @@ class SendResponseCommandTest extends AbstractFunctionalTestCase
         }
     }
 
-    private function createRetrieveRequest(string $url, Headers $headers): RetrieveRequest
-    {
-        $requestIdentifier = new RequestIdentifier($url, $headers);
-        $retrieveRequest = new RetrieveRequest($requestIdentifier->getHash(), $url, $headers);
-
-        return $retrieveRequest;
-    }
-
     private function createCachedResource(
         array $httpResponseHeaders,
         string $httpResponseBody,
-        RetrieveRequest $retrieveRequest
+        string $requestHash,
+        string $url
     ): CachedResource {
         $httpResponse = new HttpResponse(200, $httpResponseHeaders, $httpResponseBody);
 
-        $cachedResource = $this->cachedResourceFactory->create($retrieveRequest, $httpResponse);
+        $cachedResource = $this->cachedResourceFactory->create(
+            $requestHash,
+            $url,
+            $httpResponse
+        );
         $this->cachedResourceManager->update($cachedResource);
 
         return $cachedResource;
