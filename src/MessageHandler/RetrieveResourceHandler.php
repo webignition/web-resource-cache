@@ -6,7 +6,6 @@ use App\Exception\HttpTransportException;
 use App\Message\RetrieveResource;
 use App\Message\SendResponse;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 use App\Services\CachedResourceFactory;

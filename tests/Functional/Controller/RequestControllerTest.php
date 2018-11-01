@@ -8,7 +8,6 @@ use App\Entity\Callback;
 use App\Message\RetrieveResource;
 use App\Message\SendResponse;
 use App\Model\RequestIdentifier;
-use App\Model\Response\RebuildableDecoratedResponse;
 use App\Services\CallbackManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
