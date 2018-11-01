@@ -5,7 +5,6 @@ namespace App\Tests\Unit\Services;
 use App\Model\Response\AbstractFailureResponse;
 use App\Model\Response\AbstractResponse;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
@@ -90,49 +89,6 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
         ResponseInterface $expectedResponse
     ) {
         $response = $this->responseFactory->createFromArray($response->jsonSerialize());
-
-        $this->assertInstanceOf($expectedClass, $response);
-        $this->assertEquals($expectedResponse, $response);
-    }
-
-    /**
-     * @dataProvider createFromJsonInvalidDataDataProvider
-     *
-     * @param string $json
-     */
-    public function testCreateFromJsonInvalidData(string $json)
-    {
-        $this->assertNull($this->responseFactory->createFromJson($json));
-    }
-
-    public function createFromJsonInvalidDataDataProvider(): array
-    {
-        return [
-            'empty json' => [
-                'json' => '',
-            ],
-            'whitespace' => [
-                'json' => '  ',
-            ],
-            'not an array' => [
-                'json' => json_encode(true),
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider successDataProvider
-     *
-     * @param ResponseInterface $response
-     * @param string $expectedClass
-     * @param ResponseInterface $expectedResponse
-     */
-    public function testCreateFromJsonSuccess(
-        ResponseInterface $response,
-        string $expectedClass,
-        ResponseInterface $expectedResponse
-    ) {
-        $response = $this->responseFactory->createFromJson(json_encode($response));
 
         $this->assertInstanceOf($expectedClass, $response);
         $this->assertEquals($expectedResponse, $response);

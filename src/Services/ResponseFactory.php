@@ -58,26 +58,4 @@ class ResponseFactory
 
         return new KnownFailureResponse($requestId, $failureType, $statusCode);
     }
-
-    public function createFromJson(string $json): ?ResponseInterface
-    {
-        $data = $this->decodeJson($json);
-
-        if (empty($data)) {
-            return null;
-        }
-
-        return $this->createFromArray($data);
-    }
-
-    private function decodeJson(string $json)
-    {
-        $data = json_decode(trim($json), true);
-
-        if (!is_array($data)) {
-            return null;
-        }
-
-        return $data;
-    }
 }
