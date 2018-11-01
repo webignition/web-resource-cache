@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Message\RetrieveResource;
 use App\Message\SendResponse;
 use App\Model\RequestIdentifier;
+use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\SuccessResponse;
 use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
@@ -87,7 +88,9 @@ class RequestController
 
         $cachedResource = $this->cachedResourceManager->find($requestHash);
         if ($cachedResource && $this->cachedResourceValidator->isFresh($cachedResource)) {
-            $this->messageBus->dispatch(new SendResponse(new SuccessResponse($requestHash)));
+            $this->messageBus->dispatch(new SendResponse(
+                new RebuildableDecoratedResponse(new SuccessResponse($requestHash))
+            ));
         } else {
             $this->messageBus->dispatch(new RetrieveResource($requestHash, $url, $headers));
         }
