@@ -8,6 +8,7 @@ use App\Entity\Callback;
 use App\Message\RetrieveResource;
 use App\Message\SendResponse;
 use App\Model\RequestIdentifier;
+use App\Model\Response\RebuildableDecoratedResponse;
 use App\Services\CallbackManager;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use Doctrine\ORM\EntityManagerInterface;
@@ -422,7 +423,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         $messageBus
             ->shouldHaveReceived('dispatch')
             ->withArgs(function (SendResponse $sendResponseMessage) use ($requestHash) {
-                $this->assertEquals($requestHash, $sendResponseMessage->getResponse()->getRequestId());
+                $response = $sendResponseMessage->getResponse();
+
+                $this->assertInstanceOf(RebuildableDecoratedResponse::class, $response);
+                $this->assertEquals($requestHash, $response->getRequestId());
 
                 return true;
             });

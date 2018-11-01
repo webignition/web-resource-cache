@@ -7,6 +7,7 @@ use App\Message\SendResponse;
 use App\MessageHandler\RetrieveResourceHandler;
 use App\Model\RequestIdentifier;
 use App\Model\Response\KnownFailureResponse;
+use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
@@ -186,6 +187,10 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
         $messageBus
             ->shouldHaveReceived('dispatch')
             ->withArgs(function (SendResponse $sendResponseMessage) use ($expectedResponse) {
+//                var_dump($sendResponseMessage->getResponse());
+//                var_dump($expectedResponse);
+//                exit();
+
                 $this->assertEquals($expectedResponse, $sendResponseMessage->getResponse());
 
                 return true;
@@ -204,34 +209,34 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
                     new UnhandledGuzzleException(),
                 ],
                 'retrieveResourceMessage' => $retrieveResourceMessage,
-                'expectedResponse' => new UnknownFailureResponse('request_hash'),
+                'expectedResponse' => new RebuildableDecoratedResponse(new UnknownFailureResponse('request_hash')),
             ],
             'HTTP 200' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'retrieveResourceMessage' => $retrieveResourceMessage,
-                'expectedResponse' => new SuccessResponse('request_hash'),
+                'expectedResponse' => new RebuildableDecoratedResponse(new SuccessResponse('request_hash')),
             ],
             'HTTP 404' => [
                 'httpFixtures' => [
                     new Response(404),
                 ],
                 'retrieveResourceMessage' => $retrieveResourceMessage,
-                'expectedResponse' => new KnownFailureResponse(
+                'expectedResponse' => new RebuildableDecoratedResponse(new KnownFailureResponse(
                     'request_hash',
                     KnownFailureResponse::TYPE_HTTP,
                     404
-                ),
+                )),
             ],
             'HTTP 301' => [
                 'httpFixtures' => array_fill(0, 6, $http301Response),
                 'retrieveResourceMessage' => $retrieveResourceMessage,
-                'expectedResponse' => new KnownFailureResponse(
+                'expectedResponse' => new RebuildableDecoratedResponse(new KnownFailureResponse(
                     'request_hash',
                     KnownFailureResponse::TYPE_HTTP,
                     301
-                ),
+                )),
             ],
         ];
     }
