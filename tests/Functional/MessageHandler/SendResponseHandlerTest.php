@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\MessageHandler;
 
 use App\Entity\CachedResource;
+use App\Exception\InvalidResponseDataException;
 use App\Message\SendResponse;
 use App\MessageHandler\SendResponseHandler;
 use App\Model\Response\KnownFailureResponse;
@@ -75,11 +76,14 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
         $this->httpRequestAsserter = self::$container->get(HttpRequestAsserter::class);
     }
 
+    /**
+     * @throws InvalidResponseDataException
+     */
     public function testInvokeNoCachedResource()
     {
         $successResponse = new SuccessResponse('invalid-request-hash');
 
-        $message = new SendResponse($successResponse);
+        $message = new SendResponse($successResponse->jsonSerialize());
 
         $this->handler->__invoke($message);
 
@@ -93,6 +97,8 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
      * @param SendResponse $sendResponseMessage
      * @param array $expectedRequestUrls
      * @param array $expectedRequestData
+     *
+     * @throws InvalidResponseDataException
      */
     public function testRunSuccessForFailureResponseVerifyRequestData(
         array $callbacks,
@@ -130,10 +136,12 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
 
     public function runSuccessForFailureResponseDataProvider(): array
     {
+        $unknownFailureResponse = new UnknownFailureResponse('request_hash');
+
         return [
             'unknown failure response, no callbacks' => [
                 'callbacks' => [],
-                'sendResponseMessage' => new SendResponse(new UnknownFailureResponse('request_hash')),
+                'sendResponseMessage' => new SendResponse($unknownFailureResponse->jsonSerialize()),
                 'expectedRequestUrls' => [],
                 'expectedRequestData' => [],
             ],
@@ -144,7 +152,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
                         'requestHash' => 'no-matching-request-hash',
                     ],
                 ],
-                'sendResponseMessage' => new SendResponse(new UnknownFailureResponse('request_hash')),
+                'sendResponseMessage' => new SendResponse($unknownFailureResponse->jsonSerialize()),
                 'expectedRequestUrls' => [],
                 'expectedRequestData' => [],
             ],
@@ -155,7 +163,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
                         'requestHash' => 'request_hash',
                     ],
                 ],
-                'sendResponseMessage' => new SendResponse(new UnknownFailureResponse('request_hash')),
+                'sendResponseMessage' => new SendResponse($unknownFailureResponse->jsonSerialize()),
                 'expectedRequestUrls' => [
                     'http://callback1.example.com',
                 ],
@@ -172,11 +180,11 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
                         'requestHash' => 'request_hash',
                     ],
                 ],
-                'sendResponseMessage' => new SendResponse(new KnownFailureResponse(
+                'sendResponseMessage' => new SendResponse((new KnownFailureResponse(
                     'request_hash',
                     KnownFailureResponse::TYPE_HTTP,
                     404
-                )),
+                ))->jsonSerialize()),
                 'expectedRequestUrls' => [
                     'http://callback1.example.com',
                 ],
@@ -194,11 +202,11 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
                         'requestHash' => 'request_hash',
                     ],
                 ],
-                'sendResponseMessage' => new SendResponse(new KnownFailureResponse(
+                'sendResponseMessage' => new SendResponse((new KnownFailureResponse(
                     'request_hash',
                     KnownFailureResponse::TYPE_CONNECTION,
                     28
-                )),
+                ))->jsonSerialize()),
                 'expectedRequestUrls' => [
                     'http://callback1.example.com',
                 ],
@@ -224,7 +232,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
                         'requestHash' => 'non-matching-request-hash',
                     ],
                 ],
-                'sendResponseMessage' => new SendResponse(new UnknownFailureResponse('request_hash')),
+                'sendResponseMessage' => new SendResponse($unknownFailureResponse->jsonSerialize()),
                 'expectedRequestUrls' => [
                     'http://callback1.example.com',
                     'http://callback2.example.com',
@@ -238,6 +246,9 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
         ];
     }
 
+    /**
+     * @throws InvalidResponseDataException
+     */
     public function testRunSuccessForSuccessResponseVerifyRequestData()
     {
         $this->httpMockHandler->appendFixtures([
@@ -251,7 +262,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
         $this->createCallback($requestHash, $callbackUrl);
 
         $successResponse = new SuccessResponse($requestHash);
-        $sendResponseMessage = new SendResponse($successResponse);
+        $sendResponseMessage = new SendResponse($successResponse->jsonSerialize());
 
         $cachedResource = $this->createCachedResource(
             [
@@ -278,6 +289,9 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
         );
     }
 
+    /**
+     * @throws InvalidResponseDataException
+     */
     public function testSendSuccessMultipleCallbackUrls()
     {
         $callbackUrls = [
@@ -312,7 +326,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
         ];
 
         $successResponse = new SuccessResponse($requestHash);
-        $sendResponseMessage = new SendResponse($successResponse);
+        $sendResponseMessage = new SendResponse($successResponse->jsonSerialize());
 
         $this->handler->__invoke($sendResponseMessage);
 
