@@ -2,11 +2,13 @@
 
 namespace App\MessageHandler;
 
+use App\Exception\InvalidResponseDataException;
 use App\Message\SendResponse;
-use App\Model\Response\PresentationDecoratedSuccessResponse;
+use App\Model\Response\DecoratedSuccessResponse;
 use App\Model\Response\SuccessResponse;
 use App\Services\CachedResourceManager;
 use App\Services\CallbackManager;
+use App\Services\ResponseFactory;
 use App\Services\ResponseSender;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
@@ -27,19 +29,37 @@ class SendResponseHandler implements MessageHandlerInterface
      */
     private $responseSender;
 
+    /**
+     * @var ResponseFactory
+     */
+    private $responseFactory;
+
     public function __construct(
         CachedResourceManager $cachedResourceManager,
         CallbackManager $callbackManager,
-        ResponseSender $responseSender
+        ResponseSender $responseSender,
+        ResponseFactory $responseFactory
     ) {
         $this->cachedResourceManager = $cachedResourceManager;
         $this->callbackManager = $callbackManager;
         $this->responseSender = $responseSender;
+        $this->responseFactory = $responseFactory;
     }
 
+    /**
+     * @param SendResponse $sendResponseMessage
+     *
+     * @throws InvalidResponseDataException
+     */
     public function __invoke(SendResponse $sendResponseMessage)
     {
-        $response = $sendResponseMessage->getResponse();
+        $responseData = $sendResponseMessage->getResponseData();
+        $response = $this->responseFactory->createFromArray($responseData);
+
+        if (empty($response)) {
+            throw new InvalidResponseDataException();
+        }
+
         $requestHash = $response->getRequestId();
 
         if ($response instanceof SuccessResponse) {
@@ -49,7 +69,7 @@ class SendResponseHandler implements MessageHandlerInterface
                 return;
             }
 
-            $response = new PresentationDecoratedSuccessResponse($response, $cachedResource);
+            $response = new DecoratedSuccessResponse($response, $cachedResource);
         }
 
         $callbacks = $this->callbackManager->findByRequestHash($requestHash);

@@ -6,7 +6,6 @@ use App\Exception\HttpTransportException;
 use App\Message\RetrieveResource;
 use App\Message\SendResponse;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 use App\Services\CachedResourceFactory;
@@ -98,7 +97,7 @@ class RetrieveResourceHandler implements MessageHandlerInterface
 
         if ($hasUnknownFailure) {
             $this->messageBus->dispatch(
-                new SendResponse(new RebuildableDecoratedResponse(new UnknownFailureResponse($requestHash)))
+                new SendResponse((new UnknownFailureResponse($requestHash))->jsonSerialize())
             );
 
             return;
@@ -132,7 +131,7 @@ class RetrieveResourceHandler implements MessageHandlerInterface
             $response = new KnownFailureResponse($requestHash, $responseType, $statusCode);
         }
 
-        $this->messageBus->dispatch(new SendResponse(new RebuildableDecoratedResponse($response)));
+        $this->messageBus->dispatch(new SendResponse($response->jsonSerialize()));
 
         return;
     }

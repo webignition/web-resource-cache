@@ -7,8 +7,6 @@ use App\Message\SendResponse;
 use App\MessageHandler\RetrieveResourceHandler;
 use App\Model\RequestIdentifier;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse;
-use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
 use App\Services\CachedResourceFactory;
@@ -170,12 +168,12 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
      *
      * @param array $httpFixtures
      * @param RetrieveResource $retrieveResourceMessage
-     * @param ResponseInterface $expectedResponse
+     * @param array $expectedResponseData
      */
     public function testRunSendResponse(
         array $httpFixtures,
         RetrieveResource $retrieveResourceMessage,
-        ResponseInterface $expectedResponse
+        array $expectedResponseData
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
@@ -186,12 +184,8 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
 
         $messageBus
             ->shouldHaveReceived('dispatch')
-            ->withArgs(function (SendResponse $sendResponseMessage) use ($expectedResponse) {
-//                var_dump($sendResponseMessage->getResponse());
-//                var_dump($expectedResponse);
-//                exit();
-
-                $this->assertEquals($expectedResponse, $sendResponseMessage->getResponse());
+            ->withArgs(function (SendResponse $sendResponseMessage) use ($expectedResponseData) {
+                $this->assertEquals($expectedResponseData, $sendResponseMessage->getResponseData());
 
                 return true;
             });
@@ -209,34 +203,34 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
                     new UnhandledGuzzleException(),
                 ],
                 'retrieveResourceMessage' => $retrieveResourceMessage,
-                'expectedResponse' => new RebuildableDecoratedResponse(new UnknownFailureResponse('request_hash')),
+                'expectedResponseData' => (new UnknownFailureResponse('request_hash'))->jsonSerialize(),
             ],
             'HTTP 200' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'retrieveResourceMessage' => $retrieveResourceMessage,
-                'expectedResponse' => new RebuildableDecoratedResponse(new SuccessResponse('request_hash')),
+                'expectedResponseData' => (new SuccessResponse('request_hash'))->jsonSerialize(),
             ],
             'HTTP 404' => [
                 'httpFixtures' => [
                     new Response(404),
                 ],
                 'retrieveResourceMessage' => $retrieveResourceMessage,
-                'expectedResponse' => new RebuildableDecoratedResponse(new KnownFailureResponse(
+                'expectedResponseData' => (new KnownFailureResponse(
                     'request_hash',
                     KnownFailureResponse::TYPE_HTTP,
                     404
-                )),
+                ))->jsonSerialize(),
             ],
             'HTTP 301' => [
                 'httpFixtures' => array_fill(0, 6, $http301Response),
                 'retrieveResourceMessage' => $retrieveResourceMessage,
-                'expectedResponse' => new RebuildableDecoratedResponse(new KnownFailureResponse(
+                'expectedResponseData' => (new KnownFailureResponse(
                     'request_hash',
                     KnownFailureResponse::TYPE_HTTP,
                     301
-                )),
+                ))->jsonSerialize(),
             ],
         ];
     }

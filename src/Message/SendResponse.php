@@ -2,22 +2,20 @@
 
 namespace App\Message;
 
-use App\Model\Response\ResponseInterface;
-
 class SendResponse
 {
     /**
-     * @var ResponseInterface
+     * @var array
      */
-    private $response;
+    private $responseData;
 
-    public function __construct(ResponseInterface $response)
+    public function __construct(array $responseData)
     {
-        $this->response = $response;
+        $this->responseData = $responseData;
     }
 
-    public function getResponse(): ResponseInterface
+    public function getResponseData(): array
     {
-        return $this->response;
+        return $this->responseData;
     }
 }
