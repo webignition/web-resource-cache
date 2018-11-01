@@ -1,8 +1,8 @@
 sudo: false
 
 services:
-  - redis-server
   - memcached
+  - docker
 
 language: php
 php:
@@ -13,6 +13,11 @@ env:
     - APP_ENV=test
     - APP_SECRET=Secret!
     - DATABASE_URL=mysql://root:@127.0.0.1:3306/myapp_test
+    - WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD=root
+    - WEB_RESOURCE_CACHE_DATABASE_NAME=web_resource_cache_db_name
+    - WEB_RESOURCE_CACHE_DATABASE_USER=web_reource_cache_db_user
+    - WEB_RESOURCE_CACHE_DATABASE_PASSWORD=secret
+    - WEB_RESOURCE_CACHE_DATABASE_DATA_PATH=/var/docker-mysql/web-resource-cache-db
 
 cache:
   directories:
@@ -34,4 +39,8 @@ before_script:
   - ./bin/console --env=test cache:warmup
 
 script:
+  - docker-compose up -d
   - composer ci
+
+after_script:
+  - docker-compose down
