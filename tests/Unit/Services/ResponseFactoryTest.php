@@ -2,8 +2,9 @@
 
 namespace App\Tests\Unit\Services;
 
+use App\Model\Response\AbstractFailureResponse;
+use App\Model\Response\AbstractResponse;
 use App\Model\Response\KnownFailureResponse;
-use App\Model\Response\RebuildableDecoratedResponse;
 use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
@@ -41,49 +42,35 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
                     'foo' => 'bar',
                 ],
             ],
-            'missing class' => [
+            'missing status' => [
                 'data' => [
                     'request_id' => 'request_hash',
                 ],
             ],
-            'invalid class' => [
+            'invalid status' => [
                 'data' => [
                     'request_id' => 'request_hash',
-                    'class' => 'Foo',
+                    'status' => 'foo',
                 ],
             ],
-            'class not implements ResponseInterface' => [
+            'missing failure_type' => [
                 'data' => [
                     'request_id' => 'request_hash',
-                    'class' => get_class($this),
+                    'status' => AbstractResponse::STATUS_FAILED,
                 ],
             ],
-            'success response missing request_id' => [
+            'invalid failure_type' => [
                 'data' => [
-                    'class' => SuccessResponse::class,
-                ],
-            ],
-            'unknown failure response missing request_id' => [
-                'data' => [
-                    'class' => UnknownFailureResponse::class,
-                ],
-            ],
-            'known failure response missing request_id' => [
-                'data' => [
-                    'class' => KnownFailureResponse::class,
-                ],
-            ],
-            'known failure response missing failure_type' => [
-                'data' => [
-                    'class' => KnownFailureResponse::class,
                     'request_id' => 'request_hash',
+                    'status' => AbstractResponse::STATUS_FAILED,
+                    'failure_type' => 'foo',
                 ],
             ],
-            'known failure response missing status_code' => [
+            'missing status_code' => [
                 'data' => [
-                    'class' => KnownFailureResponse::class,
                     'request_id' => 'request_hash',
-                    'failure_type' => KnownFailureResponse::TYPE_HTTP,
+                    'status' => AbstractResponse::STATUS_FAILED,
+                    'failure_type' => AbstractFailureResponse::TYPE_HTTP,
                 ],
             ],
         ];
@@ -107,49 +94,6 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResponse, $response);
     }
 
-    /**
-     * @dataProvider createFromJsonInvalidDataDataProvider
-     *
-     * @param string $json
-     */
-    public function testCreateFromJsonInvalidData(string $json)
-    {
-        $this->assertNull($this->responseFactory->createFromJson($json));
-    }
-
-    public function createFromJsonInvalidDataDataProvider(): array
-    {
-        return [
-            'empty json' => [
-                'json' => '',
-            ],
-            'whitespace' => [
-                'json' => '  ',
-            ],
-            'not an array' => [
-                'json' => json_encode(true),
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider successDataProvider
-     *
-     * @param ResponseInterface $response
-     * @param string $expectedClass
-     * @param ResponseInterface $expectedResponse
-     */
-    public function testCreateFromJsonSuccess(
-        ResponseInterface $response,
-        string $expectedClass,
-        ResponseInterface $expectedResponse
-    ) {
-        $response = $this->responseFactory->createFromJson(json_encode($response));
-
-        $this->assertInstanceOf($expectedClass, $response);
-        $this->assertEquals($expectedResponse, $response);
-    }
-
     public function successDataProvider(): array
     {
         $successResponse = new SuccessResponse('request_hash');
@@ -159,22 +103,22 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
 
         return [
             'success response' => [
-                'response' => new RebuildableDecoratedResponse($successResponse),
+                'response' => $successResponse,
                 'expectedClass' => SuccessResponse::class,
                 'expectedResponse' => $successResponse,
             ],
             'unknown failure response' => [
-                'response' => new RebuildableDecoratedResponse($unknownFailureResponse),
+                'response' => $unknownFailureResponse,
                 'expectedClass' => UnknownFailureResponse::class,
                 'expectedResponse' => $unknownFailureResponse,
             ],
             'http 404 failure response' => [
-                'response' => new RebuildableDecoratedResponse($http404KnownFailureResponse),
+                'response' => $http404KnownFailureResponse,
                 'expectedClass' => KnownFailureResponse::class,
                 'expectedResponse' => $http404KnownFailureResponse,
             ],
             'curl 28 failure response' => [
-                'response' => new RebuildableDecoratedResponse($curl28FailureResponse),
+                'response' => $curl28FailureResponse,
                 'expectedClass' => KnownFailureResponse::class,
                 'expectedResponse' => $curl28FailureResponse,
             ],
