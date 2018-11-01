@@ -89,7 +89,7 @@ class RequestController
         $cachedResource = $this->cachedResourceManager->find($requestHash);
         if ($cachedResource && $this->cachedResourceValidator->isFresh($cachedResource)) {
             $this->messageBus->dispatch(new SendResponse(
-                new RebuildableDecoratedResponse(new SuccessResponse($requestHash))
+                (new SuccessResponse($requestHash))->jsonSerialize()
             ));
         } else {
             $this->messageBus->dispatch(new RetrieveResource($requestHash, $url, $headers));

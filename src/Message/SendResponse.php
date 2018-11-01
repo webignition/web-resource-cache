@@ -14,7 +14,7 @@ class SendResponse
         $this->responseData = $responseData;
     }
 
-    public function getResponseData()
+    public function getResponseData(): array
     {
         return $this->responseData;
     }

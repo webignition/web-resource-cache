@@ -423,10 +423,9 @@ class RequestControllerTest extends AbstractFunctionalTestCase
         $messageBus
             ->shouldHaveReceived('dispatch')
             ->withArgs(function (SendResponse $sendResponseMessage) use ($requestHash) {
-                $response = $sendResponseMessage->getResponse();
+                $responseData = $sendResponseMessage->getResponseData();
 
-                $this->assertInstanceOf(RebuildableDecoratedResponse::class, $response);
-                $this->assertEquals($requestHash, $response->getRequestId());
+                $this->assertEquals($requestHash, $responseData['request_id']);
 
                 return true;
             });
