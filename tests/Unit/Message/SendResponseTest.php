@@ -3,16 +3,18 @@
 namespace App\Tests\Unit\Message;
 
 use App\Message\SendResponse;
-use App\Model\Response\ResponseInterface;
 
 class SendResponseTest extends \PHPUnit\Framework\TestCase
 {
     public function testCreate()
     {
-        $response = \Mockery::mock(ResponseInterface::class);
+        $responseData = [
+            'request_id' => 'request_hash',
+            'status' => 'success',
+        ];
 
-        $message = new SendResponse($response);
+        $message = new SendResponse($responseData);
 
-        $this->assertEquals($response, $message->getResponse());
+        $this->assertEquals($responseData, $message->getResponseData());
     }
 }
