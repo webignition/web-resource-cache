@@ -9,15 +9,13 @@ use App\Model\Response\UnknownFailureResponse;
 
 class ResponseFactory
 {
-    public function createFromJson(string $json): ?ResponseInterface
+    public function createFromArray(array $data): ?ResponseInterface
     {
-        $data = $this->decodeJson($json);
+        $modelClass = $data['class'] ?? null;
 
-        if (empty($data)) {
+        if (empty($modelClass)) {
             return null;
         }
-
-        $modelClass = $data['class'];
 
         if (!$this->validateData($data, $modelClass)) {
             return null;
@@ -34,6 +32,17 @@ class ResponseFactory
         return new SuccessResponse($data['request_id']);
     }
 
+    public function createFromJson(string $json): ?ResponseInterface
+    {
+        $data = $this->decodeJson($json);
+
+        if (empty($data)) {
+            return null;
+        }
+
+        return $this->createFromArray($data);
+    }
+
     private function decodeJson(string $json)
     {
         $data = json_decode(trim($json), true);
@@ -42,12 +51,11 @@ class ResponseFactory
             return null;
         }
 
-        $modelClass = $data['class'] ?? null;
+        return $data;
+    }
 
-        if (empty($modelClass)) {
-            return null;
-        }
-
+    private function validateData(array $data, string $modelClass)
+    {
         if (!class_exists($modelClass)) {
             return null;
         }
@@ -56,11 +64,6 @@ class ResponseFactory
             return null;
         }
 
-        return $data;
-    }
-
-    private function validateData(array $data, string $modelClass)
-    {
         $requestId = $data['request_id'] ?? null;
 
         if (empty($requestId)) {
