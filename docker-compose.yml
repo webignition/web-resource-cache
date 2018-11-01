@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: web-resource-cache-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${WEB_RESOURCE_CACHE_DATABASE_NAME}
+      MYSQL_USER: ${WEB_RESOURCE_CACHE_DATABASE_USER}
+      MYSQL_PASSWORD: ${WEB_RESOURCE_CACHE_DATABASE_PASSWORD}
+    volumes:
+      - ${WEB_RESOURCE_CACHE_DATABASE_DATA_PATH}:/var/lib/mysql
+    ports:
+      - 33066:3306
