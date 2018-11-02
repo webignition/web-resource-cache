@@ -8,11 +8,15 @@ language: php
 php:
 - 7.2
 
+addons:
+  hosts:
+    - web-resource-cache-mysql-host
+
 env:
   global:
     - APP_ENV=test
     - APP_SECRET=Secret!
-    - DATABASE_URL=mysql://web_resource_cache_db_user:secret@172.29.0.1:33066/web_resource_cache_db_name
+    - DATABASE_URL=mysql://web_resource_cache_db_user:secret@web-resource-cache-mysql-host:33066/web_resource_cache_db_name
     - WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD=root
     - WEB_RESOURCE_CACHE_DATABASE_NAME=web_resource_cache_db_name
     - WEB_RESOURCE_CACHE_DATABASE_USER=web_resource_cache_db_user
@@ -24,15 +28,17 @@ cache:
   - $HOME/.composer/cache/files
 
 before_install:
+  - echo '172.29.0.1 web-resource-cache-mysql-host' | sudo tee --append /etc/hosts
   - sudo service mysql stop
   - echo $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
   - mkdir -p $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
   - docker-compose up -d
   - docker-compose ps
   - docker ps -a
+  - docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql
   - ls -la $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
-  - mysql -uroot -proot --host=172.29.0.1 --port=33066 -e "show databases;"
-  - mysql -uweb_resource_cache_db_user -psecret --host=172.29.0.1 --port=33066 -e "show databases;"
+  - mysql -uroot -proot --host=web-resource-cache-mysql-host--port=33066 -e "show databases;"
+  - mysql -uweb_resource_cache_db_user -psecret --host=web-resource-cache-mysql-host --port=33066 -e "show databases;"
   - chmod +x ./bin/console
 
 install:
