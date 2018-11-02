@@ -28,27 +28,15 @@ cache:
   - $HOME/.composer/cache/files
 
 before_install:
-  - sudo service mysql stop
-  - echo $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
   - mkdir -p $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
   - docker-compose up -d
-  #- sleep
   - ./travis/docker-wait.sh
   - export DOCKER_MYSQL_IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql`
-  - echo $DOCKER_MYSQL_IP
   - echo "$DOCKER_MYSQL_IP web-resource-cache-mysql-host" | sudo tee --append /etc/hosts
-  - cat /etc/hosts | grep web-resource-cache-mysql-host
-  - docker-compose ps
-  - docker ps -a
-  - ls -la $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
-  - mysql -uroot -proot --host=web-resource-cache-mysql-host --port=33066 -e "show databases;"
-  - mysql -uweb_resource_cache_db_user -psecret --host=web-resource-cache-mysql-host --port=33066 -e "show databases;"
   - chmod +x ./bin/console
 
 install:
   - composer install --ignore-platform-reqs
-  - docker-compose ps
-  - docker ps -a
   - php bin/console doctrine:migrations:migrate --no-interaction
 
 before_script:
