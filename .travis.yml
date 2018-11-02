@@ -17,13 +17,15 @@ env:
     - WEB_RESOURCE_CACHE_DATABASE_NAME=web_resource_cache_db_name
     - WEB_RESOURCE_CACHE_DATABASE_USER=web_resource_cache_db_user
     - WEB_RESOURCE_CACHE_DATABASE_PASSWORD=secret
-    - WEB_RESOURCE_CACHE_DATABASE_DATA_PATH=/var/docker-mysql/web-resource-cache-db
+    - WEB_RESOURCE_CACHE_DATABASE_DATA_PATH=./var/docker-mysql/web-resource-cache-db
 
 cache:
   directories:
   - $HOME/.composer/cache/files
 
 before_install:
+  - echo $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
+  - mkdir -p $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
   - docker-compose up -d
   - chmod +x ./bin/console
 
