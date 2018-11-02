@@ -22,6 +22,8 @@ env:
     - WEB_RESOURCE_CACHE_DATABASE_USER=web_resource_cache_db_user
     - WEB_RESOURCE_CACHE_DATABASE_PASSWORD=secret
     - WEB_RESOURCE_CACHE_DATABASE_DATA_PATH=./var/docker-mysql/web-resource-cache-db
+    - WEB_RESOURCE_CACHE_RABBITMQ_USER=rabbit
+    - WEB_RESOURCE_CACHE_RABBITMQ_PASS=rabbit
 
 cache:
   directories:
