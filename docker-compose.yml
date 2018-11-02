@@ -22,9 +22,9 @@ services:
       PMA_HOST: mysql
       PMA_PORT: 3306
     links:
-    - mysql:mysql
+      - mysql:mysql
     ports:
-    - 8080:80
+      - 8080:80
     depends_on:
       - mysql
 
@@ -35,5 +35,13 @@ services:
       RABBITMQ_DEFAULT_USER: ${WEB_RESOURCE_CACHE_RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${WEB_RESOURCE_CACHE_RABBITMQ_PASS}
     ports:
-    - "15672:15672"
-    - "5672:5672"
+      - 15672:15672
+      - 5672:5672
+
+  nginx:
+    image: nginx:1.14
+    container_name: web-resource-cache-nginx
+    ports:
+      - 8001:80
+    volumes:
+      - ./docker/nginx/site.conf:/etc/nginx/conf.d/default.conf
