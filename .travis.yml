@@ -1,27 +1,38 @@
 sudo: false
 
 services:
-  - redis-server
   - memcached
+  - docker
 
 language: php
 php:
 - 7.2
 
+addons:
+  hosts:
+    - web-resource-cache-mysql-host
+
 env:
   global:
     - APP_ENV=test
     - APP_SECRET=Secret!
-    - DATABASE_URL=mysql://root:@127.0.0.1:3306/myapp_test
+    - DATABASE_URL=mysql://web_resource_cache_db_user:secret@web-resource-cache-mysql-host:33066/web_resource_cache_db_name
+    - WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD=root
+    - WEB_RESOURCE_CACHE_DATABASE_NAME=web_resource_cache_db_name
+    - WEB_RESOURCE_CACHE_DATABASE_USER=web_resource_cache_db_user
+    - WEB_RESOURCE_CACHE_DATABASE_PASSWORD=secret
+    - WEB_RESOURCE_CACHE_DATABASE_DATA_PATH=./var/docker-mysql/web-resource-cache-db
 
 cache:
   directories:
   - $HOME/.composer/cache/files
 
 before_install:
-  - rm phpunit.xml.dist
-  - mv phpunit.travis-ci.xml phpunit.xml.dist
-  - mysql -e 'CREATE DATABASE myapp_test;'
+  - mkdir -p $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
+  - docker-compose up -d
+  - ./travis/docker-wait.sh
+  - export DOCKER_MYSQL_IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql`
+  - echo "$DOCKER_MYSQL_IP web-resource-cache-mysql-host" | sudo tee --append /etc/hosts
   - chmod +x ./bin/console
 
 install:
@@ -35,3 +46,6 @@ before_script:
 
 script:
   - composer ci
+
+after_script:
+  - docker-compose down
