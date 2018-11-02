@@ -13,3 +13,17 @@ services:
       - ${WEB_RESOURCE_CACHE_DATABASE_DATA_PATH}:/var/lib/mysql
     ports:
       - 33066:3306
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: web-resource-cache-phpmyadmin
+    environment:
+      MYSQL_ROOT_PASSWORD: ${WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD}
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    links:
+    - mysql:mysql
+    ports:
+    - 8080:80
+    depends_on:
+      - mysql
