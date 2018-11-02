@@ -27,3 +27,13 @@ services:
     - 8080:80
     depends_on:
       - mysql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: web-resource-cache-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${WEB_RESOURCE_CACHE_RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${WEB_RESOURCE_CACHE_RABBITMQ_PASS}
+    ports:
+    - "15672:15672"
+    - "5672:5672"
