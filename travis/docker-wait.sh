@@ -15,3 +15,8 @@ echo "Waiting for rabbitmq management interface to be up ..."
 while ! curl -I http://localhost:15672; do
     sleep 1
 done
+
+echo "Waiting for nginx to be up ..."
+while ! curl -I http://localhost:8001/composer.json; do
+    sleep 1
+done
