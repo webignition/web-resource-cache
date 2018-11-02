@@ -24,7 +24,7 @@ cache:
   - $HOME/.composer/cache/files
 
 before_install:
-  - mysql -e 'CREATE DATABASE myapp_test;'
+  - docker-compose up -d
   - chmod +x ./bin/console
 
 install:
@@ -37,7 +37,6 @@ before_script:
   - ./bin/console --env=test cache:warmup
 
 script:
-  - docker-compose up -d
   - composer ci
 
 after_script:
