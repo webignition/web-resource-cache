@@ -24,6 +24,7 @@ cache:
   - $HOME/.composer/cache/files
 
 before_install:
+  - sudo /etc/init.d/mysql stop
   - echo $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
   - mkdir -p $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
   - docker-compose up -d
