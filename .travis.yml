@@ -12,6 +12,7 @@ env:
   global:
     - APP_ENV=test
     - APP_SECRET=Secret!
+    - DATABASE_URL=mysql://web_resource_cache_db_user:secret@127.0.0.1:33066/web_resource_cache_db_name
     - WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD=root
     - WEB_RESOURCE_CACHE_DATABASE_NAME=web_resource_cache_db_name
     - WEB_RESOURCE_CACHE_DATABASE_USER=web_resource_cache_db_user
