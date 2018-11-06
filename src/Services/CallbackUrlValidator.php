@@ -4,6 +4,8 @@ namespace App\Services;
 
 class CallbackUrlValidator
 {
+    const WILDCARD = '*';
+
     /**
      * @var string[]
      */
@@ -23,7 +25,11 @@ class CallbackUrlValidator
         }
 
         foreach ($this->allowedHosts as $allowedHost) {
-            if (substr($allowedHost, 0, 2) === '*.') {
+            if (self::WILDCARD === $allowedHost) {
+                return true;
+            }
+
+            if (substr($allowedHost, 0, 2) === self::WILDCARD . '.') {
                 $comparatorAllowedHost = substr($allowedHost, 2);
 
                 if ($comparatorAllowedHost === $urlHost) {

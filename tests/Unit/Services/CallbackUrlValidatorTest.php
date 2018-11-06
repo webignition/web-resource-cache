@@ -56,6 +56,13 @@ class CallbackUrlValidatorTest extends \PHPUnit\Framework\TestCase
                 'url' => 'http://foo.example.com/',
                 'expectedIsValid' => true,
             ],
+            'wildcard-only host matches everything (1)' => [
+                'allowedHosts' => [
+                    '*',
+                ],
+                'url' => 'http://example.com/',
+                'expectedIsValid' => true,
+            ],
         ];
     }
 }
