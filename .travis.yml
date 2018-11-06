@@ -31,7 +31,7 @@ cache:
 
 before_install:
   - mkdir -p $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
-  - docker-compose up -d
+  - docker-compose -f docker/docker-compose.yml up -d
   - ./travis/docker-wait.sh
   - export DOCKER_MYSQL_IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql`
   - echo "$DOCKER_MYSQL_IP web-resource-cache-mysql-host" | sudo tee --append /etc/hosts
@@ -50,4 +50,4 @@ script:
   - composer ci
 
 after_script:
-  - docker-compose down
+  - docker-compose -f docker/docker-compose.yml down
