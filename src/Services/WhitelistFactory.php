@@ -4,12 +4,12 @@ namespace App\Services;
 
 class WhitelistFactory
 {
-    public function create(string $patternsString)
+    public function create(string $allowedHostsString)
     {
-        $patternsString = trim($patternsString);
+        $allowedHostsString = trim($allowedHostsString);
 
-        $patterns = empty($patternsString) ? [] : explode(',', $patternsString);
+        $allowedHosts = empty($allowedHostsString) ? [] : explode(',', $allowedHostsString);
 
-        return new Whitelist($patterns);
+        return new Whitelist($allowedHosts);
     }
 }
