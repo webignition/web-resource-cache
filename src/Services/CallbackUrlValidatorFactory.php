@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-class WhitelistFactory
+class CallbackUrlValidatorFactory
 {
     public function create(string $allowedHostsString)
     {
@@ -10,6 +10,6 @@ class WhitelistFactory
 
         $allowedHosts = empty($allowedHostsString) ? [] : explode(',', $allowedHostsString);
 
-        return new Whitelist($allowedHosts);
+        return new CallbackUrlValidator($allowedHosts);
     }
 }

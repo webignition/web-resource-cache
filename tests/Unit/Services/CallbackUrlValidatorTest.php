@@ -23,7 +23,7 @@ class CallbackUrlValidatorTest extends \PHPUnit\Framework\TestCase
     public function matchesDataProvider(): array
     {
         return [
-            'empty whitelist does not match' => [
+            'empty host list does not match' => [
                 'allowedHosts' => [],
                 'url' => 'http://example.com/',
                 'expectedIsValid' => false,

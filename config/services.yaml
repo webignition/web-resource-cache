@@ -32,17 +32,17 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    app.callbackurl.whitelist:
-        class: App\Services\Whitelist
-        factory: 'App\Services\WhitelistFactory:create'
+    app.services.callbackurlvalidator:
+        class: App\Services\CallbackUrlValidator
+        factory: 'App\Services\CallbackUrlValidatorFactory:create'
         arguments:
-            $patternsString: '%env(CALLBACK_ALLOWED_HOSTS)%'
+            $allowedHostsString: '%env(CALLBACK_ALLOWED_HOSTS)%'
 
     App\Controller\RequestController:
         class: App\Controller\RequestController
         tags: ['controller.service_arguments']
         arguments:
-            $callbackUrlWhitelist: '@app.callbackurl.whitelist'
+            $callbackUrlValidator: '@app.services.callbackurlvalidator'
 
     webignition\HttpHistoryContainer\Container:
 
