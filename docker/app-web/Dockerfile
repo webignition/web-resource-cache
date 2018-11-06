@@ -9,7 +9,9 @@ RUN pecl install amqp
 RUN docker-php-ext-enable amqp
 RUN pecl install memcached
 RUN docker-php-ext-enable memcached
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+RUN docker-php-ext-install pdo_mysql
+#RUN docker-php-ext-enable pdo pdo_mysql
+#RUN docker-php-ext-install mysqli pdo pdo_mysql
 
 #RUN apt-get install -y zlib1g-dev libpq-dev git libicu-dev libxml2-dev \
 #    && docker-php-ext-configure intl \
