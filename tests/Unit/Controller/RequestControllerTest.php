@@ -7,7 +7,7 @@ use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
 use App\Services\CallbackManager;
-use App\Services\Whitelist;
+use App\Services\CallbackUrlValidator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -17,13 +17,13 @@ class RequestControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidRequestDataProvider
      *
-     * @param Whitelist $callbackUrlWhitelist
+     * @param CallbackUrlValidator $callbackUrlValidator
      * @param array $requestData
      */
-    public function testInvalidRequest(Whitelist $callbackUrlWhitelist, array $requestData)
+    public function testInvalidRequest(CallbackUrlValidator $callbackUrlValidator, array $requestData)
     {
         $controller = new RequestController(
-            $callbackUrlWhitelist,
+            $callbackUrlValidator,
             \Mockery::mock(CachedResourceManager::class),
             \Mockery::mock(CachedResourceValidator::class),
             \Mockery::mock(CallbackFactory::class),
@@ -41,29 +41,29 @@ class RequestControllerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'empty request' => [
-                'callbackUrlWhitelist' => new Whitelist([]),
+                'callbackUrlValidator' => new CallbackUrlValidator([]),
                 'requestData' => [],
             ],
             'missing callback url' => [
-                'callbackUrlWhitelist' => new Whitelist([]),
+                'callbackUrlValidator' => new CallbackUrlValidator([]),
                 'requestData' => [
                     'uri' => 'http://example.com/',
                 ],
             ],
-            'non-whitelisted callback url (empty)' => [
-                'callbackUrlWhitelist' => new Whitelist([]),
+            'non-allowed callback url (empty)' => [
+                'callbackUrlValidator' => new CallbackUrlValidator([]),
                 'requestData' => [
                     'uri' => 'http://example.com/',
                     'callback' => '',
                 ],
             ],
-            'non-whitelisted callback url (non-matching)' => [
-                'callbackUrlWhitelist' => new Whitelist([
-                    '/^http:\/\/[a-z]+\.example\.com\/$/',
+            'non-allowed callback url (non-matching)' => [
+                'callbackUrlValidator' => new CallbackUrlValidator([
+                    'foo.example.com',
                 ]),
                 'requestData' => [
                     'uri' => 'http://example.com/',
-                    'callback' => 'http://example.com/callback',
+                    'callback' => 'http://bar.example.com/callback',
                 ],
             ],
         ];

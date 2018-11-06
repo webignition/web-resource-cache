@@ -17,7 +17,7 @@
         <env name="APP_DEBUG" value="1" />
         <env name="APP_SECRET" value="s$cretf0rt3st" />
         <env name="SHELL_VERBOSITY" value="-1" />
-        <env name="CALLBACK_WHITELIST" value="/http:\/\/[a-z]+\.example\.com\/$/" />
+        <env name="CALLBACK_ALLOWED_HOSTS" value="*.example.com" />
         <env name="RETRIEVER_TIMEOUT_SECONDS" value="30" />
         <!-- define your env variables for the test env here -->
 

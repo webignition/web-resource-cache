@@ -10,7 +10,7 @@ use App\Services\CachedResourceManager;
 use App\Services\CachedResourceValidator;
 use App\Services\CallbackFactory;
 use App\Services\CallbackManager;
-use App\Services\Whitelist;
+use App\Services\CallbackUrlValidator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,9 +20,9 @@ use webignition\HttpHeaders\Headers;
 class RequestController
 {
     /**
-     * @var Whitelist
+     * @var CallbackUrlValidator
      */
-    private $callbackUrlWhitelist;
+    private $callbackUrlValidator;
 
     /**
      * @var CachedResourceManager
@@ -50,14 +50,14 @@ class RequestController
     private $messageBus;
 
     public function __construct(
-        Whitelist $callbackUrlWhitelist,
+        CallbackUrlValidator $callbackUrlValidator,
         CachedResourceManager $cachedResourceManager,
         CachedResourceValidator $cachedResourceValidator,
         CallbackFactory $callbackFactory,
         CallbackManager $callbackManager,
         MessageBusInterface $messageBus
     ) {
-        $this->callbackUrlWhitelist = $callbackUrlWhitelist;
+        $this->callbackUrlValidator = $callbackUrlValidator;
         $this->cachedResourceManager = $cachedResourceManager;
         $this->cachedResourceValidator = $cachedResourceValidator;
         $this->callbackFactory = $callbackFactory;
@@ -71,7 +71,7 @@ class RequestController
         $url = trim($requestData->get('url'));
         $callbackUrl = trim($requestData->get('callback'));
 
-        if (empty($url) || empty($callbackUrl) || !$this->callbackUrlWhitelist->matches($callbackUrl)) {
+        if (empty($url) || empty($callbackUrl) || !$this->callbackUrlValidator->isValid($callbackUrl)) {
             return new Response('', 400);
         }
 
