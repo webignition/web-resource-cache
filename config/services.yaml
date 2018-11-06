@@ -36,7 +36,7 @@ services:
         class: App\Services\Whitelist
         factory: 'App\Services\WhitelistFactory:create'
         arguments:
-            $patternsString: '%env(CALLBACK_WHITELIST)%'
+            $patternsString: '%env(CALLBACK_ALLOWED_HOSTS)%'
 
     App\Controller\RequestController:
         class: App\Controller\RequestController
