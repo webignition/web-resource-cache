@@ -54,6 +54,8 @@ services:
     build: app-web
 #    image: php:7.2-fpm
     container_name: web-resource-cache-app-web
+    environment:
+      DATABASE_URL: mysql://${WEB_RESOURCE_CACHE_DATABASE_USER}:${WEB_RESOURCE_CACHE_DATABASE_PASSWORD}@mysql:3306/${WEB_RESOURCE_CACHE_DATABASE_NAME}
     working_dir: /app
     links:
       - mysql:mysql
