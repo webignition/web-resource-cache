@@ -51,7 +51,8 @@ services:
       - ../var/log/nginx:/var/log/nginx:rw
 
   app-web:
-    image: php:7.2-fpm
+    build: app-web
+#    image: php:7.2-fpm
     container_name: web-resource-cache-app-web
     working_dir: /app
     links:
