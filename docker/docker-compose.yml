@@ -80,3 +80,5 @@ services:
       - ../var/log/supervisor:/var/log/supervisor:rw
     depends_on:
       - app-web
+      - mysql
+      - rabbitmq
