@@ -37,7 +37,7 @@ before_install:
   - cd docker && ./init.sh && cd ..
   - export DOCKER_MYSQL_IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql`
   - echo "$DOCKER_MYSQL_IP web-resource-cache-mysql-host" | sudo tee --append /etc/hosts
-  - chmod +x ./bin/console
+#  - chmod +x ./bin/console
 
 install:
 #  - composer install --ignore-platform-reqs
@@ -45,8 +45,6 @@ install:
 
 before_script:
   - phpenv config-add travis.php.ini
-  - ./bin/console --env=test cache:clear
-  - ./bin/console --env=test cache:warmup
 
 script:
   - composer ci
