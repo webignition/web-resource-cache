@@ -32,8 +32,9 @@ cache:
 before_install:
   - mkdir -p $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
   - mkdir -p var/log/nginx
+  - mkdir -p var/log/supervisor
   - chmod -R 0777 var/log
-  - cd docker && docker-compose up -d && cd ..
+  - cd docker && docker-compose up -d --build && cd ..
   - ./travis/docker-wait.sh
   - export DOCKER_MYSQL_IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql`
   - echo "$DOCKER_MYSQL_IP web-resource-cache-mysql-host" | sudo tee --append /etc/hosts
