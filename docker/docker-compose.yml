@@ -15,7 +15,7 @@ services:
       - 33066:3306
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    build: phpmyadmin
     container_name: web-resource-cache-phpmyadmin
     environment:
       MYSQL_ROOT_PASSWORD: ${WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD}
