@@ -61,3 +61,19 @@ services:
       - rabbitmq:rabbitmq
     volumes:
       - ..:/app
+
+  app-cli:
+    build: app-cli
+    container_name: web-resource-cache-app-cli
+    environment:
+      DATABASE_URL: mysql://${WEB_RESOURCE_CACHE_DATABASE_USER}:${WEB_RESOURCE_CACHE_DATABASE_PASSWORD}@mysql:3306/${WEB_RESOURCE_CACHE_DATABASE_NAME}
+      MESSENGER_TRANSPORT_DSN: amqp://guest:guest@rabbitmq:5672/%2f/messages
+    working_dir: /app
+    links:
+      - mysql:mysql
+      - rabbitmq:rabbitmq
+    volumes:
+      - ..:/app
+      - ../var/log/supervisor:/var/log/supervisor:rw
+    depends_on:
+      - app-web
