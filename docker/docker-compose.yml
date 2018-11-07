@@ -67,7 +67,7 @@ services:
     container_name: web-resource-cache-app-cli
     environment:
       DATABASE_URL: mysql://${WEB_RESOURCE_CACHE_DATABASE_USER}:${WEB_RESOURCE_CACHE_DATABASE_PASSWORD}@mysql:3306/${WEB_RESOURCE_CACHE_DATABASE_NAME}
-      MESSENGER_TRANSPORT_DSN: amqp://guest:guest@rabbitmq:5672/%2f/messages
+      MESSENGER_TRANSPORT_DSN: amqp://${WEB_RESOURCE_CACHE_RABBITMQ_USER}:${WEB_RESOURCE_CACHE_RABBITMQ_PASS}@rabbitmq:5672/%2f/messages
     working_dir: /app
     links:
       - mysql:mysql
