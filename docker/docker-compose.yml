@@ -39,7 +39,7 @@ services:
       - 5672:5672
 
   nginx:
-    image: nginx:1.14
+    build: nginx
     container_name: web-resource-cache-nginx
     ports:
       - 8001:80
