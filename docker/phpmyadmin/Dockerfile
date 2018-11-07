@@ -5,4 +5,4 @@ RUN wget https://github.com/presslabs/dockerize/releases/download/$DOCKERIZE_VER
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
-CMD dockerize -wait tcp://mysql:3306 supervisord -n
+CMD dockerize -wait tcp://mysql:3306 -timeout 30s supervisord -n

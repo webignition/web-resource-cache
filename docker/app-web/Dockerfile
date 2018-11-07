@@ -14,4 +14,4 @@ RUN wget https://github.com/presslabs/dockerize/releases/download/$DOCKERIZE_VER
 
 WORKDIR /app
 
-CMD dockerize -wait tcp://rabbitmq:5672 -wait tcp://mysql:3306 php-fpm
+CMD dockerize -wait tcp://rabbitmq:5672 -timeout 30s -wait tcp://mysql:3306 -timeout 30s php-fpm
