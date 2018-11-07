@@ -1,14 +1,14 @@
 FROM php:7.2-cli
 
-RUN apt-get update && apt-get install -y librabbitmq-dev libssh-dev libmemcached-dev supervisor wget
-RUN pecl install amqp
-RUN docker-php-ext-enable amqp
-RUN pecl install memcached
-RUN docker-php-ext-enable memcached
-RUN docker-php-ext-install pdo_mysql
+RUN apt-get -qq update && apt-get install -qq -y librabbitmq-dev libssh-dev libmemcached-dev supervisor wget
+RUN pecl -q install amqp
+RUN pecl -q install memcached
+RUN docker-php-ext-enable amqp > /dev/null
+RUN docker-php-ext-enable memcached > /dev/null
+RUN docker-php-ext-install pdo_mysql > /dev/null
 
 ENV DOCKERIZE_VERSION v1.2.0
-RUN wget https://github.com/presslabs/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+RUN wget -q https://github.com/presslabs/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
     && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
 
