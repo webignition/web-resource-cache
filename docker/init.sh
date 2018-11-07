@@ -10,4 +10,6 @@ done
 docker-compose ps
 docker logs web-resource-cache-app-web
 docker logs web-resource-cache-app-cli
+
+docker-compose exec -T app-web composer install
 docker-compose exec -T app-web ./bin/console doctrine:migrations:migrate --no-interaction
