@@ -43,6 +43,21 @@ services:
     container_name: web-resource-cache-nginx
     ports:
       - 8001:80
+    links:
+      - app-web:app-web
     volumes:
       - ./nginx/site.conf:/etc/nginx/conf.d/default.conf
+      - ..:/app
+      - ../var/log/nginx:/var/log/nginx:rw
+
+  app-web:
+    build: app-web
+    container_name: web-resource-cache-app-web
+    environment:
+      DATABASE_URL: mysql://${WEB_RESOURCE_CACHE_DATABASE_USER}:${WEB_RESOURCE_CACHE_DATABASE_PASSWORD}@mysql:3306/${WEB_RESOURCE_CACHE_DATABASE_NAME}
+    working_dir: /app
+    links:
+      - mysql:mysql
+      - rabbitmq:rabbitmq
+    volumes:
       - ..:/app
