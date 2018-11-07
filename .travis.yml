@@ -34,14 +34,11 @@ before_install:
   - mkdir -p var/log/nginx
   - mkdir -p var/log/supervisor
   - chmod -R 0777 var/log
+
+install:
   - cd docker && ./init.sh && cd ..
   - export DOCKER_MYSQL_IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql`
   - echo "$DOCKER_MYSQL_IP web-resource-cache-mysql-host" | sudo tee --append /etc/hosts
-#  - chmod +x ./bin/console
-
-install:
-#  - composer install --ignore-platform-reqs
-#  - php bin/console doctrine:migrations:migrate --no-interaction
 
 before_script:
   - phpenv config-add travis.php.ini
