@@ -15,7 +15,7 @@ services:
       - 33066:3306
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    build: phpmyadmin
     container_name: web-resource-cache-phpmyadmin
     environment:
       MYSQL_ROOT_PASSWORD: ${WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD}
@@ -61,6 +61,9 @@ services:
       - rabbitmq:rabbitmq
     volumes:
       - ..:/app
+    depends_on:
+      - mysql
+      - rabbitmq
 
   app-cli:
     build: app-cli
@@ -77,3 +80,5 @@ services:
       - ../var/log/supervisor:/var/log/supervisor:rw
     depends_on:
       - app-web
+      - mysql
+      - rabbitmq
