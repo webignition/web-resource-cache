@@ -40,8 +40,8 @@ before_install:
   - chmod +x ./bin/console
 
 install:
-  - composer install --ignore-platform-reqs
-  - php bin/console doctrine:migrations:migrate --no-interaction
+#  - composer install --ignore-platform-reqs
+#  - php bin/console doctrine:migrations:migrate --no-interaction
 
 before_script:
   - phpenv config-add travis.php.ini
