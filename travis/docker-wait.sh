@@ -17,6 +17,6 @@ while ! curl -I http://localhost:15672; do
 done
 
 echo "Waiting for nginx to be up ..."
-while ! curl -I http://localhost:8001/composer.json; do
+while ! curl -d "url=http://example.com/&callback=http://callback.example.com" -X POST http://localhost:8001/; do
     sleep 1
 done
