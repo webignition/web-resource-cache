@@ -7,4 +7,5 @@ while ! mysql -uroot -p${WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD} --host web-reso
     sleep 1
 done
 
+docker-compose ps
 docker-compose exec -T app-web ./bin/console doctrine:migrations:migrate --no-interaction
