@@ -37,8 +37,8 @@ before_install:
 
 install:
   - cd docker && ./init.sh && cd ..
-  - export DOCKER_MYSQL_IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql`
-  - echo "$DOCKER_MYSQL_IP web-resource-cache-mysql-host" | sudo tee --append /etc/hosts
+#  - export DOCKER_MYSQL_IP=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' web-resource-cache-mysql`
+#  - echo "$DOCKER_MYSQL_IP web-resource-cache-mysql-host" | sudo tee --append /etc/hosts
 
 before_script:
   - phpenv config-add travis.php.ini
