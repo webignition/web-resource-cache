@@ -36,8 +36,5 @@ before_install:
 install:
   - cd docker && ./init.sh && cd ..
 
-before_script:
-  - phpenv config-add travis.php.ini
-
 script:
   - cd docker && docker-compose exec -T  app-web env TERM=xterm script -q -c "composer ci" /dev/null
