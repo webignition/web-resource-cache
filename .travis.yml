@@ -3,14 +3,11 @@ sudo: false
 services:
   - docker
 
-language: php
-php:
-- 7.2
+language: minimal
 
 addons:
   hosts:
     - web-resource-cache-mysql-host
-    - memcached
 
 env:
   global:
@@ -38,8 +35,5 @@ before_install:
 install:
   - cd docker && ./init.sh && cd ..
 
-before_script:
-  - phpenv config-add travis.php.ini
-
 script:
-  - composer ci
+  - cd docker && docker-compose exec -T  app-web env TERM=xterm script -q -c "composer ci" /dev/null
