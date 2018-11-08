@@ -50,6 +50,9 @@ services:
       - ..:/app
       - ../var/log/nginx:/var/log/nginx:rw
 
+  memcached:
+    image: memcached:1.5
+
   app-web:
     build: app-web
     container_name: web-resource-cache-app-web
@@ -59,11 +62,13 @@ services:
     links:
       - mysql:mysql
       - rabbitmq:rabbitmq
+      - memcached:memcached
     volumes:
       - ..:/app
     depends_on:
       - mysql
       - rabbitmq
+      - memcached
 
   app-cli:
     build: app-cli
@@ -75,6 +80,7 @@ services:
     links:
       - mysql:mysql
       - rabbitmq:rabbitmq
+      - memcached:memcached
     volumes:
       - ..:/app
       - ../var/log/supervisor:/var/log/supervisor:rw
@@ -82,3 +88,4 @@ services:
       - app-web
       - mysql
       - rabbitmq
+      - memcached
