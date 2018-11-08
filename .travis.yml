@@ -42,4 +42,4 @@ before_script:
   - phpenv config-add travis.php.ini
 
 script:
-  - composer ci
+  - cd docker && docker-compose exec -T  app-web env TERM=xterm script -q -c "composer ci" /dev/null
