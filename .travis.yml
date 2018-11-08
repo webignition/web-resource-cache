@@ -8,7 +8,6 @@ language: minimal
 addons:
   hosts:
     - web-resource-cache-mysql-host
-    - memcached
 
 env:
   global:
