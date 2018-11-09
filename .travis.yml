@@ -36,4 +36,4 @@ install:
   - cd docker && ./init.sh && cd ..
 
 script:
-  - cd docker && docker-compose exec -T  app-web env TERM=xterm script -q -c "composer ci" /dev/null
+  - cd docker && docker-compose exec -T --env=APP_ENV=test app-web env TERM=xterm script -q -c "composer ci" /dev/null
