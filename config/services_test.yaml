@@ -8,14 +8,14 @@ services:
 
   App\Tests\Services\Asserter\HttpRequestAsserter:
 
-  web_resource_cache.http.handler_stack.retriever:
+  async_http_retriever.http.handler_stack.retriever:
     class: GuzzleHttp\HandlerStack
     factory: 'App\Services\Http\HandlerStackFactory:create'
     arguments:
       $middlewareCollection: '@App\Services\Http\RetrieverMiddlewareCollection'
       $handler: '@App\Tests\Services\HttpMockHandler'
 
-  web_resource_cache.http.handler_stack.sender:
+  async_http_retriever.http.handler_stack.sender:
     class: GuzzleHttp\HandlerStack
     factory: 'App\Services\Http\HandlerStackFactory:create'
     arguments:
@@ -26,24 +26,24 @@ services:
     arguments:
     - '%retryable_statuses%'
 
-  web_resource_cache.http.client.retriever:
+  async_http_retriever.http.client.retriever:
     public: true
     class: GuzzleHttp\Client
     factory: 'App\Services\Http\ClientFactory:create'
     arguments:
       $curlOptions: '%curl_options%'
-      $handlerStack: '@web_resource_cache.http.handler_stack.retriever'
+      $handlerStack: '@async_http_retriever.http.handler_stack.retriever'
       $config:
         cookies: '@GuzzleHttp\Cookie\CookieJarInterface'
 
-  web_resource_cache.http.client.sender:
+  async_http_retriever.http.client.sender:
     public: true
     class: GuzzleHttp\Client
     factory: 'App\Services\Http\ClientFactory:create'
     arguments:
       $curlOptions: '%curl_options%'
-      $handlerStack: '@web_resource_cache.http.handler_stack.sender'
+      $handlerStack: '@async_http_retriever.http.handler_stack.sender'
 
   App\Services\ResponseSender:
     arguments:
-      $httpClient: '@web_resource_cache.http.client.sender'
+      $httpClient: '@async_http_retriever.http.client.sender'

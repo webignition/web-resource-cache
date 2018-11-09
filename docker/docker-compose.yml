@@ -1,0 +1,115 @@
+version: "3"
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: async-http-retriever-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
+      MYSQL_USER: ${ASYNC_HTTP_RETRIEVER_DATABASE_USER}
+      MYSQL_PASSWORD: ${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}
+    volumes:
+      - ${ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH}:/var/lib/mysql
+    ports:
+      - 33066:3306
+
+  phpmyadmin:
+    build: phpmyadmin
+    container_name: async-http-retriever-phpmyadmin
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD}
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    links:
+      - mysql:mysql
+    ports:
+      - 8080:80
+    depends_on:
+      - mysql
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: async-http-retriever-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+      args:
+        APP_SECRET: ${ASYNC_HTTP_RETRIEVER_APP_SECRET}
+        DB_USER: ${ASYNC_HTTP_RETRIEVER_DATABASE_USER}
+        DB_PASSWORD: ${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}
+        DB_NAME: ${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
+        RABBITMQ_USER: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_USER}
+        RABBITMQ_PASSWORD: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}
+    container_name: async-http-retriever-nginx
+    ports:
+      - 8001:80
+    links:
+      - app-web:app-web
+    volumes:
+      - ./nginx/site.tmpl:/etc/nginx/conf.d/site.tmpl
+      - ..:/app
+      - ../var/log/nginx:/var/log/nginx:rw
+
+  memcached:
+    image: memcached:1.5
+    container_name: async-http-retriever-memcached
+
+  app-web:
+    build:
+      context: ./app-web
+      dockerfile: Dockerfile
+      args:
+        APP_ENV: ${ASYNC_HTTP_RETRIEVER_APP_ENV}
+        APP_SECRET: ${ASYNC_HTTP_RETRIEVER_APP_SECRET}
+        CALLBACK_ALLOWED_HOSTS: ${ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS}
+        RETRIEVER_TIMEOUT_SECONDS: ${ASYNC_HTTP_RETRIEVER_RETRIEVER_TIMEOUT_SECONDS}
+    container_name: async-http-retriever-app-web
+    environment:
+      DATABASE_URL: mysql://${ASYNC_HTTP_RETRIEVER_DATABASE_USER}:${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}@mysql:3306/${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
+    working_dir: /app
+    links:
+      - mysql:mysql
+      - rabbitmq:rabbitmq
+      - memcached:memcached
+    volumes:
+      - ..:/app
+    depends_on:
+      - mysql
+      - rabbitmq
+      - memcached
+
+  app-cli:
+    build:
+      context: ./app-cli
+      dockerfile: Dockerfile
+      args:
+        APP_ENV: ${ASYNC_HTTP_RETRIEVER_APP_ENV}
+        APP_SECRET: ${ASYNC_HTTP_RETRIEVER_APP_SECRET}
+        CALLBACK_ALLOWED_HOSTS: ${ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS}
+        RETRIEVER_TIMEOUT_SECONDS: ${ASYNC_HTTP_RETRIEVER_RETRIEVER_TIMEOUT_SECONDS}
+    container_name: async-http-retriever-app-cli
+    environment:
+      DATABASE_URL: mysql://${ASYNC_HTTP_RETRIEVER_DATABASE_USER}:${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}@mysql:3306/${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
+      MESSENGER_TRANSPORT_DSN: amqp://${ASYNC_HTTP_RETRIEVER_RABBITMQ_USER}:${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}@rabbitmq:5672/%2f/messages
+    working_dir: /app
+    links:
+      - mysql:mysql
+      - rabbitmq:rabbitmq
+      - memcached:memcached
+    volumes:
+      - ..:/app
+      - ../var/log/supervisor:/var/log/supervisor:rw
+    depends_on:
+      - app-web
+      - mysql
+      - rabbitmq
+      - memcached

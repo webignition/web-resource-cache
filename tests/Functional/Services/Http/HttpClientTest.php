@@ -22,10 +22,10 @@ class HttpClientTest extends AbstractFunctionalTestCase
     {
         return [
             'sender' => [
-                'serviceId' => 'web_resource_cache.http.client.sender',
+                'serviceId' => 'async_http_retriever.http.client.sender',
             ],
             'retriever' => [
-                'serviceId' => 'web_resource_cache.http.client.retriever',
+                'serviceId' => 'async_http_retriever.http.client.retriever',
             ],
         ];
     }
@@ -73,13 +73,13 @@ class HttpClientTest extends AbstractFunctionalTestCase
     {
         return [
             'sender' => [
-                'serviceId' => 'web_resource_cache.http.client.sender',
-                'expectedSenderServiceId' => 'web_resource_cache.http.handler_stack.sender',
+                'serviceId' => 'async_http_retriever.http.client.sender',
+                'expectedSenderServiceId' => 'async_http_retriever.http.handler_stack.sender',
                 'expectedHasCookieJar' => false,
             ],
             'retriever' => [
-                'serviceId' => 'web_resource_cache.http.client.retriever',
-                'expectedSenderServiceId' => 'web_resource_cache.http.handler_stack.retriever',
+                'serviceId' => 'async_http_retriever.http.client.retriever',
+                'expectedSenderServiceId' => 'async_http_retriever.http.handler_stack.retriever',
                 'expectedHasCookieJar' => true,
             ],
         ];

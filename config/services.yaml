@@ -52,33 +52,33 @@ services:
     GuzzleHttp\Cookie\CookieJarInterface:
         class: GuzzleHttp\Cookie\CookieJar
 
-    web_resource_cache.http.handler_stack.retriever:
+    async_http_retriever.http.handler_stack.retriever:
         class: GuzzleHttp\HandlerStack
         factory: 'App\Services\Http\HandlerStackFactory:create'
         arguments:
             $middlewareCollection: '@App\Services\Http\RetrieverMiddlewareCollection'
 
-    web_resource_cache.http.handler_stack.sender:
+    async_http_retriever.http.handler_stack.sender:
         class: GuzzleHttp\HandlerStack
         factory: 'App\Services\Http\HandlerStackFactory:create'
         arguments:
             $middlewareCollection: '@App\Services\Http\SenderMiddlewareCollection'
 
-    web_resource_cache.http.client.retriever:
+    async_http_retriever.http.client.retriever:
         class: GuzzleHttp\Client
         factory: 'App\Services\Http\ClientFactory:create'
         arguments:
             $curlOptions: '%curl_options%'
-            $handlerStack: '@web_resource_cache.http.handler_stack.retriever'
+            $handlerStack: '@async_http_retriever.http.handler_stack.retriever'
             $config:
                 cookies: '@GuzzleHttp\Cookie\CookieJarInterface'
 
-    web_resource_cache.http.client.sender:
+    async_http_retriever.http.client.sender:
         class: GuzzleHttp\Client
         factory: 'App\Services\Http\ClientFactory:create'
         arguments:
             $curlOptions: '%curl_options%'
-            $handlerStack: '@web_resource_cache.http.handler_stack.sender'
+            $handlerStack: '@async_http_retriever.http.handler_stack.sender'
 
     Memcached:
         class: \Memcached
@@ -99,9 +99,9 @@ services:
 
     App\Services\ResourceRetriever:
         arguments:
-            $httpClient: '@web_resource_cache.http.client.retriever'
+            $httpClient: '@async_http_retriever.http.client.retriever'
             $requestTimeout: '%env(RETRIEVER_TIMEOUT_SECONDS)%'
 
     App\Services\ResponseSender:
         arguments:
-            $httpClient: '@web_resource_cache.http.client.sender'
+            $httpClient: '@async_http_retriever.http.client.sender'
