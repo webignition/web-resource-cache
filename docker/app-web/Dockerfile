@@ -25,12 +25,12 @@ RUN apt-get -qq update && apt-get install -y \
      --no-install-recommends
 RUN pecl -q install amqp
 RUN pecl -q install memcached
-RUN pecl install xdebug
+RUN pecl -q install xdebug
 RUN docker-php-ext-configure zip --with-libzip > /dev/null
 RUN docker-php-ext-install zip > /dev/null
 RUN docker-php-ext-enable amqp > /dev/null
 RUN docker-php-ext-enable memcached > /dev/null
-RUN docker-php-ext-enable xdebug
+RUN docker-php-ext-enable xdebug > /dev/null
 RUN docker-php-ext-install pdo_mysql > /dev/null
 
 COPY init.sh /usr/local/bin/
