@@ -15,7 +15,7 @@ services:
       $middlewareCollection: '@App\Services\Http\RetrieverMiddlewareCollection'
       $handler: '@App\Tests\Services\HttpMockHandler'
 
-  web_resource_cache.http.handler_stack.sender:
+  async_http_retriever.http.handler_stack.sender:
     class: GuzzleHttp\HandlerStack
     factory: 'App\Services\Http\HandlerStackFactory:create'
     arguments:
@@ -42,7 +42,7 @@ services:
     factory: 'App\Services\Http\ClientFactory:create'
     arguments:
       $curlOptions: '%curl_options%'
-      $handlerStack: '@web_resource_cache.http.handler_stack.sender'
+      $handlerStack: '@async_http_retriever.http.handler_stack.sender'
 
   App\Services\ResponseSender:
     arguments:
