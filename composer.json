@@ -24,8 +24,7 @@
         "squizlabs/php_codesniffer": "3.*",
         "symfony/browser-kit": "*",
         "symfony/dotenv": "*",
-        "symfony/phpunit-bridge": "^4.0.0",
-        "symfony/web-server-bundle": "*"
+        "symfony/phpunit-bridge": "^4.0.0"
     },
     "config": {
         "preferred-install": {
