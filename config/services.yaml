@@ -52,7 +52,7 @@ services:
     GuzzleHttp\Cookie\CookieJarInterface:
         class: GuzzleHttp\Cookie\CookieJar
 
-    web_resource_cache.http.handler_stack.retriever:
+    async_http_retriever.http.handler_stack.retriever:
         class: GuzzleHttp\HandlerStack
         factory: 'App\Services\Http\HandlerStackFactory:create'
         arguments:
@@ -69,7 +69,7 @@ services:
         factory: 'App\Services\Http\ClientFactory:create'
         arguments:
             $curlOptions: '%curl_options%'
-            $handlerStack: '@web_resource_cache.http.handler_stack.retriever'
+            $handlerStack: '@async_http_retriever.http.handler_stack.retriever'
             $config:
                 cookies: '@GuzzleHttp\Cookie\CookieJarInterface'
 

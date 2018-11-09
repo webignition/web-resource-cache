@@ -79,7 +79,7 @@ class HttpClientTest extends AbstractFunctionalTestCase
             ],
             'retriever' => [
                 'serviceId' => 'web_resource_cache.http.client.retriever',
-                'expectedSenderServiceId' => 'web_resource_cache.http.handler_stack.retriever',
+                'expectedSenderServiceId' => 'async_http_retriever.http.handler_stack.retriever',
                 'expectedHasCookieJar' => true,
             ],
         ];
