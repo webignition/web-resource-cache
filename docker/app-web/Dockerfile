@@ -1,5 +1,9 @@
 FROM php:7.2-fpm
 
+ARG APP_SECRET
+
+ENV APP_SECRET=$APP_SECRET
+
 RUN mv /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini-development.bak
 RUN mv /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 

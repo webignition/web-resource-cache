@@ -1,5 +1,9 @@
 FROM php:7.2-cli
 
+ARG APP_SECRET
+
+ENV APP_SECRET=$APP_SECRET
+
 RUN apt-get -qq update && apt-get install -qq -y librabbitmq-dev libssh-dev libmemcached-dev supervisor wget
 RUN pecl -q install amqp
 RUN pecl -q install memcached

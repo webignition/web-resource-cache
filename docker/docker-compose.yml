@@ -43,6 +43,7 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
       args:
+        APP_SECRET: ${WEB_RESOURCE_CACHE_APP_SECRET}
         DB_USER: ${WEB_RESOURCE_CACHE_DATABASE_USER}
         DB_PASSWORD: ${WEB_RESOURCE_CACHE_DATABASE_PASSWORD}
         DB_NAME: ${WEB_RESOURCE_CACHE_DATABASE_NAME}
@@ -60,7 +61,11 @@ services:
     image: memcached:1.5
 
   app-web:
-    build: app-web
+    build:
+      context: ./app-web
+      dockerfile: Dockerfile
+      args:
+        APP_SECRET: ${WEB_RESOURCE_CACHE_APP_SECRET}
     container_name: web-resource-cache-app-web
     environment:
       DATABASE_URL: mysql://${WEB_RESOURCE_CACHE_DATABASE_USER}:${WEB_RESOURCE_CACHE_DATABASE_PASSWORD}@mysql:3306/${WEB_RESOURCE_CACHE_DATABASE_NAME}
@@ -77,7 +82,11 @@ services:
       - memcached
 
   app-cli:
-    build: app-cli
+    build:
+      context: ./app-cli
+      dockerfile: Dockerfile
+      args:
+        APP_SECRET: ${WEB_RESOURCE_CACHE_APP_SECRET}
     container_name: web-resource-cache-app-cli
     environment:
       DATABASE_URL: mysql://${WEB_RESOURCE_CACHE_DATABASE_USER}:${WEB_RESOURCE_CACHE_DATABASE_PASSWORD}@mysql:3306/${WEB_RESOURCE_CACHE_DATABASE_NAME}

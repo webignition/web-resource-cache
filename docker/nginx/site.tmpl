@@ -14,7 +14,7 @@ server {
         include fastcgi_params;
 
         fastcgi_param APP_ENV "prod";
-        fastcgi_param APP_SECRET "secret";
+        fastcgi_param APP_SECRET "{{ .Env.APP_SECRET }}";
         fastcgi_param DATABASE_URL "mysql://{{ .Env.DB_USER }}:{{ .Env.DB_PASSWORD }}@mysql:3306/{{ .Env.DB_NAME }}";
 
         fastcgi_param CALLBACK_ALLOWED_HOSTS "*";
