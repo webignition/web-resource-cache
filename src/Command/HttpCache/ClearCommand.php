@@ -26,7 +26,7 @@ class ClearCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('web-resource-cache:httpcache:clear')
+            ->setName('async-http-retriever:httpcache:clear')
             ->setDescription('Clear memcache http cache')
             ->setHelp('Clear memcache http cache');
     }
