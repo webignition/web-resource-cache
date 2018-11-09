@@ -36,7 +36,7 @@ services:
       $config:
         cookies: '@GuzzleHttp\Cookie\CookieJarInterface'
 
-  web_resource_cache.http.client.sender:
+  async_http_retriever.http.client.sender:
     public: true
     class: GuzzleHttp\Client
     factory: 'App\Services\Http\ClientFactory:create'
@@ -46,4 +46,4 @@ services:
 
   App\Services\ResponseSender:
     arguments:
-      $httpClient: '@web_resource_cache.http.client.sender'
+      $httpClient: '@async_http_retriever.http.client.sender'

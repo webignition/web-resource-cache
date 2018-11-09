@@ -22,7 +22,7 @@ class HttpClientTest extends AbstractFunctionalTestCase
     {
         return [
             'sender' => [
-                'serviceId' => 'web_resource_cache.http.client.sender',
+                'serviceId' => 'async_http_retriever.http.client.sender',
             ],
             'retriever' => [
                 'serviceId' => 'async_http_retriever.http.client.retriever',
@@ -73,7 +73,7 @@ class HttpClientTest extends AbstractFunctionalTestCase
     {
         return [
             'sender' => [
-                'serviceId' => 'web_resource_cache.http.client.sender',
+                'serviceId' => 'async_http_retriever.http.client.sender',
                 'expectedSenderServiceId' => 'async_http_retriever.http.handler_stack.sender',
                 'expectedHasCookieJar' => false,
             ],
