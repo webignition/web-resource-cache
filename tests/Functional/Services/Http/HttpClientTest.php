@@ -25,7 +25,7 @@ class HttpClientTest extends AbstractFunctionalTestCase
                 'serviceId' => 'web_resource_cache.http.client.sender',
             ],
             'retriever' => [
-                'serviceId' => 'web_resource_cache.http.client.retriever',
+                'serviceId' => 'async_http_retriever.http.client.retriever',
             ],
         ];
     }
@@ -78,7 +78,7 @@ class HttpClientTest extends AbstractFunctionalTestCase
                 'expectedHasCookieJar' => false,
             ],
             'retriever' => [
-                'serviceId' => 'web_resource_cache.http.client.retriever',
+                'serviceId' => 'async_http_retriever.http.client.retriever',
                 'expectedSenderServiceId' => 'async_http_retriever.http.handler_stack.retriever',
                 'expectedHasCookieJar' => true,
             ],
