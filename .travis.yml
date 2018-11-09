@@ -13,13 +13,13 @@ env:
   global:
     - APP_ENV=test
     - APP_SECRET=Secret!
-    - DATABASE_URL=mysql://async_http_retriever_db_user:secret@web-resource-cache-mysql-host:33066/web_resource_cache_db_name
+    - DATABASE_URL=mysql://async_http_retriever_db_user:secret@web-resource-cache-mysql-host:33066/async_http_retriever
     - WEB_RESOURCE_CACHE_APP_ENV=test
     - WEB_RESOURCE_CACHE_APP_SECRET=secret
     - WEB_RESOURCE_CACHE_CALLBACK_ALLOWED_HOSTS=*
     - WEB_RESOURCE_CACHE_RETRIEVER_TIMEOUT_SECONDS=30
     - WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD=root
-    - WEB_RESOURCE_CACHE_DATABASE_NAME=web_resource_cache_db_name
+    - WEB_RESOURCE_CACHE_DATABASE_NAME=async_http_retriever
     - WEB_RESOURCE_CACHE_DATABASE_USER=async_http_retriever_db_user
     - WEB_RESOURCE_CACHE_DATABASE_PASSWORD=secret
     - WEB_RESOURCE_CACHE_DATABASE_DATA_PATH=./var/docker-mysql/web-resource-cache-db
