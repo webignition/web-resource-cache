@@ -14,6 +14,10 @@ env:
     - APP_ENV=test
     - APP_SECRET=Secret!
     - DATABASE_URL=mysql://web_resource_cache_db_user:secret@web-resource-cache-mysql-host:33066/web_resource_cache_db_name
+    - WEB_RESOURCE_CACHE_APP_ENV=test
+    - WEB_RESOURCE_CACHE_APP_SECRET=secret
+    - WEB_RESOURCE_CACHE_CALLBACK_ALLOWED_HOSTS=*
+    - WEB_RESOURCE_CACHE_RETRIEVER_TIMEOUT_SECONDS=30
     - WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD=root
     - WEB_RESOURCE_CACHE_DATABASE_NAME=web_resource_cache_db_name
     - WEB_RESOURCE_CACHE_DATABASE_USER=web_resource_cache_db_user
@@ -36,4 +40,4 @@ install:
   - cd docker && ./init.sh && cd ..
 
 script:
-  - cd docker && docker-compose exec -T  app-web env TERM=xterm script -q -c "composer ci" /dev/null
+  - cd docker && docker-compose exec -T app-web env TERM=xterm script -q -c "composer ci" /dev/null
