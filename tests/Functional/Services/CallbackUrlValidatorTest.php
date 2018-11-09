@@ -23,4 +23,10 @@ class CallbackUrlValidatorTest extends AbstractFunctionalTestCase
     {
         $this->assertInstanceOf(CallbackUrlValidator::class, $this->callbackUrlValidator);
     }
+
+    public function testFoo()
+    {
+        var_dump($this->callbackUrlValidator);
+        exit();
+    }
 }
