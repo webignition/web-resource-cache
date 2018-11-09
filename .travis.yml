@@ -22,7 +22,7 @@ env:
     - ASYNC_HTTP_RETRIEVER_DATABASE_NAME=async_http_retriever
     - ASYNC_HTTP_RETRIEVER_DATABASE_USER=async_http_retriever_db_user
     - ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD=secret
-    - ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH=./var/docker-mysql/web-resource-cache-db
+    - ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH=./var/docker-mysql/async-http-retriever-db
     - ASYNC_HTTP_RETRIEVER_RABBITMQ_USER=rabbit
     - ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS=rabbit
 
