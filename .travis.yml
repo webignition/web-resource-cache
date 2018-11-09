@@ -14,24 +14,24 @@ env:
     - APP_ENV=test
     - APP_SECRET=Secret!
     - DATABASE_URL=mysql://async_http_retriever_db_user:secret@web-resource-cache-mysql-host:33066/async_http_retriever
-    - WEB_RESOURCE_CACHE_APP_ENV=test
-    - WEB_RESOURCE_CACHE_APP_SECRET=secret
-    - WEB_RESOURCE_CACHE_CALLBACK_ALLOWED_HOSTS=*
-    - WEB_RESOURCE_CACHE_RETRIEVER_TIMEOUT_SECONDS=30
-    - WEB_RESOURCE_CACHE_MYSQL_ROOT_PASSWORD=root
-    - WEB_RESOURCE_CACHE_DATABASE_NAME=async_http_retriever
-    - WEB_RESOURCE_CACHE_DATABASE_USER=async_http_retriever_db_user
-    - WEB_RESOURCE_CACHE_DATABASE_PASSWORD=secret
-    - WEB_RESOURCE_CACHE_DATABASE_DATA_PATH=./var/docker-mysql/web-resource-cache-db
-    - WEB_RESOURCE_CACHE_RABBITMQ_USER=rabbit
-    - WEB_RESOURCE_CACHE_RABBITMQ_PASS=rabbit
+    - ASYNC_HTTP_RETRIEVER_APP_ENV=test
+    - ASYNC_HTTP_RETRIEVER_APP_SECRET=secret
+    - ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS=*
+    - ASYNC_HTTP_RETRIEVER_RETRIEVER_TIMEOUT_SECONDS=30
+    - ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD=root
+    - ASYNC_HTTP_RETRIEVER_DATABASE_NAME=async_http_retriever
+    - ASYNC_HTTP_RETRIEVER_DATABASE_USER=async_http_retriever_db_user
+    - ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD=secret
+    - ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH=./var/docker-mysql/web-resource-cache-db
+    - ASYNC_HTTP_RETRIEVER_RABBITMQ_USER=rabbit
+    - ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS=rabbit
 
 cache:
   directories:
   - $HOME/.composer/cache/files
 
 before_install:
-  - mkdir -p $WEB_RESOURCE_CACHE_DATABASE_DATA_PATH
+  - mkdir -p $ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH
   - mkdir -p var/log/nginx
   - mkdir -p var/log/supervisor
   - chmod -R 0777 var/log
