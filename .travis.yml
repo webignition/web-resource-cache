@@ -7,13 +7,13 @@ language: minimal
 
 addons:
   hosts:
-    - web-resource-cache-mysql-host
+    - mysql
 
 env:
   global:
     - APP_ENV=test
     - APP_SECRET=Secret!
-    - DATABASE_URL=mysql://async_http_retriever_db_user:secret@web-resource-cache-mysql-host:33066/async_http_retriever
+    - DATABASE_URL=mysql://async_http_retriever_db_user:secret@mysql:33066/async_http_retriever
     - ASYNC_HTTP_RETRIEVER_APP_ENV=test
     - ASYNC_HTTP_RETRIEVER_APP_SECRET=secret
     - ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS=*

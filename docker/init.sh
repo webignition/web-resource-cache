@@ -3,7 +3,7 @@
 docker-compose up -d --build
 
 echo "Waiting for mysql to accept connections ..."
-while ! mysql -uroot -p${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD} --host web-resource-cache-mysql-host --port 33066 -e 'SELECT 1'; do
+while ! mysql -uroot -p${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD} --host mysql --port 33066 -e 'SELECT 1'; do
     sleep 1
 done
 
