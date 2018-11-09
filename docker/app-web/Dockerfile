@@ -32,6 +32,11 @@ RUN docker-php-ext-enable amqp > /dev/null
 RUN docker-php-ext-enable memcached > /dev/null
 RUN docker-php-ext-enable xdebug
 RUN docker-php-ext-install pdo_mysql > /dev/null
+
+COPY init.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/init.sh
+RUN /usr/local/bin/init.sh
+
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 ENV DOCKERIZE_VERSION v1.2.0
