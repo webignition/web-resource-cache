@@ -11,9 +11,6 @@ addons:
 
 env:
   global:
-    - APP_ENV=test
-    - APP_SECRET=Secret!
-    - DATABASE_URL=mysql://async_http_retriever_db_user:secret@mysql:33066/async_http_retriever
     - ASYNC_HTTP_RETRIEVER_APP_ENV=test
     - ASYNC_HTTP_RETRIEVER_APP_SECRET=secret
     - ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS=*
