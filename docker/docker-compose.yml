@@ -34,7 +34,7 @@ services:
         RABBITMQ_PASSWORD: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}
     container_name: async-http-retriever-nginx
     ports:
-      - 8001:80
+      - ${ASYNC_HTTP_RETRIEVER_EXPOSED_PORT}:80
     links:
       - app-web:app-web
     volumes:
