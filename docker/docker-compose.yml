@@ -11,8 +11,6 @@ services:
       MYSQL_PASSWORD: ${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}
     volumes:
       - ${ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH}:/var/lib/mysql
-    ports:
-      - 33066:3306
 
   phpmyadmin:
     build: phpmyadmin
