@@ -3,7 +3,7 @@ version: "3"
 services:
   mysql:
     image: mysql:5.7
-    container_name: async-http-retriever-mysql
+    container_name: async-http-retriever-mysql-${ID}
     environment:
       MYSQL_ROOT_PASSWORD: ${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
@@ -14,7 +14,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: async-http-retriever-rabbitmq
+    container_name: async-http-retriever-rabbitmq-${ID}
     environment:
       RABBITMQ_DEFAULT_USER: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}
@@ -32,7 +32,7 @@ services:
         DB_NAME: ${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
         RABBITMQ_USER: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_USER}
         RABBITMQ_PASSWORD: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}
-    container_name: async-http-retriever-nginx
+    container_name: async-http-retriever-nginx-${ID}
     ports:
       - ${ASYNC_HTTP_RETRIEVER_EXPOSED_PORT}:80
     links:
@@ -44,7 +44,7 @@ services:
 
   memcached:
     image: memcached:1.5
-    container_name: async-http-retriever-memcached
+    container_name: async-http-retriever-memcached-${ID}
 
   app-web:
     build:
@@ -55,7 +55,7 @@ services:
         APP_SECRET: ${ASYNC_HTTP_RETRIEVER_APP_SECRET}
         CALLBACK_ALLOWED_HOSTS: ${ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS}
         RETRIEVER_TIMEOUT_SECONDS: ${ASYNC_HTTP_RETRIEVER_RETRIEVER_TIMEOUT_SECONDS}
-    container_name: async-http-retriever-app-web
+    container_name: async-http-retriever-app-web-${ID}
     environment:
       DATABASE_URL: mysql://${ASYNC_HTTP_RETRIEVER_DATABASE_USER}:${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}@mysql:3306/${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
     working_dir: /app
@@ -79,7 +79,7 @@ services:
         APP_SECRET: ${ASYNC_HTTP_RETRIEVER_APP_SECRET}
         CALLBACK_ALLOWED_HOSTS: ${ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS}
         RETRIEVER_TIMEOUT_SECONDS: ${ASYNC_HTTP_RETRIEVER_RETRIEVER_TIMEOUT_SECONDS}
-    container_name: async-http-retriever-app-cli
+    container_name: async-http-retriever-app-cli-${ID}
     environment:
       DATABASE_URL: mysql://${ASYNC_HTTP_RETRIEVER_DATABASE_USER}:${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}@mysql:3306/${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
       MESSENGER_TRANSPORT_DSN: amqp://${ASYNC_HTTP_RETRIEVER_RABBITMQ_USER}:${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}@rabbitmq:5672/%2f/messages

@@ -3,7 +3,7 @@ version: "3"
 services:
   phpmyadmin:
     build: phpmyadmin
-    container_name: async-http-retriever-phpmyadmin
+    container_name: async-http-retriever-phpmyadmin-${ID}
     environment:
       MYSQL_ROOT_PASSWORD: ${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD}
       PMA_HOST: mysql
