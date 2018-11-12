@@ -1,0 +1,6 @@
+version: "3"
+
+services:
+  mysql:
+    ports:
+      - ${ASYNC_HTTP_RETRIEVER_MYSQL_EXPOSED_PORT}:3306

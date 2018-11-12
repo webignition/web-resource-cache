@@ -11,22 +11,6 @@ services:
       MYSQL_PASSWORD: ${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}
     volumes:
       - ${ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH}:/var/lib/mysql
-    ports:
-      - 33066:3306
-
-  phpmyadmin:
-    build: phpmyadmin
-    container_name: async-http-retriever-phpmyadmin
-    environment:
-      MYSQL_ROOT_PASSWORD: ${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD}
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-    links:
-      - mysql:mysql
-    ports:
-      - 8080:80
-    depends_on:
-      - mysql
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -35,8 +19,7 @@ services:
       RABBITMQ_DEFAULT_USER: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}
     ports:
-      - 15672:15672
-      - 5672:5672
+      - ${ASYNC_HTTP_RETRIEVER_RABBITMQ_MANAGEMENT_EXPOSED_PORT}:15672
 
   nginx:
     build:
@@ -51,7 +34,7 @@ services:
         RABBITMQ_PASSWORD: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}
     container_name: async-http-retriever-nginx
     ports:
-      - 8001:80
+      - ${ASYNC_HTTP_RETRIEVER_EXPOSED_PORT}:80
     links:
       - app-web:app-web
     volumes:
