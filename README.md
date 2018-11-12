@@ -94,3 +94,23 @@ Set these if you like, things will work just fine if you don't.
 | <sub>`ASYNC_HTTP_RETRIEVER_DATABASE_NAME`</sub> | Name of the database the application uses. | Leave as-is for single-instance uses. |
 | <sub>`ASYNC_HTTP_RETRIEVER_DATABASE_USER`</sub> | DB user for the application. | `--` |
 | <sub>`ASYNC_HTTP_RETRIEVER_RABBITMQ_MANAGEMENT_EXPOSED_PORT`</sub> | Exposed port of the rabbit-mq management interface. | `--` |
+
+## Install
+
+You've got the code and you've set your configuration via environment variables. Now to install.
+
+```bash
+cd docker
+
+# Build container images
+docker-compose up -d --build
+
+# Install third-party dependencies
+docker-compose exec -T app-web ./bin/console composer install
+
+# Create database schema
+docker-compose exec -T app-web ./bin/console doctrine:migrations:migrate --no-interaction
+
+# Restart containers (will have failed due to lack of third-party dependencies and lack of database schema)
+docker-compose down && docker-compose up -d
+```
