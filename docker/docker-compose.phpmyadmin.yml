@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  phpmyadmin:
+    build: phpmyadmin
+    container_name: async-http-retriever-phpmyadmin
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD}
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    links:
+      - mysql:mysql
+    ports:
+      - ${ASYNC_HTTP_RETRIEVER_PHPMYADMIN_EXPOSED_PORT}:80
+    depends_on:
+      - mysql

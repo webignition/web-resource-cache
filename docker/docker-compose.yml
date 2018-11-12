@@ -12,20 +12,6 @@ services:
     volumes:
       - ${ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH}:/var/lib/mysql
 
-  phpmyadmin:
-    build: phpmyadmin
-    container_name: async-http-retriever-phpmyadmin
-    environment:
-      MYSQL_ROOT_PASSWORD: ${ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD}
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-    links:
-      - mysql:mysql
-    ports:
-      - 8080:80
-    depends_on:
-      - mysql
-
   rabbitmq:
     image: rabbitmq:3-management
     container_name: async-http-retriever-rabbitmq
