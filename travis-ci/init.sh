@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-cd ../docker
+cd docker
 
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml -f docker-compose.phpmyadmin.yml up -d --build
 
@@ -11,3 +11,5 @@ done
 
 docker-compose exec -T app-web composer install
 docker-compose exec -T app-web ./bin/console doctrine:migrations:migrate --no-interaction
+
+cd ..
