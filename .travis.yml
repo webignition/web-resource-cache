@@ -16,12 +16,16 @@ env:
     - ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS=*
     - ASYNC_HTTP_RETRIEVER_RETRIEVER_TIMEOUT_SECONDS=30
     - ASYNC_HTTP_RETRIEVER_MYSQL_ROOT_PASSWORD=root
+    - ASYNC_HTTP_RETRIEVER_MYSQL_EXPOSED_PORT=33066
+    - ASYNC_HTTP_RETRIEVER_PHPMYADMIN_EXPOSED_PORT=8080
     - ASYNC_HTTP_RETRIEVER_DATABASE_NAME=async_http_retriever
     - ASYNC_HTTP_RETRIEVER_DATABASE_USER=async_http_retriever_db_user
     - ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD=secret
     - ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH=./var/docker-mysql/async-http-retriever-db
     - ASYNC_HTTP_RETRIEVER_RABBITMQ_USER=rabbit
     - ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS=rabbit
+    - ASYNC_HTTP_RETRIEVER_RABBITMQ_MANAGEMENT_EXPOSED_PORT=15672
+    - ASYNC_HTTP_RETRIEVER_EXPOSED_PORT=8001
 
 cache:
   directories:
@@ -32,9 +36,10 @@ before_install:
   - mkdir -p var/log/nginx
   - mkdir -p var/log/supervisor
   - chmod -R 0777 var/log
+  - chmod +x ./travis-ci/init.sh
 
 install:
-  - cd docker && ./init.sh && cd ..
+  - ./travis-ci/init.sh
 
 script:
   - cd docker && docker-compose exec -T app-web env TERM=xterm script -q -c "composer ci" /dev/null
