@@ -42,6 +42,13 @@ class CallbackUrlValidatorTest extends \PHPUnit\Framework\TestCase
                 'url' => 'http://foo.example.com/',
                 'expectedIsValid' => false,
             ],
+            'direct allowed host, domain of allowed host does match' => [
+                'allowedHosts' => [
+                    'example.com',
+                ],
+                'url' => 'http://example.com/',
+                'expectedIsValid' => true,
+            ],
             'wildcard allowed host, domain of allowed host does match' => [
                 'allowedHosts' => [
                     '*.example.com',
