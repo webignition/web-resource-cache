@@ -79,6 +79,16 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
     /**
      * @throws InvalidResponseDataException
      */
+    public function testInvokeInvalidResponse()
+    {
+        $this->expectException(InvalidResponseDataException::class);
+
+        $this->handler->__invoke(new SendResponse([]));
+    }
+
+    /**
+     * @throws InvalidResponseDataException
+     */
     public function testInvokeNoCachedResource()
     {
         $successResponse = new SuccessResponse('invalid-request-hash');
