@@ -1,6 +1,6 @@
 # Asychronous HTTP Retriever
 
-Service for retrieving HTTP resources asychronously. Self-hosted within a lovely collection of [docker containers](https://en.wikipedia.org/wiki/Docker_(software)).
+Service for retrieving HTTP resources asynchronously. Self-hosted within a lovely collection of [docker containers](https://en.wikipedia.org/wiki/Docker_(software)).
 
 **Short description**:<br> 
 Send a `POST` request containing `url` and `callback` values.
@@ -8,7 +8,7 @@ Content for the given `url` will be retrieved *eventually* and `POSTed` back to 
 
 **Why?**<br>
 Pretty much every modern programming ecosystem provides a means for making HTTP requests and handling the resulting responses.
-You already get sychronous HTTP out the box, possibly asychronous HTTP as well.
+You already get synchronous HTTP out the box, possibly asychronous HTTP as well.
 
 Using whatever HTTP functionality your progamming ecosystem provides is fine most of the time.
 
