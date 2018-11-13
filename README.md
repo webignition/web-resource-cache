@@ -13,15 +13,17 @@ Content for the given `url` will be retrieved *eventually* and `POSTed` back to 
 **Why?**<br>
 Pretty much every modern programming ecosystem provides a means for making HTTP requests and handling the resulting responses.
 You already get synchronous HTTP out the box, possibly asynchronous HTTP as well.
-
 Using whatever HTTP functionality your programming ecosystem provides is fine most of the time.
 
-Want to retrieve the content of arbitrary urls often? No, you probably don't. But if you do, you quickly run into edge cases.
-Temporary [service unavailability](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503),
+Want to retrieve the content of arbitrary urls often? No, you probably don't. But if you do, you periodically run into
+failure cases.
+
+We don't like failure cases. Temporary [service unavailability](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503),
 intermittent [internal server errors](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500), 
 unpredictable [HTTP 429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) responses.
 
-To reliably retrieve an arbitrary HTTP resource, you need to able to retry after a given period. 
+To reliably retrieve an arbitrary HTTP resource, you need to able to retry after a given period for those odd cases
+where a request failed *right now* but which could (maybe would) succeed *a little later*. 
 You introduce state (remembering *what* to retrieve) and you need something to handle doing so *at the right time*
 (some form of delayable background job processing).
 
