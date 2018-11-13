@@ -32,11 +32,11 @@ Developed and tested against `docker` 18.06.1-ce and `docker-compose` 1.22.0.
 
 ## Installation
 
-Please read [the installation guide](/INSTALL.md).
+Please read [the installation guide](/docs/installation.md).
 
 ## Configuration
 
 There are some configuration values you must set before installing. There are some configuration values
 that can only be set before installing. 
 
-Please read [the configuration guide](/CONFIG.md).
+Please read [the configuration guide](/docs/configuration.md).

@@ -14,7 +14,7 @@ or defined in `docker/.env`. I'm assuming the use of a `.env` file to be consume
 There are some configuration values you must set before installing. There are some configuration values
 that can only be set before installing. 
 
-Please read [the configuration guide](/CONFIG.md).
+Please read [the configuration guide](/docs/configuration.md).
 
 ## Install
 
