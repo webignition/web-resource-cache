@@ -50,6 +50,19 @@ that can only be set before installing.
 
 Please read [the configuration guide](/docs/configuration.md).
 
+## Usage
+
+Make a `POST` request containing the `url` of the resource you wish to retrieve, any `headers` you wish to send with
+the retrieval request, and the `callback` URL you wish the resulting resource to be sent to.
+
+The [usage guide](/docs/usage.md) provides an overview for requesting a resource.
+
+The guide to [requesting a resource](/docs/requesting-a-resource.md) details what is expected of a resource request
+and explains how to understand the response you receive.
+
+The guide to [callback responses](/docs/callback-responses.md) details the success or failure response that will
+be POSTed to your given `callback` URL.
+
 ## Upgrading with zero downtime (preferred)
 
 Refer to the [multiple live instances](/docs/multiple-live-instances.md) guide for an example of how to
