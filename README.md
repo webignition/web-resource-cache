@@ -6,6 +6,11 @@ Service for retrieving HTTP resources asynchronously. Self-hosted within a lovel
 Send a `POST` request containing `url` and `callback` values.
 Content for the given `url` will be retrieved *eventually* and `POSTed` back to the specified `callback` url.
 
+Further reading:
+- [usage](/docs/usage.md)
+- [requesting a resource](/docs/requesting-a-resource.md)
+- understanding [callback responses](/docs/callback-responses.md)
+
 **Why?**<br>
 Pretty much every modern programming ecosystem provides a means for making HTTP requests and handling the resulting responses.
 You already get synchronous HTTP out the box, possibly asynchronous HTTP as well.
