@@ -21,6 +21,9 @@ To reliably retrieve an arbitrary HTTP resource, you need to able to retry after
 You introduce state (remembering *what* to retrieve) and you need something to handle doing so *at the right time*
 (some form of delayable background job processing).
 
+You could re-write the means for doing so for every application you create that needs to retrieve
+resources over HTTP. Or you could not. Up to you really.
+
 **Production readiness**<br>
 Not production ready
 
