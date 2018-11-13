@@ -32,7 +32,13 @@ Developed and tested against `docker` 18.06.1-ce and `docker-compose` 1.22.0.
 
 ## Installation
 
-Please read [the installation guide](/docs/installation.md).
+The [simple installation guide](/docs/simple-installation.md) provides an overview on how install and new instance.
+
+The [namespaced installation guide](/docs/namespaced-installation.md) provides instructions on how to create
+an isolated, namespaced installation that can be run alongside other live instances.
+
+Read the namespaced installation guide if you want, in the future, to be able to upgrade with zero downtime 
+(that's a good idea).
 
 ## Configuration
 
@@ -40,3 +46,16 @@ There are some configuration values you must set before installing. There are so
 that can only be set before installing. 
 
 Please read [the configuration guide](/docs/configuration.md).
+
+## Upgrading with zero downtime (preferred)
+
+Refer to the [multiple live instances](/docs/multiple-live-instances.md) guide for an example of how to
+use two instances to achieve an upgrade without any lack of availability for applications using the service.
+
+Short version: do not upgrade a live instance. Create a second new instance, configure applications to use the 
+second instance and remove the old instance.
+
+## Upgrading a running instance
+
+Do not do this. It is possible and will eventually work. Application errors are likely if database migrations
+are involved. Just don't.

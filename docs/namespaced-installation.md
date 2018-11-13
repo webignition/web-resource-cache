@@ -11,7 +11,7 @@ non-conflicting service ports)
 
 ## Installation and configuration
 
-Please refer to the [the installation guide](/docs/installation.md) and the [the configuration guide](/docs/configuration.md)
+Please refer to the [the installation guide](/docs/simple-installation.md) and the [the configuration guide](/docs/configuration.md)
 but don't follow them. You just need to be aware of how to install and configure.
 
 ## Creating an isolated, namespaced installation
