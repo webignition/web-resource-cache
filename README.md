@@ -8,9 +8,9 @@ Content for the given `url` will be retrieved *eventually* and `POSTed` back to 
 
 **Why?**<br>
 Pretty much every modern programming ecosystem provides a means for making HTTP requests and handling the resulting responses.
-You already get synchronous HTTP out the box, possibly asychronous HTTP as well.
+You already get synchronous HTTP out the box, possibly asynchronous HTTP as well.
 
-Using whatever HTTP functionality your progamming ecosystem provides is fine most of the time.
+Using whatever HTTP functionality your programming ecosystem provides is fine most of the time.
 
 Want to retrieve the content of arbitrary urls often? No, you probably don't. But if you do, you quickly run into edge cases.
 Temporary [service unavailability](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503),
