@@ -60,11 +60,11 @@ sed -i 's|MYSQL_DATA_PATH_ON_HOST|/var/docker-mysql/async-http-retriever-x|g' .e
 
 # INSTALL
 
-ID=x docker-compose -p instance-x up -d --build
-ID=x docker-compose -p instance-x exec -T app-web composer install
-ID=x docker-compose -p instance-x exec -T app-web ./bin/console doctrine:migrations:migrate --no-interaction
-ID=x docker-compose -p instance-x down
-ID=x docker-compose -p instance-x up -d
+ID=instance-x docker-compose -p instance-x up -d --build
+ID=instance-x docker-compose -p instance-x exec -T app-web composer install
+ID=instance-x docker-compose -p instance-x exec -T app-web ./bin/console doctrine:migrations:migrate --no-interaction
+ID=instance-x docker-compose -p instance-x down
+ID=instance-x docker-compose -p instance-x up -d
 ```
 
 ### Time passes
@@ -107,11 +107,11 @@ sed -i 's|8001|8002|g' .env
 
 # INSTALL
 
-ID=y docker-compose -p instance-y up -d --build
-ID=y docker-compose -p instance-y exec -T app-web composer install
-ID=y docker-compose -p instance-y exec -T app-web ./bin/console doctrine:migrations:migrate --no-interaction
-ID=y docker-compose -p instance-y down
-ID=y docker-compose -p instance-y up -d
+ID=instance-y docker-compose -p instance-y up -d --build
+ID=instance-y docker-compose -p instance-y exec -T app-web composer install
+ID=instance-y docker-compose -p instance-y exec -T app-web ./bin/console doctrine:migrations:migrate --no-interaction
+ID=instance-y docker-compose -p instance-y down
+ID=instance-y docker-compose -p instance-y up -d
 ```
 
 ### Configure applications to use instance-y
@@ -129,7 +129,7 @@ no applications are using instance-x.
 cd /var/www/async-http-retriever-y/docker
 
 # Stop and remove containers
-ID=x docker-compose -p instance-x down
+ID=instance-x docker-compose -p instance-x down
 
 # Remove MySQL data files
 rm -rf /var/docker-mysql/async-http-retriever-x 
