@@ -24,7 +24,6 @@ Have a look at the :doc:`getting started guide </getting-started>` for details o
 and :ref:`install an instance <getting-started-installation>`.
 
 .. toctree::
-   :maxdepth: 2
    :hidden:
    :caption: First Steps
 
@@ -32,7 +31,7 @@ and :ref:`install an instance <getting-started-installation>`.
    getting-started
 
 .. toctree::
-    :caption: Reference
+    :caption: Requests And Callbacks
     :maxdepth: 3
 
     request-response-cycle
