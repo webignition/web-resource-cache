@@ -32,7 +32,7 @@ that can only be set before installing.
 
 .. code-block:: bash
 
-    cd <directory into which you cloned the repository>
+    cd /var/www/async-http-retriever/instance-x
     cp docker/.env.dist docker/.env
 
 Edit your ``docker/.env`` file as needed. Refer to the :doc:`configuration guide </configuration>`
@@ -58,7 +58,12 @@ Simple Installation
 
 .. code-block:: sh
 
-    cd <directory into which you cloned the repository>
+    # Create a directory for the application and get the code
+    mkdir -p /var/www/async-http-retriever/instance-x
+    cd /var/www/async-http-retriever/instance-x
+    git clone git@github.com:webignition/async-http-retriever.git .
+
+    # Change to the docker directory as that is where all the fun happens
     cd docker
 
     # Build container images
@@ -107,12 +112,9 @@ An isolated instance has a name. This can be whatever is meaningful to you. For 
     # GET CODE
     ##########
 
-    # Start at the current user's home directory (just a starting point for this example)
-    cd ~
-
-    # Create a directory for the instance, change to that directory and retrieve the code
-    mkdir -p /var/www/async-http-retriever-x
-    cd /var/www/async-http-retriever-x
+    # Create a directory for the application and get the code
+    mkdir -p /var/www/async-http-retriever/instance-x
+    cd /var/www/async-http-retriever/instance-x
     git clone git@github.com:webignition/async-http-retriever.git .
 
     # Create a directory for the MySQL data files for this instance
