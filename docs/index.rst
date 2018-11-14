@@ -15,5 +15,6 @@ User Guide
 .. toctree::
     :maxdepth: 2
 
+    simple-installation
     configuration
     multiple-live-instances
