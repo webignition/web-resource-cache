@@ -6,7 +6,8 @@ Asynchronous HTTP Retriever Documentation
 
 .. include:: includes/overview/introduction.rst
 .. include:: includes/overview/short-description.rst
-.. include:: includes/ascii-diagram.rst
+
+Everything becomes clear if you read the :doc:`overview </overview>`. There is even a handy diagram.
 
 ------------
 Requirements
@@ -14,12 +15,26 @@ Requirements
 
 .. include:: includes/requirements.rst
 
+-----------
+First Steps
+-----------
+
+Have a look at the :doc:`getting started guide </getting-started>` for details on how to
+:ref:`get the code <getting-started-getting-the-code>`, :ref:`create your configuration <getting-started-creating-your-configuration>`
+and :ref:`install an instance <getting-started-installation>`.
+
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: First Steps
+
+   overview
+   getting-started
+
 .. toctree::
     :caption: Table of Contents
     :maxdepth: 2
 
-    overview
-    getting-started
     simple-installation
     namespaced-installation
     configuration

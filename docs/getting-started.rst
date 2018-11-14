@@ -8,6 +8,8 @@ Requirements
 
 .. include:: includes/requirements.rst
 
+.. _getting-started-getting-the-code:
+
 ----------------
 Getting the Code
 ----------------
@@ -15,6 +17,8 @@ Getting the Code
 .. code-block:: bash
 
     git clone git@github.com:webignition/async-http-retriever.git
+
+.. _getting-started-creating-your-configuration:
 
 ---------------------------
 Creating Your Configuration
@@ -33,18 +37,20 @@ that can only be set before installing.
 
 Edit your ``docker/.env`` file as needed. Refer to the :doc:`configuration guide </configuration>`
 
+.. _getting-started-installation:
+
 ------------
 Installation
 ------------
 
 You've got the code and you've set your configuration via environment variables. Now to install.
 
-The following :ref:`simple installation guide <simple-installation>` briefly covers how to install an instance.
+The following :ref:`simple installation guide <getting-started-simple-installation>` briefly covers how to install an instance.
 
 If you ever want to perform zero-downtime upgrades (yes, yes, do you) or if you ever want to run multiple instances
-on the same host, you want to create an :ref:`isolated installation <isolated-installation>`.
+on the same host, you want to create an :ref:`isolated installation <getting-started-isolated-installation>`.
 
-.. _simple-installation:
+.. _getting-started-simple-installation:
 
 ~~~~~~~~~~~~~~~~~~~
 Simple Installation
@@ -68,7 +74,7 @@ Simple Installation
     # (will have failed due to lack of third-party dependencies and lack of database schema)
     docker-compose down && docker-compose up -d
 
-.. _isolated-installation:
+.. _getting-started-isolated-installation:
 
 ~~~~~~~~~~~~~~~~~~~~~
 Isolated Installation
