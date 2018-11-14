@@ -16,3 +16,4 @@ User Guide
     :maxdepth: 2
 
     configuration
+    multiple-live-instances
