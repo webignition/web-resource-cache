@@ -40,4 +40,3 @@ and :ref:`install an instance <getting-started-installation>`.
     namespaced-installation
     configuration
     multiple-live-instances
-    usage
