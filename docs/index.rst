@@ -5,6 +5,7 @@ Asynchronous HTTP Retriever Documentation
 =========================================
 
 .. include:: includes/overview/introduction.rst
+.. include:: includes/overview/short-description.rst
 
 User Guide
 ==========
@@ -13,6 +14,7 @@ User Guide
     :maxdepth: 2
 
     overview
+    getting-started
     simple-installation
     namespaced-installation
     configuration
