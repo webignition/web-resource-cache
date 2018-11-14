@@ -78,4 +78,4 @@ Unknown Failure Example
       "failure_type": "unknown"
     }
 
-.. _request identifier: /
+.. _request identifier: /requesting-a-resource.html#understanding-the-response

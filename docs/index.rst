@@ -20,3 +20,4 @@ User Guide
     configuration
     multiple-live-instances
     callback-responses
+    requesting-a-resource
