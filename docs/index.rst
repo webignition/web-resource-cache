@@ -21,3 +21,4 @@ User Guide
     multiple-live-instances
     callback-responses
     requesting-a-resource
+    usage
