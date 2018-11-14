@@ -5,9 +5,11 @@ Configuration
 Configuration is provided through a collection of environment variables. These can be set on the host itself
 or defined in `docker/.env`. I'm assuming the use of a `.env` file to be consumed by `docker-compose`.
 
-## Creating your configuration file
+--------------------------------
+Creating your configuration file
+--------------------------------
 
-Copy the relevant `.env.dist` to `.env`.
+Copy the relevant ``.env.dist`` to ``.env``.
 
 .. code-block:: sh
 
