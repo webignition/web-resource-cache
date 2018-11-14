@@ -6,6 +6,7 @@ Asynchronous HTTP Retriever Documentation
 
 .. include:: includes/overview/introduction.rst
 .. include:: includes/overview/short-description.rst
+.. include:: includes/ascii-diagram.rst
 
 User Guide
 ==========

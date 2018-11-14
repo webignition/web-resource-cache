@@ -8,6 +8,7 @@ Overview
 Short Description
 -----------------
 .. include:: includes/overview/short-description.rst
+.. include:: includes/ascii-diagram.rst
 
 ----
 Why?
