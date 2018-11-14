@@ -21,3 +21,4 @@ build
 /phpcs.xml
 ###< squizlabs/php_codesniffer ###
 /docker/.env
+/docs/_build/
