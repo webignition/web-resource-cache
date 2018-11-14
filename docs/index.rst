@@ -38,7 +38,6 @@ and :ref:`install an instance <getting-started-installation>`.
     request-response-cycle
     requesting-a-resource
     callback-responses
-    simple-installation
     namespaced-installation
     configuration
     multiple-live-instances
