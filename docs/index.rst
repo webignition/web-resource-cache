@@ -8,3 +8,11 @@ Service for retrieving HTTP resources asynchronously. Self-hosted within a lovel
 `docker containers`_.
 
 .. _docker containers: https://en.wikipedia.org/wiki/Docker_(software)
+
+User Guide
+==========
+
+.. toctree::
+    :maxdepth: 2
+
+    configuration
