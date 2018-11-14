@@ -3,7 +3,7 @@ Configuration
 =============
 
 Configuration is provided through a collection of environment variables. These can be set on the host itself
-or defined in `docker/.env`. I'm assuming the use of a `.env` file to be consumed by `docker-compose`.
+or defined in ``docker/.env``.
 
 --------------------------------
 Creating your configuration file

@@ -8,10 +8,14 @@ Asynchronous HTTP Retriever Documentation
 .. include:: includes/overview/short-description.rst
 .. include:: includes/ascii-diagram.rst
 
-User Guide
-==========
+------------
+Requirements
+------------
+
+.. include:: includes/requirements.rst
 
 .. toctree::
+    :caption: Table of Contents
     :maxdepth: 2
 
     overview
