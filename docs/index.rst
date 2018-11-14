@@ -16,5 +16,6 @@ User Guide
     :maxdepth: 2
 
     simple-installation
+    namespaced-installation
     configuration
     multiple-live-instances
