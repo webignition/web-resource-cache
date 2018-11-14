@@ -1,4 +1,4 @@
-# Asychronous HTTP Retriever
+# Asynchronous HTTP Retriever
 
 Service for retrieving HTTP resources asynchronously. Self-hosted within a lovely collection of [docker containers](https://en.wikipedia.org/wiki/Docker_(software)).
 
