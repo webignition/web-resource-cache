@@ -19,3 +19,4 @@ User Guide
     namespaced-installation
     configuration
     multiple-live-instances
+    callback-responses
