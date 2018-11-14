@@ -33,12 +33,13 @@ and :ref:`install an instance <getting-started-installation>`.
 
 .. toctree::
     :caption: Reference
-    :maxdepth: 2
+    :maxdepth: 3
 
+    request-response-cycle
+    requesting-a-resource
+    callback-responses
     simple-installation
     namespaced-installation
     configuration
     multiple-live-instances
-    callback-responses
-    requesting-a-resource
     usage

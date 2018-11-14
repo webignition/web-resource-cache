@@ -52,6 +52,8 @@ Curl Example With Headers
 Understanding The Response
 --------------------------
 
+.. _requesting-a-resource-success-request:
+
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Successful Request (200)
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -73,15 +75,6 @@ Your request will receive a ``HTTP 400`` response if:
 - ``url`` is empty
 - ``callback`` is empty
 - ``callback`` is not valid (which depends on your configuration for allowed callback host names)
-
----------
-Callbacks
----------
-
-A request to retrieve a resource will be followed up (*eventually*) by a ``POST`` request to the given
-``callback`` URL.
-
-The body of the request is a `application/json`-encoded `response object`_.
 
 .. _User-Agent: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent
 .. _Authorization: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization

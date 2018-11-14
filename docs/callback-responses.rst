@@ -7,9 +7,9 @@ A request to retrieve a resource will be followed up (*eventually*) by a ``POST`
 
 The body of the request is a json-encoded response object.
 
-==========================
+--------------------------
 Response Object Properties
-==========================
+--------------------------
 
 ================  ======================================================  =======
  Name             Description                                             Example
@@ -23,9 +23,9 @@ Response Object Properties
 ``content``       | Response body if ``status=success``                   ``<doctype html> … </html>``
 ================  ======================================================  =======
 
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 Success Response Example
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: json
 
@@ -40,9 +40,9 @@ Success Response Example
       "content": "<doctype html><html><body></body></html>"
     }
 
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 HTTP Failure Example (404 Not Found)
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: json
 
@@ -53,9 +53,9 @@ HTTP Failure Example (404 Not Found)
       "status_code": 404
     }
 
-------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Curl Failure Example (Operation Timed Out)
-------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: json
 
@@ -66,9 +66,9 @@ Curl Failure Example (Operation Timed Out)
       "status_code": 28
     }
 
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 Unknown Failure Example
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: json
 
