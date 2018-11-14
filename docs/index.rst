@@ -32,7 +32,7 @@ and :ref:`install an instance <getting-started-installation>`.
    getting-started
 
 .. toctree::
-    :caption: Table of Contents
+    :caption: Reference
     :maxdepth: 2
 
     simple-installation
