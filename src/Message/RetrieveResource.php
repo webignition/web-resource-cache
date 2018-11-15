@@ -4,7 +4,7 @@ namespace App\Message;
 
 use webignition\HttpHeaders\Headers;
 
-class RetrieveResource
+class RetrieveResource implements \JsonSerializable
 {
     /**
      * @var string
@@ -59,5 +59,15 @@ class RetrieveResource
     public function getRetryCount(): int
     {
         return $this->retryCount;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'requestHash' => $this->requestHash,
+            'url' => $this->url,
+            'headers' => $this->headers,
+            'retryCount' => $this->retryCount,
+        ];
     }
 }
