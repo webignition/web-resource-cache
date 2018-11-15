@@ -86,6 +86,9 @@
     "mockery/mockery": {
         "version": "1.2.0"
     },
+    "monolog/monolog": {
+        "version": "1.24.0"
+    },
     "myclabs/deep-copy": {
         "version": "1.8.1"
     },
@@ -273,6 +276,18 @@
             "branch": "master",
             "version": "4.1",
             "ref": "f11dfa18618a8a5dd853ea3a302db2e0557e031c"
+        }
+    },
+    "symfony/monolog-bridge": {
+        "version": "v4.1.7"
+    },
+    "symfony/monolog-bundle": {
+        "version": "3.1",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "master",
+            "version": "3.1",
+            "ref": "18ebf5a940573a20de06f9c4060101eeb438cf3d"
         }
     },
     "symfony/orm-pack": {
