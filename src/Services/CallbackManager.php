@@ -56,4 +56,10 @@ class CallbackManager
         $this->entityManager->persist($callback);
         $this->entityManager->flush();
     }
+
+    public function remove(CallbackEntity $callback)
+    {
+        $this->entityManager->remove($callback);
+        $this->entityManager->flush();
+    }
 }

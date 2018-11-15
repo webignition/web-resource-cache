@@ -74,7 +74,11 @@ class SendResponseHandler implements MessageHandlerInterface
 
         $callbacks = $this->callbackManager->findByRequestHash($requestHash);
         foreach ($callbacks as $callback) {
-            $this->responseSender->send($callback->getUrl(), $response);
+            $callbackSent = $this->responseSender->send($callback->getUrl(), $response);
+
+            if ($callbackSent) {
+                $this->callbackManager->remove($callback);
+            }
         }
     }
 }
