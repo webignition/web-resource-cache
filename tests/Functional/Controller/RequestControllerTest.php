@@ -14,7 +14,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\RouterInterface;
 use webignition\HttpHeaders\Headers;
@@ -45,9 +44,10 @@ class RequestControllerTest extends AbstractFunctionalTestCase
 
     public function testGetRequest()
     {
-        $this->expectException(MethodNotAllowedHttpException::class);
-
         $this->client->request('GET', $this->routeUrl);
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_METHOD_NOT_ALLOWED, $response->getStatusCode());
     }
 
     public function testPostRequest()
