@@ -64,17 +64,17 @@ Run the full test suite in the same manner as the travis-ci build.
 To execute an individual test or set of tests from your host:
 
 ```bash
-    cd docker
-    docker-compose exec -T app-web \
-    ./vendor/bin/phpunit tests/<path to test class>
+cd docker
+docker-compose exec -T --env APP_ENV=test app-web \
+./vendor/bin/phpunit tests/<path to test class>
 ```
 
 To execute an individual test or set of tests from within your container:
 
 ```bash
-    cd docker
-    docker-compose exec app-web /bin/bash
-    ./vendor/bin/phpunit tests/<path to test class>
+cd docker
+docker-compose exec app-web /bin/bash
+APP_ENV=test ./vendor/bin/phpunit tests/<path to test class>
 ```
 
 Ensure your development environment database is empty before running functional tests.
