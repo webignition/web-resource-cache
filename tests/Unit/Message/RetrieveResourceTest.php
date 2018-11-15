@@ -42,4 +42,74 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider jsonSerializeDataProvider
+     *
+     * @param RetrieveResource $retrieveResourceMessage
+     * @param array $expectedArray
+     */
+    public function testJsonSerialize(RetrieveResource $retrieveResourceMessage, array $expectedArray)
+    {
+        $this->assertEquals($expectedArray, $retrieveResourceMessage->jsonSerialize());
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerializeDataProvider(): array
+    {
+        return [
+            'no headers, default retry count' => [
+                'retrieveResourceMessage' => new RetrieveResource(
+                    'request-hash-1',
+                    'http://example.com/1/'
+                ),
+                'expectedArray' => [
+                    'requestHash' => 'request-hash-1',
+                    'url' => 'http://example.com/1/',
+                    'headers' => [],
+                    'retryCount' => 0,
+                ],
+            ],
+            'no headers, non-default retry count' => [
+                'retrieveResourceMessage' => new RetrieveResource(
+                    'request-hash-1',
+                    'http://example.com/1/',
+                    new Headers(),
+                    2
+                ),
+                'expectedArray' => [
+                    'requestHash' => 'request-hash-1',
+                    'url' => 'http://example.com/1/',
+                    'headers' => [],
+                    'retryCount' => 2,
+                ],
+            ],
+            'has headers, default retry count' => [
+                'retrieveResourceMessage' => new RetrieveResource(
+                    'request-hash-1',
+                    'http://example.com/1/',
+                    new Headers([
+                        'foo' => 'bar',
+                        'fizz' => 'buzz',
+                    ]),
+                    0
+                ),
+                'expectedArray' => [
+                    'requestHash' => 'request-hash-1',
+                    'url' => 'http://example.com/1/',
+                    'headers' => [
+                        'foo' => [
+                            'bar',
+                        ],
+                        'fizz' => [
+                            'buzz',
+                        ],
+                    ],
+                    'retryCount' => 0,
+                ],
+            ],
+        ];
+    }
 }
