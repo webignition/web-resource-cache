@@ -32,7 +32,6 @@ cache:
   - $HOME/.composer/cache/files
 
 before_install:
-  - curl -L "https://github.com/docker/compose/releases/download/1.22.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
   - mkdir -p $ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH
   - mkdir -p var/log/nginx
   - mkdir -p var/log/supervisor
