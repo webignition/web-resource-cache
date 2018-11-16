@@ -96,3 +96,6 @@ This must be set before installing if you want to set it.
 
 | ``ASYNC_HTTP_RETRIEVER_RABBITMQ_MANAGEMENT_EXPOSED_PORT``
 | Exposed port of the rabbit-mq management interface.
+
+| ``ASYNC_HTTP_RETRIEVER_HTTPBIN_EXPOSED_PORT``
+| Port to expose for httpbin when using the dev configuration. Defaults to 7000.
