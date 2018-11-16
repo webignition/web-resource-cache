@@ -21,29 +21,3 @@ services:
     arguments:
       $middlewareCollection: '@App\Services\Http\SenderMiddlewareCollection'
       $handler: '@App\Tests\Services\HttpMockHandler'
-
-  App\Services\RetryDecider:
-    arguments:
-    - '%retryable_statuses%'
-
-  async_http_retriever.http.client.retriever:
-    public: true
-    class: GuzzleHttp\Client
-    factory: 'App\Services\Http\ClientFactory:create'
-    arguments:
-      $curlOptions: '%curl_options%'
-      $handlerStack: '@async_http_retriever.http.handler_stack.retriever'
-      $config:
-        cookies: '@GuzzleHttp\Cookie\CookieJarInterface'
-
-  async_http_retriever.http.client.sender:
-    public: true
-    class: GuzzleHttp\Client
-    factory: 'App\Services\Http\ClientFactory:create'
-    arguments:
-      $curlOptions: '%curl_options%'
-      $handlerStack: '@async_http_retriever.http.handler_stack.sender'
-
-  App\Services\ResponseSender:
-    arguments:
-      $httpClient: '@async_http_retriever.http.client.sender'
