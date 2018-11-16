@@ -70,6 +70,9 @@ Configuration You Can Optionally Set
 
 Set these if you like, things will work just fine if you don't.
 
+| ``ASYNC_HTTP_RETRIEVER_CONSUMER_COUNT``
+| Number of parallel message consumers. Defaults to 1. Ideally set higher.
+
 | ``ASYNC_HTTP_RETRIEVER_APP_SECRET``
 | Private token used within the application. Set to whatever you like.
 
