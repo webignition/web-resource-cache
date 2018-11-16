@@ -76,6 +76,7 @@ services:
             $handlerStack: '@async_http_retriever.http.handler_stack.retriever'
             $config:
                 cookies: '@GuzzleHttp\Cookie\CookieJarInterface'
+                timeout: '%env(RETRIEVER_TIMEOUT_SECONDS)%'
 
     async_http_retriever.http.client.sender:
         class: GuzzleHttp\Client
