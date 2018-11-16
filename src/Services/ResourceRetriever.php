@@ -19,15 +19,9 @@ class ResourceRetriever
      */
     private $httpClient;
 
-    /**
-     * @var int
-     */
-    private $requestTimeout;
-
-    public function __construct(HttpClient $httpClient, int $requestTimeout)
+    public function __construct(HttpClient $httpClient)
     {
         $this->httpClient = $httpClient;
-        $this->requestTimeout = $requestTimeout;
     }
 
     /**
@@ -49,7 +43,6 @@ class ResourceRetriever
 
         try {
             $response = $this->httpClient->send($request, [
-                'timeout' => $this->requestTimeout,
                 'on_stats' => function (TransferStats $stats) use (&$requestUri) {
                     if ($stats->hasResponse()) {
                         $requestUri = $stats->getEffectiveUri();
