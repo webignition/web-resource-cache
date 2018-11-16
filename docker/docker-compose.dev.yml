@@ -4,3 +4,9 @@ services:
   mysql:
     ports:
       - ${ASYNC_HTTP_RETRIEVER_MYSQL_EXPOSED_PORT}:3306
+
+  httpbin:
+    image: kennethreitz/httpbin
+    container_name: httpbin
+    ports:
+    - ${ASYNC_HTTP_RETRIEVER_HTTPBIN_EXPOSED_PORT}:80
