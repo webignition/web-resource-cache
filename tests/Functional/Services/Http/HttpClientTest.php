@@ -35,9 +35,9 @@ class HttpClientTest extends AbstractFunctionalTestCase
      *
      * @param string $serviceId
      * @param string $expectedSenderServiceId
-     * @param bool $expectedHasCookieJar
+     * @param array $expectedConfig
      */
-    public function testConfig(string $serviceId, string $expectedSenderServiceId, bool $expectedHasCookieJar)
+    public function testConfig(string $serviceId, string $expectedSenderServiceId, array $expectedConfig)
     {
         /* @var HttpClient $httpClient */
         $httpClient = self::$container->get($serviceId);
@@ -60,12 +60,16 @@ class HttpClientTest extends AbstractFunctionalTestCase
             $httpClientConfig['handler']
         );
 
-        $configCookies = $httpClientConfig['cookies'];
+        foreach ($expectedConfig as $key => $value) {
+            $this->assertArrayHasKey($key, $httpClientConfig);
 
-        if ($expectedHasCookieJar) {
-            $this->assertEquals(self::$container->get(CookieJarInterface::class), $configCookies);
-        } else {
-            $this->assertFalse($configCookies);
+            if (is_string($value) && preg_match('/^service:/', $value)) {
+                $expectedServiceId = str_replace('service:', '', $value);
+
+                $value = self::$container->get($expectedServiceId);
+            }
+
+            $this->assertEquals($value, $httpClientConfig[$key]);
         }
     }
 
@@ -75,12 +79,17 @@ class HttpClientTest extends AbstractFunctionalTestCase
             'sender' => [
                 'serviceId' => 'async_http_retriever.http.client.sender',
                 'expectedSenderServiceId' => 'async_http_retriever.http.handler_stack.sender',
-                'expectedHasCookieJar' => false,
+                'expectedConfig' => [
+                    'cookies' => false,
+                ],
             ],
             'retriever' => [
                 'serviceId' => 'async_http_retriever.http.client.retriever',
                 'expectedSenderServiceId' => 'async_http_retriever.http.handler_stack.retriever',
-                'expectedHasCookieJar' => true,
+                'expectedConfig' => [
+                    'cookies' => 'service:' . CookieJarInterface::class,
+                    'timeout' => 30,
+                ],
             ],
         ];
     }
