@@ -133,9 +133,9 @@ class CallbackResponseLoggerTest extends AbstractFunctionalTestCase
                 'requestId' => 'request_hash_5',
                 'response' => $this->createHttpResponse('application/json', json_encode([
                     'url' => 'http://httpbin/post',
-                    'data' => [
+                    'data' => json_encode([
                         'foo' => 'bar',
-                    ]
+                    ]),
                 ])),
                 'expectedLogFile' => self::LOG_PATH . '/request_hash_5.json',
                 'expectedLogContent' => json_encode([

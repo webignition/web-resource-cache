@@ -53,7 +53,7 @@ class CallbackResponseLogger
             $isHttpBinResponse = $dataUrl && substr_count($dataUrl, '//httpbin');
 
             $logData = $isHttpBinResponse
-                ? json_encode($data['data'])
+                ? $data['data']
                 : json_encode($data);
         }
 
