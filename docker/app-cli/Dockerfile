@@ -28,6 +28,7 @@ COPY supervisor/supervisord.conf /etc/supervisor/supervisord.conf
 COPY supervisor/conf.d/app.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN mkdir -p var/log/supervisor
+RUN mkdir -p var/log/callback-responses
 
 WORKDIR /app
 
