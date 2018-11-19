@@ -79,9 +79,19 @@ class RequestController
         $requestIdentifier = new RequestIdentifier($url, $headers);
         $requestHash = $requestIdentifier->getHash();
 
+        $logCallbackResponse = $requestData->has('log-callback-response')
+            ? $requestData->getBoolean('log-callback-response')
+            : false;
+
         $callback = $this->callbackManager->findByRequestHashAndUrl($requestHash, $callbackUrl);
-        if (!$callback) {
-            $callback = $this->callbackFactory->create($requestHash, $callbackUrl);
+
+        if ($callback) {
+            if ($callback->getLogResponse() !== $logCallbackResponse) {
+                $callback->setLogResponse($logCallbackResponse);
+                $this->callbackManager->persist($callback);
+            }
+        } else {
+            $callback = $this->callbackFactory->create($requestHash, $callbackUrl, $logCallbackResponse);
             $this->callbackManager->persist($callback);
         }
 
