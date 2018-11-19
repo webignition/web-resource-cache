@@ -49,7 +49,12 @@ class CallbackManagerTest extends AbstractFunctionalTestCase
         ];
 
         foreach ($existingCallbacks as $existingCallback) {
-            $callback = $this->callbackFactory->create($existingCallback['requestHash'], $existingCallback['url']);
+            $callback = $this->callbackFactory->create(
+                $existingCallback['requestHash'],
+                $existingCallback['url'],
+                false
+            );
+
             $this->callbackManager->persist($callback);
         }
     }

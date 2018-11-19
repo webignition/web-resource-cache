@@ -19,17 +19,39 @@ class CallbackFactoryTest extends \PHPUnit\Framework\TestCase
         $this->callbackFactory = new CallbackFactory();
     }
 
-    public function testCreate()
+    /**
+     * @dataProvider createDataProvider
+     *
+     * @param string $requestHash
+     * @param string $url
+     * @param bool $logResponse
+     */
+    public function testCreate(string $requestHash, string $url, bool $logResponse)
     {
-        $requestHash = 'request_hash';
-        $url = 'http://example.com/';
-
-        $callback = $this->callbackFactory->create($requestHash, $url);
+        $callback = $this->callbackFactory->create($requestHash, $url, $logResponse);
 
         $this->assertInstanceOf(Callback::class, $callback);
         $this->assertNull($callback->getId());
+
         $this->assertEquals($requestHash, $callback->getRequestHash());
         $this->assertEquals($url, $callback->getUrl());
         $this->assertEquals(0, $callback->getRetryCount());
+        $this->assertFalse($logResponse, $callback->getLogResponse());
+    }
+
+    public function createDataProvider(): array
+    {
+        return [
+            'logResponse: false' => [
+                'requestHash' => 'request_hash_1',
+                'url' => 'http://example.com/1/',
+                'logResponse' => false,
+            ],
+            'logResponse: true' => [
+                'requestHash' => 'request_hash_1',
+                'url' => 'http://example.com/1/',
+                'logResponse' => false,
+            ],
+        ];
     }
 }
