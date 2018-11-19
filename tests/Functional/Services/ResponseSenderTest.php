@@ -3,18 +3,22 @@
 namespace App\Tests\Functional\Services;
 
 use App\Entity\CachedResource;
+use App\Entity\Callback;
 use App\Model\Response\KnownFailureResponse;
 use App\Model\Response\DecoratedSuccessResponse;
 use App\Model\Response\ResponseInterface;
 use App\Model\Response\SuccessResponse;
 use App\Model\Response\UnknownFailureResponse;
+use App\Services\CallbackResponseLogger;
 use App\Services\ResponseSender;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\Asserter\HttpRequestAsserter;
 use App\Tests\Services\HttpMockHandler;
+use Grpc\Call;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\RequestInterface;
+use Psr\Log\LoggerInterface;
 use webignition\HttpHeaders\Headers;
 use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
@@ -48,18 +52,47 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
      * @dataProvider sendFailureDataProvider
      *
      * @param array $httpFixtures
+     * @param string $requestHash
+     * @param array $expectedLogContext
      */
-    public function testSendFailure(array $httpFixtures)
+    public function testSendFailure(array $httpFixtures, string $requestHash, array $expectedLogContext)
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
+        $logger = \Mockery::mock(LoggerInterface::class);
+        $logger
+            ->shouldReceive('error')
+            ->withArgs(function (string $message, array $context) use ($requestHash, $expectedLogContext) {
+                $this->assertEquals('Callback failed', $message);
+
+                $this->assertEquals($expectedLogContext, $context);
+
+                return true;
+            });
+
         $url = 'http://example.com/';
+        $callback = new Callback();
+        $callback->setUrl($url);
+        $callback->setRequestHash($requestHash);
+
         $response = \Mockery::mock(ResponseInterface::class);
+
+        $response
+            ->shouldReceive('getRequestId')
+            ->andReturn($requestHash);
+
         $response
             ->shouldReceive('jsonSerialize')
             ->andReturn('');
 
-        $this->assertFalse($this->responseSender->send($url, $response));
+        $this->setObjectPrivateProperty(
+            $this->responseSender,
+            ResponseSender::class,
+            'logger',
+            $logger
+        );
+
+        $this->assertFalse($this->responseSender->send($callback, $response));
     }
 
     public function sendFailureDataProvider(): array
@@ -72,10 +105,22 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                         \Mockery::mock(RequestInterface::class)
                     ),
                 ],
+                'requestHash' => 'request_hash_1',
+                'expectedLogContext' => [
+                    'requestId' => 'request_hash_1',
+                    'code' => 0,
+                    'message' => 'cURL error 28: foo',
+                ],
             ],
             'HTTP 404' => [
                 'httpFixtures' => [
                     new Response(404),
+                ],
+                'requestHash' => 'request_hash_2',
+                'expectedLogContext' => [
+                    'requestId' => 'request_hash_2',
+                    'code' => 404,
+                    'message' => 'Client error: `POST http://example.com/` resulted in a `404 Not Found` response',
                 ],
             ],
         ];
@@ -87,7 +132,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
      * @param ResponseInterface $response
      * @param array $expectedRequestData
      */
-    public function testSendSuccess(ResponseInterface $response, array $expectedRequestData)
+    public function testSendSuccessNoLogResponse(ResponseInterface $response, array $expectedRequestData)
     {
         $this->httpMockHandler->appendFixtures([
             new Response(),
@@ -95,7 +140,11 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
 
         $url = 'http://example.com/';
 
-        $this->assertTrue($this->responseSender->send($url, $response));
+        $callback = new Callback();
+        $callback->setRequestHash('request_hash');
+        $callback->setUrl($url);
+
+        $this->assertTrue($this->responseSender->send($callback, $response));
         $this->assertEquals($url, $this->httpHistoryContainer->getLastRequestUrl());
 
         $lastRequest = $this->httpHistoryContainer->getLastRequest();
@@ -216,6 +265,38 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
         ];
     }
 
+    public function testSendSuccessLogResponse()
+    {
+        $callbackHttpResponse = new Response();
+
+        $this->httpMockHandler->appendFixtures([
+            $callbackHttpResponse,
+        ]);
+
+        $url = 'http://example.com/';
+        $requestHash = 'request_hash';
+
+        $callback = new Callback();
+        $callback->setRequestHash($requestHash);
+        $callback->setUrl($url);
+        $callback->setLogResponse(true);
+
+        $callbackResponseLogger = \Mockery::mock(CallbackResponseLogger::class);
+        $callbackResponseLogger
+            ->shouldReceive('log')
+            ->with($requestHash, $callbackHttpResponse);
+
+        $responseSender = new ResponseSender(
+            self::$container->get('async_http_retriever.http.client.sender'),
+            self::$container->get(LoggerInterface::class),
+            $callbackResponseLogger
+        );
+
+        $responseSenderReturnValue = $responseSender->send($callback, new UnknownFailureResponse($requestHash));
+
+        $this->assertTrue($responseSenderReturnValue);
+    }
+
     private function createCachedResource(array $headers, string $content): CachedResource
     {
         $cachedResource = new CachedResource();
@@ -223,5 +304,20 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
         $cachedResource->setBody($content);
 
         return $cachedResource;
+    }
+
+    private function setObjectPrivateProperty(
+        $object,
+        $objectClass,
+        $propertyName,
+        $propertyValue
+    ) {
+        try {
+            $reflector = new \ReflectionClass($objectClass);
+            $property = $reflector->getProperty($propertyName);
+            $property->setAccessible(true);
+            $property->setValue($object, $propertyValue);
+        } catch (\ReflectionException $exception) {
+        }
     }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Entity\Callback;
 use App\Model\Response\ResponseInterface;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
+use Psr\Log\LoggerInterface;
 
 class ResponseSender
 {
@@ -14,22 +16,49 @@ class ResponseSender
      */
     private $httpClient;
 
-    public function __construct(HttpClient $httpClient)
-    {
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var CallbackResponseLogger
+     */
+    private $callbackResponseLogger;
+
+    public function __construct(
+        HttpClient $httpClient,
+        LoggerInterface $logger,
+        CallbackResponseLogger $callbackResponseLogger
+    ) {
         $this->httpClient = $httpClient;
+        $this->logger = $logger;
+        $this->callbackResponseLogger = $callbackResponseLogger;
     }
 
-    public function send(string $url, ResponseInterface $response)
+    public function send(Callback $callback, ResponseInterface $response)
     {
+        $httpResponse = null;
+
         try {
-            $this->httpClient->send(new Request(
+            $httpResponse = $this->httpClient->send(new Request(
                 'POST',
-                $url,
+                $callback->getUrl(),
                 ['content-type' => 'application/json'],
                 json_encode($response)
             ));
-        } catch (GuzzleException $e) {
+        } catch (GuzzleException $guzzleException) {
+            $this->logger->error('Callback failed', [
+                'requestId' => $response->getRequestId(),
+                'code' => $guzzleException->getCode(),
+                'message' => $guzzleException->getMessage(),
+            ]);
+
             return false;
+        }
+
+        if ($callback->getLogResponse()) {
+            $this->callbackResponseLogger->log($response->getRequestId(), $httpResponse);
         }
 
         return true;
