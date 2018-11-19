@@ -42,5 +42,6 @@ install:
   - ./travis-ci/init.sh
 
 script:
-  - cd docker && docker-compose exec -T app-web env APP_ENV=test composer ci
-  - cd docker && docker-compose exec -T app-cli env APP_ENV=test env TERM=xterm script -q -c "./vendor/bin/phpunit tests/EndToEnd" /dev/null
+  - cd docker
+  - docker-compose exec -T app-web env APP_ENV=test composer ci
+  - docker-compose exec -T app-cli env APP_ENV=test env TERM=xterm script -q -c "./vendor/bin/phpunit tests/EndToEnd" /dev/null
