@@ -10,6 +10,7 @@ use App\Services\CachedResourceManager;
 use App\Services\CallbackManager;
 use App\Services\ResponseFactory;
 use App\Services\ResponseSender;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 class SendResponseHandler implements MessageHandlerInterface
@@ -38,7 +39,8 @@ class SendResponseHandler implements MessageHandlerInterface
         CachedResourceManager $cachedResourceManager,
         CallbackManager $callbackManager,
         ResponseSender $responseSender,
-        ResponseFactory $responseFactory
+        ResponseFactory $responseFactory,
+        LoggerInterface $logger
     ) {
         $this->cachedResourceManager = $cachedResourceManager;
         $this->callbackManager = $callbackManager;
@@ -74,7 +76,7 @@ class SendResponseHandler implements MessageHandlerInterface
 
         $callbacks = $this->callbackManager->findByRequestHash($requestHash);
         foreach ($callbacks as $callback) {
-            $callbackSent = $this->responseSender->send($callback->getUrl(), $response);
+            $callbackSent = $this->responseSender->send($callback, $response);
 
             if ($callbackSent) {
                 $this->callbackManager->remove($callback);
