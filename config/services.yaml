@@ -109,3 +109,12 @@ services:
     App\Services\ResponseSender:
         arguments:
             $httpClient: '@async_http_retriever.http.client.sender'
+            $logger: '@Psr\Log\LoggerInterface'
+            $callbackResponseLogger: '@App\Services\CallbackResponseLogger'
+
+    App\Services\CallbackResponseLogger:
+        arguments:
+            $logPath: '%kernel.logs_dir%/callback-responses'
+
+    webignition\InternetMediaType\Parser\Parser:
+        class: webignition\InternetMediaType\Parser\Parser
