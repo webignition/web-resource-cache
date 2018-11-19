@@ -21,19 +21,32 @@ class CallbackTest extends AbstractFunctionalTestCase
         $this->entityManager = self::$container->get(EntityManagerInterface::class);
     }
 
-    public function testCreate()
+    public function testDefaultLogResponse()
     {
-        $url = 'http://example.com';
-        $requestHash = 'request_hash';
+        $callback = new Callback();
 
+        $this->assertFalse($callback->getLogResponse());
+    }
+
+    /**
+     * @dataProvider createDataProvider
+     *
+     * @param string $url
+     * @param string $requestHash
+     * @param bool $logResponse
+     */
+    public function testCreate(string $url, string $requestHash, bool $logResponse)
+    {
         $callback = new Callback();
         $callback->setUrl($url);
         $callback->setRequestHash($requestHash);
+        $callback->setLogResponse($logResponse);
 
         $this->assertNull($callback->getId());
         $this->assertEquals($url, $callback->getUrl());
         $this->assertEquals($requestHash, $callback->getRequestHash());
         $this->assertEquals(0, $callback->getRetryCount());
+        $this->assertEquals($logResponse, $callback->getLogResponse());
         $this->entityManager->persist($callback);
         $this->entityManager->flush();
 
@@ -48,6 +61,23 @@ class CallbackTest extends AbstractFunctionalTestCase
         $this->assertEquals($url, $retrievedCallback->getUrl());
         $this->assertEquals($requestHash, $retrievedCallback->getRequestHash());
         $this->assertEquals(0, $retrievedCallback->getRetryCount());
+        $this->assertEquals($logResponse, $retrievedCallback->getLogResponse());
+    }
+
+    public function createDataProvider(): array
+    {
+        return [
+            'logResponse: false' => [
+                'url' => 'http://example.com/1/',
+                'requestHash' => 'request_hash_1',
+                'logResponse' => false,
+            ],
+            'logResponse: true' => [
+                'url' => 'http://example.com/2/',
+                'requestHash' => 'request_hash_2',
+                'logResponse' => true,
+            ],
+        ];
     }
 
 

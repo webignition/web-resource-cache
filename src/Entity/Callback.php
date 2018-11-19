@@ -46,6 +46,13 @@ class Callback
     private $urlHash;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean")
+     */
+    private $logResponse = false;
+
+    /**
      * @var int
      *
      * @ORM\Column(type="smallint")
@@ -86,5 +93,15 @@ class Callback
     public function getRetryCount(): int
     {
         return $this->retryCount;
+    }
+
+    public function setLogResponse(bool $logResponse)
+    {
+        $this->logResponse = $logResponse;
+    }
+
+    public function getLogResponse(): bool
+    {
+        return $this->logResponse;
     }
 }
