@@ -44,4 +44,4 @@ install:
 script:
   - cd docker
   - docker-compose exec -T app-web env APP_ENV=test composer ci
-  - docker-compose exec -T app-cli env APP_ENV=test env TERM=xterm script -q -c "./vendor/bin/phpunit tests/EndToEnd; exit $?" /dev/null
+  - docker-compose exec -T app-cli env APP_ENV=test ./vendor/bin/phpunit tests/EndToEnd
