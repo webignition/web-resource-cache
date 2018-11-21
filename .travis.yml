@@ -44,7 +44,5 @@ install:
 script:
   - cd docker
   - docker-compose exec -T app-web env APP_ENV=test composer ci
+  - ASYNC_HTTP_RETRIEVER_APP_ENV=prod docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
   - docker-compose exec -T app-cli env APP_ENV=test ./vendor/bin/phpunit tests/EndToEnd
-  - cd ..
-  - cat var/log/prod.log
-  - cat var/log/test.log
