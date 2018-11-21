@@ -42,4 +42,4 @@ install:
   - ./travis-ci/init.sh
 
 script:
-  - cd docker && docker-compose exec -T app-web env APP_ENV=test env TERM=xterm script -q -c "composer ci" /dev/null
+  - cd docker && docker-compose exec -T app-web env APP_ENV=test composer ci
