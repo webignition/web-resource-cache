@@ -16,6 +16,6 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml stop
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml ps
 docker-compose logs app-cli
-docker-compose exec app-cli supervisorctl status
+docker-compose exec app-cli supervisorctl -c /etc/supervisor/supervisord.conf status
 
 cd ..
