@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\EndToEnd;
+namespace App\Tests\Integration;
 
 use App\Controller\RequestController;
 use App\Entity\CachedResource;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\EndToEnd;
+namespace App\Tests\Integration;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
