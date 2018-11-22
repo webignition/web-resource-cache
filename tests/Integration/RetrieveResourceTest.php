@@ -106,7 +106,7 @@ class RetrieveResourceTest extends AbstractEndToEndTestCase
                             'text/html',
                         ],
                     ],
-                    'content' => $this->loadFixture('/example.html'),
+                    'content' => base64_encode($this->loadFixture('/example.html')),
                 ],
             ],
             'text/css' => [
@@ -117,7 +117,7 @@ class RetrieveResourceTest extends AbstractEndToEndTestCase
                             'text/css',
                         ],
                     ],
-                    'content' => $this->loadFixture('/example.css'),
+                    'content' => base64_encode($this->loadFixture('/example.css')),
                 ],
             ],
         ];
