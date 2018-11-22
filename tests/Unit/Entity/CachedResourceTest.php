@@ -59,4 +59,32 @@ class CachedResourceTest extends \PHPUnit\Framework\TestCase
         $resource = new CachedResource();
         $this->assertEquals(0, $resource->getStoredAge());
     }
+
+    /**
+     * @dataProvider getSerializedBodyDataProvider
+     *
+     * @param string $body
+     * @param string $expectedSerializedBody
+     */
+    public function testGetSerializedBody(string $body, string $expectedSerializedBody)
+    {
+        $cachedResource = new CachedResource();
+        $cachedResource->setBody($body);
+
+        $this->assertEquals($expectedSerializedBody, $cachedResource->getSerializedBody());
+    }
+
+    public function getSerializedBodyDataProvider(): array
+    {
+        return [
+            'empty' => [
+                'body' => '',
+                'expectedSerializedBody' => '',
+            ],
+            'non-empty' => [
+                'body' => 'content',
+                'expectedSerializedBody' => base64_encode('content'),
+            ],
+        ];
+    }
 }

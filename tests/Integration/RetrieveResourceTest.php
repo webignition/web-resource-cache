@@ -5,8 +5,6 @@ namespace App\Tests\Integration;
 use App\Controller\RequestController;
 use App\Entity\CachedResource;
 use App\Entity\Callback;
-use App\Message\SendResponse;
-use App\Model\Response\DecoratedSuccessResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -106,7 +104,7 @@ class RetrieveResourceTest extends AbstractEndToEndTestCase
                             'text/html',
                         ],
                     ],
-                    'content' => $this->loadFixture('/example.html'),
+                    'content' => base64_encode($this->loadFixture('/example.html')),
                 ],
             ],
             'text/css' => [
@@ -117,7 +115,51 @@ class RetrieveResourceTest extends AbstractEndToEndTestCase
                             'text/css',
                         ],
                     ],
-                    'content' => $this->loadFixture('/example.css'),
+                    'content' => base64_encode($this->loadFixture('/example.css')),
+                ],
+            ],
+            'application/javascript' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.js'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'application/javascript',
+                        ],
+                    ],
+                    'content' => base64_encode($this->loadFixture('/example.js')),
+                ],
+            ],
+            'image/gif' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.gif'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'image/gif',
+                        ],
+                    ],
+                    'content' => base64_encode($this->loadFixture('/example.gif')),
+                ],
+            ],
+            'image/jpeg' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.jpg'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'image/jpeg',
+                        ],
+                    ],
+                    'content' => base64_encode($this->loadFixture('/example.jpg')),
+                ],
+            ],
+            'image/png' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.png'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'image/png',
+                        ],
+                    ],
+                    'content' => base64_encode($this->loadFixture('/example.png')),
                 ],
             ],
         ];

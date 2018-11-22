@@ -50,7 +50,7 @@ class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
                     'headers' => [
                         'content-type' => ['text/plain; charset=utf-8'],
                     ],
-                    'content' => 'text body content',
+                    'content' => base64_encode('text body content'),
                 ]),
             ],
         ];
@@ -70,10 +70,6 @@ class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
 
     private function createCachedResource(Headers $headers, string $body): CachedResource
     {
-        $stream = fopen('php://memory', 'r+');
-        fwrite($stream, $body);
-        rewind($stream);
-
         $resource = \Mockery::mock(CachedResource::class);
 
         $resource
@@ -81,8 +77,8 @@ class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
             ->andReturn($headers);
 
         $resource
-            ->shouldReceive('getBody')
-            ->andReturn($stream);
+            ->shouldReceive('getSerializedBody')
+            ->andReturn(base64_encode($body));
 
         return $resource;
     }

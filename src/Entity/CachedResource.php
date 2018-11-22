@@ -119,6 +119,11 @@ class CachedResource
         return $now->getTimestamp() - $this->lastStored->getTimestamp();
     }
 
+    public function getSerializedBody()
+    {
+        return base64_encode(stream_get_contents($this->getBody()));
+    }
+
     /**
      * @param string $content
      *
