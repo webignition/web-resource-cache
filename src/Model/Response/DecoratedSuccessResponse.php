@@ -26,7 +26,7 @@ class DecoratedSuccessResponse implements ResponseInterface
     {
         return array_merge($this->response->jsonSerialize(), [
             'headers' => $this->resource->getHeaders()->toArray(),
-            'content' => $this->resource->getBody(),
+            'content' => stream_get_contents($this->resource->getBody()),
         ]);
     }
 
