@@ -416,7 +416,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
 
     private function createCallback(string $requestHash, string $url): CallbackEntity
     {
-        $callback = $this->callbackFactory->create($requestHash, $url);
+        $callback = $this->callbackFactory->create($requestHash, $url, false);
         $this->callbackManager->persist($callback);
 
         return $callback;

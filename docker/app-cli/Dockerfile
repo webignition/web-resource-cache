@@ -28,7 +28,8 @@ COPY supervisor/supervisord.conf /etc/supervisor/supervisord.conf
 COPY supervisor/conf.d/app.conf /etc/supervisor/conf.d/supervisord.conf
 
 RUN mkdir -p var/log/supervisor
+RUN mkdir -p var/log/callback-responses
 
 WORKDIR /app
 
-CMD dockerize -wait tcp://rabbitmq:5672 -timeout 30s -wait tcp://mysql:3306 -timeout 30s supervisord -n
+CMD dockerize -wait tcp://rabbitmq:5672 -timeout 30s -wait tcp://mysql:3306 -timeout 30s supervisord -c /etc/supervisor/supervisord.conf

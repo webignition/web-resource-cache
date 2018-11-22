@@ -10,3 +10,29 @@ services:
     container_name: httpbin
     ports:
     - ${ASYNC_HTTP_RETRIEVER_HTTPBIN_EXPOSED_PORT}:80
+
+  app-web:
+    build:
+      context: ./app-web
+      dockerfile: Dockerfile
+      args:
+        APP_ENV: ${ASYNC_HTTP_RETRIEVER_APP_ENV}
+        APP_SECRET: ${ASYNC_HTTP_RETRIEVER_APP_SECRET}
+        CALLBACK_ALLOWED_HOSTS: ${ASYNC_HTTP_RETRIEVER_CALLBACK_ALLOWED_HOSTS}
+        RETRIEVER_TIMEOUT_SECONDS: ${ASYNC_HTTP_RETRIEVER_RETRIEVER_TIMEOUT_SECONDS}
+    container_name: async-http-retriever-app-web-${ID}
+    environment:
+      DATABASE_URL: mysql://${ASYNC_HTTP_RETRIEVER_DATABASE_USER}:${ASYNC_HTTP_RETRIEVER_DATABASE_PASSWORD}@mysql:3306/${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
+    working_dir: /app
+    links:
+    - mysql:mysql
+    - rabbitmq:rabbitmq
+    - memcached:memcached
+    - httpbin:httpbin
+    volumes:
+    - ..:/app
+    depends_on:
+    - mysql
+    - rabbitmq
+    - memcached
+    - httpbin

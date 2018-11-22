@@ -92,6 +92,7 @@ services:
     volumes:
       - ..:/app
       - ../var/log/supervisor:/var/log/supervisor:rw
+      - ../var/log/callback-responses:/var/log/callback-responses:rw
     depends_on:
       - app-web
       - mysql
