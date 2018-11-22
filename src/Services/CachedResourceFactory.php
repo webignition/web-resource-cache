@@ -31,9 +31,8 @@ class CachedResourceFactory
         }
 
         $responseContent = $response->getBody()->getContents();
-        $utf8ResponseContent = mb_convert_encoding($responseContent, 'utf-8');
 
         $cachedResource->setHeaders(new Headers($response->getHeaders()));
-        $cachedResource->setBody($utf8ResponseContent);
+        $cachedResource->setBody($responseContent);
     }
 }
