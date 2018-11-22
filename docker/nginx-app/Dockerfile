@@ -15,7 +15,7 @@ ENV RABBITMQ_USER=$RABBITMQ_USER
 ENV RABBITMQ_PASSWORD=$RABBITMQ_PASSWORD
 
 RUN apt-get -qq update && apt-get install -qq -y wget
-RUN mkdir -p var/log/nginx
+RUN mkdir -p var/log/nginx-app
 
 ENV DOCKERIZE_VERSION v1.2.0
 RUN wget -q https://github.com/presslabs/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \

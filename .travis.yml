@@ -33,7 +33,7 @@ cache:
 
 before_install:
   - mkdir -p $ASYNC_HTTP_RETRIEVER_DATABASE_DATA_PATH
-  - mkdir -p var/log/nginx
+  - mkdir -p var/log/nginx-app
   - mkdir -p var/log/supervisor
   - chmod -R 0777 var/log
   - chmod +x ./travis-ci/init.sh
