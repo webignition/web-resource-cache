@@ -21,9 +21,9 @@ services:
     ports:
       - ${ASYNC_HTTP_RETRIEVER_RABBITMQ_MANAGEMENT_EXPOSED_PORT}:15672
 
-  nginx:
+  nginx-app:
     build:
-      context: ./nginx
+      context: ./nginx-app
       dockerfile: Dockerfile
       args:
         APP_SECRET: ${ASYNC_HTTP_RETRIEVER_APP_SECRET}
@@ -32,15 +32,14 @@ services:
         DB_NAME: ${ASYNC_HTTP_RETRIEVER_DATABASE_NAME}
         RABBITMQ_USER: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_USER}
         RABBITMQ_PASSWORD: ${ASYNC_HTTP_RETRIEVER_RABBITMQ_PASS}
-    container_name: async-http-retriever-nginx-${ID}
+    container_name: async-http-retriever-nginx-app-${ID}
     ports:
       - ${ASYNC_HTTP_RETRIEVER_EXPOSED_PORT}:80
     links:
       - app-web:app-web
     volumes:
-      - ./nginx/site.tmpl:/etc/nginx/conf.d/site.tmpl
       - ..:/app
-      - ../var/log/nginx:/var/log/nginx:rw
+      - ../var/log/nginx-app:/var/log/nginx:rw
 
   memcached:
     image: memcached:1.5
