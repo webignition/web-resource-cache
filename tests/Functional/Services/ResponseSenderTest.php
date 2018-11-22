@@ -218,7 +218,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                             'text/plain',
                         ],
                     ],
-                    'content' => 'response content',
+                    'content' => base64_encode('response content'),
                 ],
             ],
             'success response, text/plain, has additional headers' => [
@@ -243,7 +243,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                             'bar',
                         ],
                     ],
-                    'content' => 'response content',
+                    'content' => base64_encode('response content'),
                 ],
             ],
             'success response, text/html, no additional headers' => [
@@ -259,7 +259,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                             'text/html',
                         ],
                     ],
-                    'content' => '<!doctype><html></html>',
+                    'content' => base64_encode('<!doctype><html></html>'),
                 ],
             ],
         ];
