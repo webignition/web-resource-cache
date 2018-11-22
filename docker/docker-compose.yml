@@ -38,7 +38,6 @@ services:
     links:
       - app-web:app-web
     volumes:
-      - ./nginx-app/site.tmpl:/etc/nginx-app/conf.d/site.tmpl
       - ..:/app
       - ../var/log/nginx-app:/var/log/nginx:rw
 
