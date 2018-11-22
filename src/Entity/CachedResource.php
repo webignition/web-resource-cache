@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Model\RequestIdentifier;
 use Doctrine\ORM\Mapping as ORM;
 use webignition\HttpHeaders\Headers;
 
@@ -34,9 +33,9 @@ class CachedResource
     private $headers = [];
 
     /**
-     * @var string
+     * @var resource
      *
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="blob")
      */
     private $body = '';
 
@@ -77,9 +76,18 @@ class CachedResource
         $this->body = $body;
     }
 
-    public function getBody(): string
+    /**
+     * @return resource
+     */
+    public function getBody()
     {
-        return $this->body;
+        $body = $this->body;
+
+        if (!is_resource($body)) {
+            $body = $this->createStreamFromString($body);
+        }
+
+        return $body;
     }
 
     public function setRequestHash(string $requestHash)
@@ -109,5 +117,19 @@ class CachedResource
         }
 
         return $now->getTimestamp() - $this->lastStored->getTimestamp();
+    }
+
+    /**
+     * @param string $content
+     *
+     * @return resource
+     */
+    private function createStreamFromString(string $content)
+    {
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $content);
+        rewind($stream);
+
+        return $stream;
     }
 }
