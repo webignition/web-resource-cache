@@ -330,7 +330,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
             'request_id' => $requestHash,
             'status' => SuccessResponse::STATUS_SUCCESS,
             'headers' => $cachedResource->getHeaders()->toArray(),
-            'content' => stream_get_contents($cachedResource->getBody()),
+            'content' => $cachedResource->getSerializedBody(),
         ];
 
         $this->handler->__invoke($sendResponseMessage);
@@ -375,7 +375,7 @@ class SendResponseHandlerTest extends AbstractFunctionalTestCase
             'request_id' => $requestHash,
             'status' => SuccessResponse::STATUS_SUCCESS,
             'headers' => $cachedResource->getHeaders()->toArray(),
-            'content' => stream_get_contents($cachedResource->getBody()),
+            'content' => $cachedResource->getSerializedBody(),
         ];
 
         $successResponse = new SuccessResponse($requestHash);
