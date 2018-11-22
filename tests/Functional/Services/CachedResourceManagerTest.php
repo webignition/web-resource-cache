@@ -72,7 +72,7 @@ class CachedResourceManagerTest extends AbstractFunctionalTestCase
         $this->assertEquals($requestHash, $foundCachedResource->getRequestHash());
         $this->assertEquals($url, $foundCachedResource->getUrl());
         $this->assertEquals($responseHeaders, $foundCachedResource->getHeaders());
-        $this->assertEquals($body, $foundCachedResource->getBody());
+        $this->assertEquals($body, stream_get_contents($foundCachedResource->getBody()));
     }
 
     private function createCachedResource(
