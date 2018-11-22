@@ -36,7 +36,7 @@ class CachedResource
     /**
      * @var string
      *
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="blob")
      */
     private $body = '';
 
