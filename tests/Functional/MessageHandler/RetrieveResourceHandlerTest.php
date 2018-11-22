@@ -260,7 +260,7 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
         $cachedResourceManager->update($cachedResource);
 
         $this->assertSame($currentHeaders, $cachedResource->getHeaders()->toArray());
-        $this->assertSame($currentBody, $cachedResource->getBody());
+        $this->assertSame($currentBody, stream_get_contents($cachedResource->getBody()));
 
         $updatedHeaders = [
             'fizz' => [
@@ -283,7 +283,7 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
 
         $this->assertArrayNotHasKey('foo', $cachedResourceHeaders);
         $this->assertSame($updatedHeaders['fizz'], $cachedResourceHeaders['fizz']);
-        $this->assertSame($updatedBody, $cachedResource->getBody());
+        $this->assertSame($updatedBody, stream_get_contents($cachedResource->getBody()));
     }
 
     private function setHandlerMessageBus(RetrieveResourceHandler $handler, MessageBusInterface $messageBus)
