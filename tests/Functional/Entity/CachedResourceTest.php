@@ -51,7 +51,7 @@ class CachedResourceTest extends AbstractFunctionalTestCase
 
         $this->assertEquals($url, $resource->getUrl());
         $this->assertEquals($headers, $resource->getHeaders());
-        $this->assertEquals($body, $resource->getBody());
+        $this->assertEquals($body, stream_get_contents($resource->getBody()));
         $this->assertEquals((string) $requestIdentifier, $resource->getRequestHash());
         $this->assertEquals($lastStored, $resource->getLastStored());
 
@@ -67,7 +67,7 @@ class CachedResourceTest extends AbstractFunctionalTestCase
 
         $this->assertEquals($url, $retrievedResource->getUrl());
         $this->assertEquals($headers, $retrievedResource->getHeaders());
-        $this->assertEquals($body, $retrievedResource->getBody());
+        $this->assertEquals($body, stream_get_contents($retrievedResource->getBody()));
         $this->assertEquals((string) $requestIdentifier, $retrievedResource->getRequestHash());
         $this->assertEquals($lastStored, $retrievedResource->getLastStored());
     }
