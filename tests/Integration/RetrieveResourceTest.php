@@ -5,8 +5,6 @@ namespace App\Tests\Integration;
 use App\Controller\RequestController;
 use App\Entity\CachedResource;
 use App\Entity\Callback;
-use App\Message\SendResponse;
-use App\Model\Response\DecoratedSuccessResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
