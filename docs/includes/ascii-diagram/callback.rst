@@ -8,7 +8,7 @@
     |               |                   "headers": {                          |                 |
     |               |                     "content-type": "text/html;"        |                 |
     | Your          |                   },                                    |                 |
-    | callback      |                   "content": "<doctype html>……</html>"  | Asynchronous    |
+    | callback      |                   "content": "PGRvY3R5cGUgaHRtbD4="     | Asynchronous    |
     | handler       |                 }                                       | HTTP            |
     |               |                                                         | Retriever       |
     |               | <-----------------------------------------------------+ |                 |

@@ -20,7 +20,8 @@ Response Object Properties
 ``status_code``   | If ``status=failed``                                  | ``failure_type=http``: ``404``, ``500`` …
                   | and (``failure_type=http`` or ``failure_type=curl``)  | ``failure_type=curl``: ``6``, ``28`` …
 ``headers``       | Response headers if ``status=success``                ``{"content-type": "text/html" }``
-``content``       | Response body if ``status=success``                   ``<doctype html> … </html>``
+``content``       | Base64-encoded response body                          ``PGRvY3R5cGUgaHRtbD4=``
+                  | in cases where ``status=success``
 ================  ======================================================  =======
 
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,7 +38,7 @@ Success Response Example
         "content-length": 40,
         "cache-control": "public, max-age=60"
       },
-      "content": "<doctype html><html><body></body></html>"
+      "content": "PGRvY3R5cGUgaHRtbD48aHRtbD48Ym9keT48L2JvZHk+PC9odG1sPg=="
     }
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
