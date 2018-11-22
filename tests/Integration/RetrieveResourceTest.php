@@ -5,11 +5,16 @@ namespace App\Tests\Integration;
 use App\Controller\RequestController;
 use App\Entity\CachedResource;
 use App\Entity\Callback;
+use App\Message\SendResponse;
+use App\Model\Response\DecoratedSuccessResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class RetrieveResourceTest extends AbstractEndToEndTestCase
 {
+    const NGINX_INTEGRATION_HOST = 'nginx-integration';
+    const NGINX_INTEGRATION_PORT = 81;
+
     /**
      * @var string
      */
@@ -32,12 +37,18 @@ class RetrieveResourceTest extends AbstractEndToEndTestCase
         $this->removeCallbackResponseLogs();
     }
 
-    public function testRetrieveResource()
+    /**
+     * @dataProvider retrieveResourceSuccessDataProvider
+     *
+     * @param string $requestUrlPath
+     * @param array $expectedSendResponseData
+     */
+    public function testRetrieveResourceSuccess(string $requestUrlPath, array $expectedSendResponseData)
     {
         $requestController = self::$container->get(RequestController::class);
 
         $requestData = [
-            'url' => 'http://example.com/',
+            'url' => $requestUrlPath,
             'callback' => 'http://httpbin/post',
             'log-callback-response' => 1,
         ];
@@ -69,13 +80,47 @@ class RetrieveResourceTest extends AbstractEndToEndTestCase
 
         $logData = json_decode(file_get_contents($logFilePath), true);
 
-
         $this->assertEquals($requestId, $logData['request_id']);
         $this->assertEquals('success', $logData['status']);
         $this->assertInternalType('array', $logData['headers']);
         $this->assertNotEmpty($logData['headers']);
+
+        foreach ($expectedSendResponseData['headers'] as $key => $value) {
+            $this->assertArrayHasKey($key, $logData['headers']);
+            $this->assertEquals($value, $logData['headers'][$key]);
+        }
+
         $this->assertInternalType('string', $logData['content']);
         $this->assertNotEmpty($logData['content']);
+        $this->assertEquals($expectedSendResponseData['content'], $logData['content']);
+    }
+
+    public function retrieveResourceSuccessDataProvider(): array
+    {
+        return [
+            'text/html' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.html'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'text/html',
+                        ],
+                    ],
+                    'content' => $this->loadFixture('/example.html'),
+                ],
+            ],
+            'text/css' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.css'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'text/css',
+                        ],
+                    ],
+                    'content' => $this->loadFixture('/example.css'),
+                ],
+            ],
+        ];
     }
 
     private function removeCallbackResponseLogs()
@@ -97,5 +142,25 @@ class RetrieveResourceTest extends AbstractEndToEndTestCase
             $this->entityManager->remove($cachedResource);
             $this->entityManager->flush();
         }
+    }
+
+    private function createNginxIntegrationRequestUrl(string $path): string
+    {
+        return sprintf(
+            'http://%s:%s%s',
+            self::NGINX_INTEGRATION_HOST,
+            self::NGINX_INTEGRATION_PORT,
+            $path
+        );
+    }
+
+    private function loadFixture(string $path): string
+    {
+        $fixturePath = sprintf(
+            '/app/tests/Fixtures/Integration/Nginx%s',
+            $path
+        );
+
+        return file_get_contents($fixturePath);
     }
 }
