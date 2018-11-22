@@ -120,6 +120,50 @@ class RetrieveResourceTest extends AbstractEndToEndTestCase
                     'content' => base64_encode($this->loadFixture('/example.css')),
                 ],
             ],
+            'application/javascript' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.js'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'application/javascript',
+                        ],
+                    ],
+                    'content' => base64_encode($this->loadFixture('/example.js')),
+                ],
+            ],
+            'image/gif' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.gif'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'image/gif',
+                        ],
+                    ],
+                    'content' => base64_encode($this->loadFixture('/example.gif')),
+                ],
+            ],
+            'image/jpeg' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.jpg'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'image/jpeg',
+                        ],
+                    ],
+                    'content' => base64_encode($this->loadFixture('/example.jpg')),
+                ],
+            ],
+            'image/png' => [
+                'requestUrlPath' => $this->createNginxIntegrationRequestUrl('/example.png'),
+                'expectedSendResponseData' => [
+                    'headers' => [
+                        'content-type' => [
+                            'image/png',
+                        ],
+                    ],
+                    'content' => base64_encode($this->loadFixture('/example.png')),
+                ],
+            ],
         ];
     }
 
