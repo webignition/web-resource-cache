@@ -15,7 +15,17 @@ server {
         return 429;
     }
 
+    location ~ /429/(?<retry_after>[0-9]+) {
+        add_header 'Retry-After' '$retry_after' always;
+
+        return 429;
+    }
+
     location /500 {
         return 500;
+    }
+
+    location /503 {
+        return 503;
     }
 }
