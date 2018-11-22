@@ -70,6 +70,10 @@ class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
 
     private function createCachedResource(Headers $headers, string $body): CachedResource
     {
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $body);
+        rewind($stream);
+
         $resource = \Mockery::mock(CachedResource::class);
 
         $resource
@@ -78,7 +82,7 @@ class DecoratedSuccessResponseTest extends \PHPUnit\Framework\TestCase
 
         $resource
             ->shouldReceive('getBody')
-            ->andReturn($body);
+            ->andReturn($stream);
 
         return $resource;
     }

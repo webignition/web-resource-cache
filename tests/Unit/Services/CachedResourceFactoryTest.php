@@ -65,7 +65,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(Headers::class, $cachedResourceHeaders);
         $this->assertSame($expectedCachedResourceHeaders, $cachedResourceHeaders->toArray());
-        $this->assertSame($expectedCachedResourceBody, $cachedResource->getBody());
+        $this->assertSame($expectedCachedResourceBody, stream_get_contents($cachedResource->getBody()));
         $this->assertSame($url, $cachedResource->getUrl());
         $this->assertSame($requestHash, $cachedResource->getRequestHash());
     }
@@ -97,12 +97,12 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         $cachedResource = $this->cachedResourceFactory->create('request_hash', 'http://example.com/', $response);
 
         $this->assertSame($cachedResource->getHeaders()->toArray(), $response->getHeaders());
-        $this->assertSame($cachedResource->getBody(), (string) $response->getBody());
+        $this->assertSame(stream_get_contents($cachedResource->getBody()), (string) $response->getBody());
 
         $this->cachedResourceFactory->updateResponse($cachedResource, new Response(404));
 
         $this->assertSame($cachedResource->getHeaders()->toArray(), $response->getHeaders());
-        $this->assertSame($cachedResource->getBody(), (string) $response->getBody());
+        $this->assertSame(stream_get_contents($cachedResource->getBody()), (string) $response->getBody());
     }
 
     /**
@@ -122,7 +122,7 @@ class CachedResourceFactoryTest extends \PHPUnit\Framework\TestCase
         $this->cachedResourceFactory->updateResponse($cachedResource, $response);
 
         $this->assertSame($expectedCachedResourceHeaders, $cachedResource->getHeaders()->toArray());
-        $this->assertSame($expectedCachedResourceBody, $cachedResource->getBody());
+        $this->assertSame($expectedCachedResourceBody, stream_get_contents($cachedResource->getBody()));
     }
 
     public function updatedResponseSuccessDataProvider(): array
