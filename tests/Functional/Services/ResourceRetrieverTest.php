@@ -307,9 +307,6 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                         'Host' => [
                             'anotherexample.com',
                         ],
-                        'cookie' => [
-                            'foo1=value1; foo2=value2',
-                        ],
                     ],
                 ],
             ],
