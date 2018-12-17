@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exception\HttpTransportException;
 use App\Model\RequestResponse;
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
@@ -19,9 +20,15 @@ class ResourceRetriever
      */
     private $httpClient;
 
-    public function __construct(HttpClient $httpClient)
+    /**
+     * @var CookieJarInterface
+     */
+    private $cookieJar;
+
+    public function __construct(HttpClient $httpClient, CookieJarInterface $cookieJar)
     {
         $this->httpClient = $httpClient;
+        $this->cookieJar = $cookieJar;
     }
 
     /**
