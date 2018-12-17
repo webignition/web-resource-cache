@@ -51,23 +51,9 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $httpAuthHeaderName = 'Authorization';
-        $httpAuthPasswordValue = 'Basic ' . base64_encode('example:password');
-
-        $headers = new Headers([
-            $httpAuthHeaderName => $httpAuthPasswordValue,
-            'foo' => 'bar',
-        ]);
-
-        $requestResponse = $this->resourceRetriever->retrieve('http://example.com/', $headers);
+        $requestResponse = $this->resourceRetriever->retrieve('http://example.com/');
         $response = $requestResponse->getResponse();
         $this->assertSame($expectedResponseStatusCode, $response->getStatusCode());
-
-        $lastRequest = $this->httpHistoryContainer->getLastRequest();
-
-        foreach ($headers as $key => $value) {
-            $this->assertEquals($value, $lastRequest->getHeaderLine($key));
-        }
     }
 
     public function retrieveReturnsResponseDataProvider(): array
@@ -140,6 +126,192 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                     $http200Response,
                 ],
                 'expectedResponseStatusCode' => 200,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider retrieveRequestHeadersDataProvider
+     *
+     * @param array $headers
+     * @param int $expectedResponseStatusCode
+     *
+     * @throws \App\Exception\HttpTransportException
+     */
+    public function testRetrieveRequestHeaders(
+        array $httpFixtures,
+        string $url,
+        Headers $headers,
+        array $expectedRequestHeaderCollection
+    ) {
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $httpAuthHeaderName = 'Authorization';
+        $httpAuthPasswordValue = 'Basic ' . base64_encode('example:password');
+
+//        $headers = new Headers([
+//            $httpAuthHeaderName => $httpAuthPasswordValue,
+//            'foo' => 'bar',
+//            'cookie' => 'foo1=bar1; foo2=bar2',
+//        ]);
+
+        $requestResponse = $this->resourceRetriever->retrieve($url, $headers);
+        $response = $requestResponse->getResponse();
+        $this->assertSame(200, $response->getStatusCode());
+
+        $requests = $this->httpHistoryContainer->getRequests();
+
+        $this->assertCount($this->httpHistoryContainer->count(), $expectedRequestHeaderCollection);
+
+        foreach ($this->httpHistoryContainer->getRequests() as $requestIndex => $request) {
+            $expectedRequestHeaders = $expectedRequestHeaderCollection[$requestIndex];
+            $this->assertEquals($expectedRequestHeaders, $request->getHeaders());
+        }
+
+//        $lastRequest = $this->httpHistoryContainer->getLastRequest();
+
+//        $this->assertEquals($lastRequest)
+
+//        var_dump($lastRequest->getHeaders());
+//
+//        foreach ($headers as $key => $value) {
+//            $this->assertEquals($value, $lastRequest->getHeaderLine($key));
+//        }
+    }
+
+    public function retrieveRequestHeadersDataProvider(): array
+    {
+        return [
+            'single request, no explicit headers' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers(),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single redirect on same host, no explicit headers' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://example.com/foo'
+                    ]),
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers(),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                    [
+                        'User-Agent' => [
+                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single redirect on different host, no explicit headers' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://foo.example.com'
+                    ]),
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers(),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                    [
+                        'User-Agent' => [
+                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                        ],
+                        'Host' => [
+                            'foo.example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, cookie header' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'cookie' => [
+                            'foo1=value1; foo2=value2',
+                        ],
+                    ],
+                ],
+            ],
+            'single redirect on different host, cookie header' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://anotherexample.com'
+                    ]),
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'cookie' => [
+                            'foo1=value1; foo2=value2',
+                        ],
+                    ],
+                    [
+                        'User-Agent' => [
+                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                        ],
+                        'Host' => [
+                            'anotherexample.com',
+                        ],
+                        'cookie' => [
+                            'foo1=value1; foo2=value2',
+                        ],
+                    ],
+                ],
             ],
         ];
     }
