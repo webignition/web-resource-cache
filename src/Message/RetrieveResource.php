@@ -2,6 +2,7 @@
 
 namespace App\Message;
 
+use App\Model\RequestParameters;
 use webignition\HttpHeaders\Headers;
 
 class RetrieveResource implements \JsonSerializable
@@ -62,9 +63,9 @@ class RetrieveResource implements \JsonSerializable
         return new Headers($this->headers);
     }
 
-    public function getParameters(): array
+    public function getParameters(): RequestParameters
     {
-        return $this->parameters;
+        return new RequestParameters($this->parameters);
     }
 
     public function incrementRetryCount()

@@ -3,6 +3,7 @@
 namespace App\Tests\Unit\Message;
 
 use App\Message\RetrieveResource;
+use App\Model\RequestParameters;
 use webignition\HttpHeaders\Headers;
 
 class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
@@ -23,7 +24,7 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($requestHash, $retrieveRequest->getRequestHash());
         $this->assertEquals($url, $retrieveRequest->getUrl());
         $this->assertEquals($headers, $retrieveRequest->getHeaders());
-        $this->assertEquals($parameters, $retrieveRequest->getParameters());
+        $this->assertEquals(new RequestParameters($parameters), $retrieveRequest->getParameters());
         $this->assertEquals($retryCount, $retrieveRequest->getRetryCount());
     }
 
