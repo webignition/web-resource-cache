@@ -2,8 +2,6 @@
 
 namespace App\Model;
 
-use webignition\HttpHeaders\Headers;
-
 class RequestIdentifier
 {
     /**
@@ -14,18 +12,18 @@ class RequestIdentifier
     /**
      * @var array
      */
-    private $headers = [];
+    private $parameters = [];
 
     /**
      * @var string
      */
     private $hash = '';
 
-    public function __construct(string $url, Headers $headers)
+    public function __construct(string $url, array $parameters)
     {
         $this->url = $url;
-        $this->headers = $headers;
-        $this->hash = md5($this->url . $this->headers->createHash());
+        $this->parameters = $parameters;
+        $this->hash = md5($this->url . json_encode($parameters));
     }
 
     public function getHash(): string
