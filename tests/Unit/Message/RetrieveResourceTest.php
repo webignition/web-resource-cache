@@ -13,15 +13,17 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
      * @param string $requestHash
      * @param string $url
      * @param Headers $headers
+     * @param array $parameters
      * @param int|null $retryCount
      */
-    public function testCreate(string $requestHash, string $url, Headers $headers, $retryCount)
+    public function testCreate(string $requestHash, string $url, Headers $headers, array $parameters, ?int $retryCount)
     {
-        $retrieveRequest = new RetrieveResource($requestHash, $url, $headers, $retryCount);
+        $retrieveRequest = new RetrieveResource($requestHash, $url, $headers, $parameters, $retryCount);
 
         $this->assertEquals($requestHash, $retrieveRequest->getRequestHash());
         $this->assertEquals($url, $retrieveRequest->getUrl());
         $this->assertEquals($headers, $retrieveRequest->getHeaders());
+        $this->assertEquals($parameters, $retrieveRequest->getParameters());
         $this->assertEquals($retryCount, $retrieveRequest->getRetryCount());
     }
 
@@ -32,13 +34,27 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
                 'requestHash' => 'request_hash',
                 'url' => 'http://example.com/',
                 'headers' => new Headers(),
+                'parameters' => [],
                 'retryCount' => null,
             ],
             'integer retry count' => [
                 'requestHash' => 'request_hash',
                 'url' => 'http://example.com/',
                 'headers' => new Headers(),
+                'parameters' => [],
                 'retryCount' => 2,
+            ],
+            'non-empty parameters' => [
+                'requestHash' => 'request_hash',
+                'url' => 'http://example.com/',
+                'headers' => new Headers(),
+                'parameters' => [
+                    'cookies' => [
+                        'domain' => '.example.com',
+                        'path' => '/',
+                    ],
+                ],
+                'retryCount' => null,
             ],
         ];
     }
@@ -60,33 +76,38 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
     public function jsonSerializeDataProvider(): array
     {
         return [
-            'no headers, default retry count' => [
+            'no headers, no parameters, default retry count' => [
                 'retrieveResourceMessage' => new RetrieveResource(
                     'request-hash-1',
-                    'http://example.com/1/'
+                    'http://example.com/1/',
+                    new Headers(),
+                    []
                 ),
                 'expectedArray' => [
                     'requestHash' => 'request-hash-1',
                     'url' => 'http://example.com/1/',
                     'headers' => [],
+                    'parameters' => [],
                     'retryCount' => 0,
                 ],
             ],
-            'no headers, non-default retry count' => [
+            'no headers, no parameters, non-default retry count' => [
                 'retrieveResourceMessage' => new RetrieveResource(
                     'request-hash-1',
                     'http://example.com/1/',
                     new Headers(),
+                    [],
                     2
                 ),
                 'expectedArray' => [
                     'requestHash' => 'request-hash-1',
                     'url' => 'http://example.com/1/',
                     'headers' => [],
+                    'parameters' => [],
                     'retryCount' => 2,
                 ],
             ],
-            'has headers, default retry count' => [
+            'has headers, no parameters, default retry count' => [
                 'retrieveResourceMessage' => new RetrieveResource(
                     'request-hash-1',
                     'http://example.com/1/',
@@ -94,6 +115,7 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
                         'foo' => 'bar',
                         'fizz' => 'buzz',
                     ]),
+                    [],
                     0
                 ),
                 'expectedArray' => [
@@ -105,6 +127,43 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
                         ],
                         'fizz' => [
                             'buzz',
+                        ],
+                    ],
+                    'parameters' => [],
+                    'retryCount' => 0,
+                ],
+            ],
+            'has headers, has parameters, default retry count' => [
+                'retrieveResourceMessage' => new RetrieveResource(
+                    'request-hash-1',
+                    'http://example.com/1/',
+                    new Headers([
+                        'foo' => 'bar',
+                        'fizz' => 'buzz',
+                    ]),
+                    [
+                        'cookies' => [
+                            'domain' => '.example.com',
+                            'path' => '/',
+                        ],
+                    ],
+                    0
+                ),
+                'expectedArray' => [
+                    'requestHash' => 'request-hash-1',
+                    'url' => 'http://example.com/1/',
+                    'headers' => [
+                        'foo' => [
+                            'bar',
+                        ],
+                        'fizz' => [
+                            'buzz',
+                        ],
+                    ],
+                    'parameters' => [
+                        'cookies' => [
+                            'domain' => '.example.com',
+                            'path' => '/',
                         ],
                     ],
                     'retryCount' => 0,
