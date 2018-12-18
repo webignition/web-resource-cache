@@ -5,7 +5,7 @@
     |               | POST http://localhost:8001/                             |                 |
     |               | url=http://example.com/                                 |                 |
     |               | callback=http://callback.example.com/                   |                 |
-    |               | headers[user-agent]='Chrome, honest'                    | Asynchronous    |
+    |               | headers={"User-Agent":"Chrome, honest"}                 | Asynchronous    |
     | Your          |                                                         | HTTP            |
     | application   | +-----------------------------------------------------> | retriever       |
     |               |                                                         |                 |
