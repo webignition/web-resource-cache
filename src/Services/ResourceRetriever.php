@@ -3,8 +3,12 @@
 namespace App\Services;
 
 use App\Exception\HttpTransportException;
+use App\Model\CookieParameters;
+use App\Model\RequestParameters;
 use App\Model\RequestResponse;
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Cookie\CookieJarInterface;
+use GuzzleHttp\Cookie\SetCookie;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
@@ -19,22 +23,33 @@ class ResourceRetriever
      */
     private $httpClient;
 
-    public function __construct(HttpClient $httpClient)
+    /**
+     * @var CookieJarInterface
+     */
+    private $cookieJar;
+
+    public function __construct(HttpClient $httpClient, CookieJarInterface $cookieJar)
     {
         $this->httpClient = $httpClient;
+        $this->cookieJar = $cookieJar;
     }
 
     /**
      * @param string $url
      * @param Headers $headers
+     * @param RequestParameters $requestParameters
      *
      * @return RequestResponse
      *
      * @throws HttpTransportException
      */
-    public function retrieve(string $url, ?Headers $headers = null): RequestResponse
+    public function retrieve(string $url, Headers $headers, RequestParameters $requestParameters): RequestResponse
     {
-        $headers = $headers ?? new Headers();
+        $cookieHeader = $headers->get('cookie');
+        if ($cookieHeader) {
+            $this->setCookies($cookieHeader[0], $requestParameters->getCookieParameters());
+            $headers = $headers->withoutHeader('cookie');
+        }
 
         $request = new Request('GET', $url, $headers->toArray());
 
@@ -63,5 +78,29 @@ class ResourceRetriever
         $request = $request->withUri($requestUri);
 
         return new RequestResponse($request, $response);
+    }
+
+    private function setCookies(string $cookieHeader, CookieParameters $cookieParameters)
+    {
+        $nameValues = explode('; ', $cookieHeader);
+
+        foreach ($nameValues as $nameValue) {
+            $cookieData = [
+                'Name' => null,
+                'Value' => null,
+                'Path' => $cookieParameters->getPath(),
+                'Domain' => $cookieParameters->getDomain(),
+            ];
+
+            $nameValueParts = explode('=', $nameValue, 2);
+            $expectedPartCount = 2;
+
+            if ($expectedPartCount === count($nameValueParts)) {
+                $cookieData['Name'] = $nameValueParts[0];
+                $cookieData['Value'] = $nameValueParts[1];
+            }
+
+            $this->cookieJar->setCookie(new SetCookie($cookieData));
+        }
     }
 }

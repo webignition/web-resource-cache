@@ -11,12 +11,12 @@ class RequestIdentifierTest extends \PHPUnit\Framework\TestCase
      * @dataProvider createDataProvider
      *
      * @param string $url
-     * @param Headers $headers
+     * @param array $parameters
      * @param string $expectedHash
      */
-    public function testCreate(string $url, Headers $headers, string $expectedHash)
+    public function testCreate(string $url, array $parameters, string $expectedHash)
     {
-        $requestIdentifier = new RequestIdentifier($url, $headers);
+        $requestIdentifier = new RequestIdentifier($url, $parameters);
 
         $this->assertEquals($expectedHash, $requestIdentifier->getHash());
     }
@@ -26,34 +26,34 @@ class RequestIdentifierTest extends \PHPUnit\Framework\TestCase
         return [
             'no headers' => [
                 'url' => 'http://example.com/',
-                'headers' => new Headers(),
-                'expectedHash' => '118e35f631be802c41bec5c9dfb0f415',
+                'parameters' => [],
+                'expectedHash' => '4c2297fd8f408fa415ebfbc2d991f9ce',
             ],
             'has headers, all invalid' => [
                 'url' => 'http://example.com/',
-                'headers' => new Headers([
+                'parameters' => [
                     'boolean' => true,
                     'array' => [],
                     'object' => (object) [],
-                ]),
-                'expectedHash' => '00bd01b2277e9401e89dc3431afe0db6',
+                ],
+                'expectedHash' => '7fadf3ab7b21c766c93585c2097d17b0',
             ],
             'has headers, all valid' => [
                 'url' => 'http://example.com/',
-                'headers' => new Headers([
+                'parameters' => [
                     'foo' => 'bar',
-                ]),
-                'expectedHash' => 'e0db2182d9cc7589763876fb7cee314f',
+                ],
+                'expectedHash' => 'eb4e3044ea80f54bfcb69f8d209b416e',
             ],
             'has headers, some valid' => [
                 'url' => 'http://example.com/',
-                'headers' => new Headers([
+                'parameters' => [
                     'foo' => 'bar',
                     'boolean' => true,
                     'array' => [],
                     'object' => (object) [],
-                ]),
-                'expectedHash' => 'c1ec8873271ff238158cfa672cbfb253',
+                ],
+                'expectedHash' => 'f21761dbec3e762077f7f8370f169247',
             ],
         ];
     }

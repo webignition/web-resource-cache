@@ -71,7 +71,8 @@ class RetrieveResourceHandler implements MessageHandlerInterface
         try {
             $requestResponse = $this->resourceRetriever->retrieve(
                 $retrieveResourceMessage->getUrl(),
-                $retrieveResourceMessage->getHeaders()
+                $retrieveResourceMessage->getHeaders(),
+                $retrieveResourceMessage->getParameters()
             );
 
             $httpResponse = $requestResponse->getResponse();

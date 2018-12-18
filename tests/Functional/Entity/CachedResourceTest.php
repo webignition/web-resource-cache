@@ -74,12 +74,13 @@ class CachedResourceTest extends AbstractFunctionalTestCase
 
     public function createDataProvider(): array
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return [
             'empty headers, empty body' => [
                 'url' => 'http://example.com/',
                 'headers' => new Headers(),
                 'body' => '',
-                'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
+                'requestIdentifier' => new RequestIdentifier('http://example.com', []),
                 'lastStored' => new \DateTime('2018-10-18 11:41'),
             ],
             'has headers, empty body' => [
@@ -88,14 +89,14 @@ class CachedResourceTest extends AbstractFunctionalTestCase
                     'foo' => 'bar',
                 ]),
                 'body' => '',
-                'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
+                'requestIdentifier' => new RequestIdentifier('http://example.com', []),
                 'lastStored' => new \DateTime('2018-10-18 12:41'),
             ],
             'empty headers, has body' => [
                 'url' => 'http://example.com/',
                 'headers' => new Headers(),
                 'body' => 'body content',
-                'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
+                'requestIdentifier' => new RequestIdentifier('http://example.com', []),
                 'lastStored' => new \DateTime('2018-10-18 13:41'),
             ],
             'has headers, has body' => [
@@ -104,7 +105,7 @@ class CachedResourceTest extends AbstractFunctionalTestCase
                     'foo' => 'bar',
                 ]),
                 'body' => 'body content',
-                'requestIdentifier' => new RequestIdentifier('http://example.com', new Headers()),
+                'requestIdentifier' => new RequestIdentifier('http://example.com', []),
                 'lastStored' => new \DateTime('2018-10-18 14:41'),
             ],
         ];

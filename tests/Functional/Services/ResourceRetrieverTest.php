@@ -3,6 +3,7 @@
 namespace App\Tests\Functional\Services;
 
 use App\Exception\HttpTransportException;
+use App\Model\RequestParameters;
 use App\Services\ResourceRetriever;
 use App\Tests\Functional\AbstractFunctionalTestCase;
 use App\Tests\Services\HttpMockHandler;
@@ -51,23 +52,14 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $httpAuthHeaderName = 'Authorization';
-        $httpAuthPasswordValue = 'Basic ' . base64_encode('example:password');
+        $requestResponse = $this->resourceRetriever->retrieve(
+            'http://example.com/',
+            new Headers(),
+            new RequestParameters()
+        );
 
-        $headers = new Headers([
-            $httpAuthHeaderName => $httpAuthPasswordValue,
-            'foo' => 'bar',
-        ]);
-
-        $requestResponse = $this->resourceRetriever->retrieve('http://example.com/', $headers);
         $response = $requestResponse->getResponse();
         $this->assertSame($expectedResponseStatusCode, $response->getStatusCode());
-
-        $lastRequest = $this->httpHistoryContainer->getLastRequest();
-
-        foreach ($headers as $key => $value) {
-            $this->assertEquals($value, $lastRequest->getHeaderLine($key));
-        }
     }
 
     public function retrieveReturnsResponseDataProvider(): array
@@ -145,6 +137,335 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     }
 
     /**
+     * @dataProvider retrieveRequestHeadersDataProvider
+     *
+     * @param array $httpFixtures
+     * @param string $url
+     * @param Headers $headers
+     * @param RequestParameters $requestParameters
+     * @param array $expectedRequestHeaderCollection
+     *
+     * @throws HttpTransportException
+     */
+    public function testRetrieveRequestHeaders(
+        array $httpFixtures,
+        string $url,
+        Headers $headers,
+        RequestParameters $requestParameters,
+        array $expectedRequestHeaderCollection
+    ) {
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, $requestParameters);
+        $response = $requestResponse->getResponse();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertCount($this->httpHistoryContainer->count(), $expectedRequestHeaderCollection);
+
+        foreach ($this->httpHistoryContainer->getRequests() as $requestIndex => $request) {
+            $expectedRequestHeaders = $expectedRequestHeaderCollection[$requestIndex];
+            $this->assertEquals($expectedRequestHeaders, $request->getHeaders());
+        }
+    }
+
+    public function retrieveRequestHeadersDataProvider(): array
+    {
+        return [
+            'single request, no explicit headers, no parameters' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers(),
+                'parameters' => new RequestParameters(),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, basic http authorization headers, no parameters' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'Authorization' => 'Basic ' . base64_encode('example:password'),
+                ]),
+                'parameters' => new RequestParameters(),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'authorization' => [
+                            'Basic ' . base64_encode('example:password'),
+                        ],
+                    ],
+                ],
+            ],
+            'single redirect on same host, no explicit headers, no parameters' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://example.com/foo'
+                    ]),
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers(),
+                'parameters' => new RequestParameters(),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single redirect on different host, no explicit headers, no parameters' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://foo.example.com'
+                    ]),
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers(),
+                'parameters' => new RequestParameters(),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'foo.example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, cookie header, no parameters' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'parameters' => new RequestParameters(),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, cookie header, non-matching cookie parameters (no match on domain)' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'parameters' => new RequestParameters([
+                    'cookies' => [
+                        'domain' => 'foo.example.com',
+                        'path' => '/',
+                    ],
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, cookie header, non-matching cookie parameters (no match on path)' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'parameters' => new RequestParameters([
+                    'cookies' => [
+                        'domain' => '.example.com',
+                        'path' => '/foo',
+                    ],
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, cookie header, matching cookie parameters (exact domain, minimal path)' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'parameters' => new RequestParameters([
+                    'cookies' => [
+                        'domain' => 'example.com',
+                        'path' => '/',
+                    ],
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'Cookie' => [
+                            'foo1=value1; foo2=value2',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, cookie header, matching cookie parameters (exact domain, non-minimal path)' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com/foo',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'parameters' => new RequestParameters([
+                    'cookies' => [
+                        'domain' => 'example.com',
+                        'path' => '/foo',
+                    ],
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'Cookie' => [
+                            'foo1=value1; foo2=value2',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, cookie header, matching cookie parameters (wildcard domain, minimal path)' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://foo.example.com',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'parameters' => new RequestParameters([
+                    'cookies' => [
+                        'domain' => '.example.com',
+                        'path' => '/',
+                    ],
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'foo.example.com',
+                        ],
+                        'Cookie' => [
+                            'foo1=value1; foo2=value2',
+                        ],
+                    ],
+                ],
+            ],
+            'single redirect on different host, cookie header matches first request only' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://anotherexample.com'
+                    ]),
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'cookie' => 'foo1=value1; foo2=value2'
+                ]),
+                'parameters' => new RequestParameters([
+                    'cookies' => [
+                        'domain' => '.example.com',
+                        'path' => '/',
+                    ],
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'Cookie' => [
+                            'foo1=value1; foo2=value2',
+                        ],
+                    ],
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'anotherexample.com',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @throws HttpTransportException
      */
     public function testReturnedRequestUsesRedirectUrl()
@@ -157,7 +478,11 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
             $http200Response,
         ]);
 
-        $requestResponse = $this->resourceRetriever->retrieve('http://example.com/');
+        $requestResponse = $this->resourceRetriever->retrieve(
+            'http://example.com/',
+            new Headers(),
+            new RequestParameters()
+        );
         $request = $requestResponse->getRequest();
 
         $this->assertEquals('http://example.com/foo', $request->getUri());
@@ -181,7 +506,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
         try {
-            $this->resourceRetriever->retrieve('http://example.com/');
+            $this->resourceRetriever->retrieve('http://example.com/', new Headers(), new RequestParameters());
             $this->fail('HttpTransportException not thrown');
         } catch (HttpTransportException $transportException) {
             $this->assertSame($expectedTransportErrorCode, $transportException->getTransportErrorCode());

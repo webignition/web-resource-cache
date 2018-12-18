@@ -126,17 +126,48 @@ class RequestControllerTest extends AbstractFunctionalTestCase
             'c=d' => ['c' => 'd'],
         ];
 
+        /* @var Headers[] $headersObjects */
+        $headersObjects = [
+            'a=b' => new Headers($headers['a=b']),
+            'c=d' => new Headers($headers['c=d']),
+        ];
+
+        $parameters = [
+            'w=x' => ['w' => 'x'],
+            'y=z' => ['y' => 'z'],
+        ];
+
         $requestHashes = [
-            '1.example.com headers=[]' => $this->createRequestHash(self::URL_1_EXAMPLE_COM),
-            '2.example.com headers=[]' => $this->createRequestHash(self::URL_2_EXAMPLE_COM),
-            '1.example.com headers=[a=b]' => $this->createRequestHash(self::URL_1_EXAMPLE_COM, $headers['a=b']),
-            '1.example.com headers=[c=d]' => $this->createRequestHash(self::URL_1_EXAMPLE_COM, $headers['c=d']),
-            '2.example.com headers=[a=b]' => $this->createRequestHash(self::URL_2_EXAMPLE_COM, $headers['c=d']),
-            '2.example.com headers=[c=d]' => $this->createRequestHash(self::URL_2_EXAMPLE_COM, $headers['c=d']),
+            '1.example.com headers=[] parameters=[]' => $this->createRequestHash(self::URL_1_EXAMPLE_COM),
+            '2.example.com headers=[] parameters=[]' => $this->createRequestHash(self::URL_2_EXAMPLE_COM),
+            '1.example.com headers=[a=b] parameters=[]' => $this->createRequestHash(
+                self::URL_1_EXAMPLE_COM,
+                $headersObjects['a=b']->toArray()
+            ),
+            '1.example.com headers=[c=d] parameters=[]' => $this->createRequestHash(
+                self::URL_1_EXAMPLE_COM,
+                $headersObjects['c=d']->toArray()
+            ),
+            '2.example.com headers=[a=b] parameters=[]' => $this->createRequestHash(
+                self::URL_2_EXAMPLE_COM,
+                $headersObjects['c=d']->toArray()
+            ),
+            '2.example.com headers=[c=d] parameters=[]' => $this->createRequestHash(
+                self::URL_2_EXAMPLE_COM,
+                $headersObjects['c=d']->toArray()
+            ),
+            '1.example.com headers=[a=b] parameters=[w=x]' => $this->createRequestHash(
+                self::URL_1_EXAMPLE_COM,
+                array_merge($headersObjects['a=b']->toArray(), $parameters['w=x'])
+            ),
+            '1.example.com headers=[a=b] parameters=[y=z]' => $this->createRequestHash(
+                self::URL_1_EXAMPLE_COM,
+                array_merge($headersObjects['a=b']->toArray(), $parameters['y=z'])
+            ),
         ];
 
         return [
-            'single request' => [
+            'single request, no headers, no parameters' => [
                 'requestDataCollection' => [
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
@@ -144,19 +175,24 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    $requestHashes['1.example.com headers=[]'],
+                    $requestHashes['1.example.com headers=[] parameters=[]'],
                 ],
                 'expectedCallbacks' => [
                     $this->createCallback(
-                        $requestHashes['1.example.com headers=[]'],
+                        $requestHashes['1.example.com headers=[] parameters=[]'],
                         'http://callback.example.com/'
                     ),
                 ],
                 'expectedRetrieveResourceMessages' => [
-                    new RetrieveResource($requestHashes['1.example.com headers=[]'], self::URL_1_EXAMPLE_COM),
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[] parameters=[]'],
+                        self::URL_1_EXAMPLE_COM,
+                        new Headers(),
+                        []
+                    ),
                 ],
             ],
-            'two non-identical requests (different url, no headers)' => [
+            'two non-identical requests (different url, no headers, no parameters)' => [
                 'requestDataCollection' => [
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
@@ -168,105 +204,163 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    $requestHashes['1.example.com headers=[]'],
-                    $requestHashes['2.example.com headers=[]'],
+                    $requestHashes['1.example.com headers=[] parameters=[]'],
+                    $requestHashes['2.example.com headers=[] parameters=[]'],
                 ],
                 'expectedCallbacks' => [
                     $this->createCallback(
-                        $requestHashes['1.example.com headers=[]'],
+                        $requestHashes['1.example.com headers=[] parameters=[]'],
                         'http://foo.example.com/'
                     ),
                     $this->createCallback(
-                        $requestHashes['2.example.com headers=[]'],
-                        'http://bar.example.com/'
-                    ),
-                ],
-                'expectedRetrieveResourceMessages' => [
-                    new RetrieveResource($requestHashes['1.example.com headers=[]'], self::URL_1_EXAMPLE_COM),
-                    new RetrieveResource($requestHashes['2.example.com headers=[]'], self::URL_2_EXAMPLE_COM),
-                ],
-            ],
-            'two non-identical requests (same url, different headers)' => [
-                'requestDataCollection' => [
-                    [
-                        'url' => self::URL_1_EXAMPLE_COM,
-                        'callback' => 'http://foo.example.com/',
-                        'headers' => json_encode($headers['a=b']),
-                    ],
-                    [
-                        'url' => self::URL_1_EXAMPLE_COM,
-                        'callback' => 'http://bar.example.com/',
-                        'headers' => json_encode($headers['c=d']),
-                    ],
-                ],
-                'expectedResponseDataCollection' => [
-                    $requestHashes['1.example.com headers=[a=b]'],
-                    $requestHashes['1.example.com headers=[c=d]'],
-                ],
-                'expectedCallbacks' => [
-                    $this->createCallback(
-                        $requestHashes['1.example.com headers=[a=b]'],
-                        'http://foo.example.com/'
-                    ),
-                    $this->createCallback(
-                        $requestHashes['1.example.com headers=[c=d]'],
+                        $requestHashes['2.example.com headers=[] parameters=[]'],
                         'http://bar.example.com/'
                     ),
                 ],
                 'expectedRetrieveResourceMessages' => [
                     new RetrieveResource(
-                        $requestHashes['1.example.com headers=[a=b]'],
+                        $requestHashes['1.example.com headers=[] parameters=[]'],
                         self::URL_1_EXAMPLE_COM,
-                        new Headers($headers['a=b'])
+                        new Headers(),
+                        []
                     ),
                     new RetrieveResource(
-                        $requestHashes['1.example.com headers=[c=d]'],
-                        self::URL_1_EXAMPLE_COM,
-                        new Headers($headers['c=d'])
-                    ),
-                ],
-            ],
-            'two non-identical requests (different url, different headers)' => [
-                'requestDataCollection' => [
-                    [
-                        'url' => self::URL_1_EXAMPLE_COM,
-                        'callback' => 'http://foo.example.com/',
-                        'headers' => json_encode($headers['a=b']),
-                    ],
-                    [
-                        'url' => self::URL_2_EXAMPLE_COM,
-                        'callback' => 'http://bar.example.com/',
-                        'headers' => json_encode($headers['c=d']),
-                    ],
-                ],
-                'expectedResponseDataCollection' => [
-                    $requestHashes['1.example.com headers=[a=b]'],
-                    $requestHashes['2.example.com headers=[c=d]'],
-                ],
-                'expectedCallbacks' => [
-                    $this->createCallback(
-                        $requestHashes['1.example.com headers=[a=b]'],
-                        'http://foo.example.com/'
-                    ),
-                    $this->createCallback(
-                        $requestHashes['2.example.com headers=[c=d]'],
-                        'http://bar.example.com/'
-                    ),
-                ],
-                'expectedRetrieveResourceMessages' => [
-                    new RetrieveResource(
-                        $requestHashes['1.example.com headers=[a=b]'],
-                        self::URL_1_EXAMPLE_COM,
-                        new Headers($headers['a=b'])
-                    ),
-                    new RetrieveResource(
-                        $requestHashes['2.example.com headers=[c=d]'],
+                        $requestHashes['2.example.com headers=[] parameters=[]'],
                         self::URL_2_EXAMPLE_COM,
-                        new Headers($headers['c=d'])
+                        new Headers(),
+                        []
                     ),
                 ],
             ],
-            'two identical requests (same url, no headers)' => [
+            'two non-identical requests (same url, different headers, no parameters)' => [
+                'requestDataCollection' => [
+                    [
+                        'url' => self::URL_1_EXAMPLE_COM,
+                        'callback' => 'http://foo.example.com/',
+                        'headers' => json_encode($headers['a=b']),
+                    ],
+                    [
+                        'url' => self::URL_1_EXAMPLE_COM,
+                        'callback' => 'http://bar.example.com/',
+                        'headers' => json_encode($headers['c=d']),
+                    ],
+                ],
+                'expectedResponseDataCollection' => [
+                    $requestHashes['1.example.com headers=[a=b] parameters=[]'],
+                    $requestHashes['1.example.com headers=[c=d] parameters=[]'],
+                ],
+                'expectedCallbacks' => [
+                    $this->createCallback(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[]'],
+                        'http://foo.example.com/'
+                    ),
+                    $this->createCallback(
+                        $requestHashes['1.example.com headers=[c=d] parameters=[]'],
+                        'http://bar.example.com/'
+                    ),
+                ],
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[]'],
+                        self::URL_1_EXAMPLE_COM,
+                        $headersObjects['a=b'],
+                        []
+                    ),
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[c=d] parameters=[]'],
+                        self::URL_1_EXAMPLE_COM,
+                        $headersObjects['c=d'],
+                        []
+                    ),
+                ],
+            ],
+            'two non-identical requests (different url, different headers, no parameters)' => [
+                'requestDataCollection' => [
+                    [
+                        'url' => self::URL_1_EXAMPLE_COM,
+                        'callback' => 'http://foo.example.com/',
+                        'headers' => json_encode($headers['a=b']),
+                    ],
+                    [
+                        'url' => self::URL_2_EXAMPLE_COM,
+                        'callback' => 'http://bar.example.com/',
+                        'headers' => json_encode($headers['c=d']),
+                    ],
+                ],
+                'expectedResponseDataCollection' => [
+                    $requestHashes['1.example.com headers=[a=b] parameters=[]'],
+                    $requestHashes['2.example.com headers=[c=d] parameters=[]'],
+                ],
+                'expectedCallbacks' => [
+                    $this->createCallback(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[]'],
+                        'http://foo.example.com/'
+                    ),
+                    $this->createCallback(
+                        $requestHashes['2.example.com headers=[c=d] parameters=[]'],
+                        'http://bar.example.com/'
+                    ),
+                ],
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[]'],
+                        self::URL_1_EXAMPLE_COM,
+                        $headersObjects['a=b'],
+                        []
+                    ),
+                    new RetrieveResource(
+                        $requestHashes['2.example.com headers=[c=d] parameters=[]'],
+                        self::URL_2_EXAMPLE_COM,
+                        $headersObjects['c=d'],
+                        []
+                    ),
+                ],
+            ],
+            'two non-identical requests (same url, same headers, different parameters)' => [
+                'requestDataCollection' => [
+                    [
+                        'url' => self::URL_1_EXAMPLE_COM,
+                        'callback' => 'http://foo.example.com/',
+                        'headers' => json_encode($headers['a=b']),
+                        'parameters' => json_encode($parameters['w=x']),
+                    ],
+                    [
+                        'url' => self::URL_1_EXAMPLE_COM,
+                        'callback' => 'http://bar.example.com/',
+                        'headers' => json_encode($headers['a=b']),
+                        'parameters' => json_encode($parameters['y=z']),
+                    ],
+                ],
+                'expectedResponseDataCollection' => [
+                    $requestHashes['1.example.com headers=[a=b] parameters=[w=x]'],
+                    $requestHashes['1.example.com headers=[a=b] parameters=[y=z]'],
+                ],
+                'expectedCallbacks' => [
+                    $this->createCallback(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[w=x]'],
+                        'http://foo.example.com/'
+                    ),
+                    $this->createCallback(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[y=z]'],
+                        'http://bar.example.com/'
+                    ),
+                ],
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[w=x]'],
+                        self::URL_1_EXAMPLE_COM,
+                        $headersObjects['a=b'],
+                        $parameters['w=x']
+                    ),
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[y=z]'],
+                        self::URL_1_EXAMPLE_COM,
+                        $headersObjects['a=b'],
+                        $parameters['y=z']
+                    ),
+                ],
+            ],
+            'two identical requests (same url, no headers, no parameters)' => [
                 'requestDataCollection' => [
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
@@ -280,21 +374,31 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    $requestHashes['1.example.com headers=[]'],
-                    $requestHashes['1.example.com headers=[]'],
+                    $requestHashes['1.example.com headers=[] parameters=[]'],
+                    $requestHashes['1.example.com headers=[] parameters=[]'],
                 ],
                 'expectedCallbacks' => [
                     $this->createCallback(
-                        $requestHashes['1.example.com headers=[]'],
+                        $requestHashes['1.example.com headers=[] parameters=[]'],
                         'http://callback.example.com/'
                     ),
                 ],
                 'expectedRetrieveResourceMessages' => [
-                    new RetrieveResource($requestHashes['1.example.com headers=[]'], self::URL_1_EXAMPLE_COM),
-                    new RetrieveResource($requestHashes['1.example.com headers=[]'], self::URL_1_EXAMPLE_COM),
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[] parameters=[]'],
+                        self::URL_1_EXAMPLE_COM,
+                        new Headers(),
+                        []
+                    ),
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[] parameters=[]'],
+                        self::URL_1_EXAMPLE_COM,
+                        new Headers(),
+                        []
+                    ),
                 ],
             ],
-            'two identical requests (same url, same headers)' => [
+            'two identical requests (same url, same headers, no parameters)' => [
                 'requestDataCollection' => [
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
@@ -308,25 +412,67 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     ],
                 ],
                 'expectedResponseDataCollection' => [
-                    $requestHashes['1.example.com headers=[a=b]'],
-                    $requestHashes['1.example.com headers=[a=b]'],
+                    $requestHashes['1.example.com headers=[a=b] parameters=[]'],
+                    $requestHashes['1.example.com headers=[a=b] parameters=[]'],
                 ],
                 'expectedCallbacks' => [
                     $this->createCallback(
-                        $requestHashes['1.example.com headers=[a=b]'],
+                        $requestHashes['1.example.com headers=[a=b] parameters=[]'],
                         'http://callback.example.com/'
                     ),
                 ],
                 'expectedRetrieveResourceMessages' => [
                     new RetrieveResource(
-                        $requestHashes['1.example.com headers=[a=b]'],
+                        $requestHashes['1.example.com headers=[a=b] parameters=[]'],
                         self::URL_1_EXAMPLE_COM,
-                        new Headers($headers['a=b'])
+                        $headersObjects['a=b'],
+                        []
                     ),
                     new RetrieveResource(
-                        $requestHashes['1.example.com headers=[a=b]'],
+                        $requestHashes['1.example.com headers=[a=b] parameters=[]'],
                         self::URL_1_EXAMPLE_COM,
-                        new Headers($headers['a=b'])
+                        $headersObjects['a=b'],
+                        []
+                    ),
+                ],
+            ],
+            'two identical requests (same url, same headers, same parameters)' => [
+                'requestDataCollection' => [
+                    [
+                        'url' => self::URL_1_EXAMPLE_COM,
+                        'callback' => 'http://callback.example.com/',
+                        'headers' => json_encode($headers['a=b']),
+                        'parameters' => json_encode($parameters['w=x']),
+                    ],
+                    [
+                        'url' => self::URL_1_EXAMPLE_COM,
+                        'callback' => 'http://callback.example.com/',
+                        'headers' => json_encode($headers['a=b']),
+                        'parameters' => json_encode($parameters['w=x']),
+                    ],
+                ],
+                'expectedResponseDataCollection' => [
+                    $requestHashes['1.example.com headers=[a=b] parameters=[w=x]'],
+                    $requestHashes['1.example.com headers=[a=b] parameters=[w=x]'],
+                ],
+                'expectedCallbacks' => [
+                    $this->createCallback(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[w=x]'],
+                        'http://callback.example.com/'
+                    ),
+                ],
+                'expectedRetrieveResourceMessages' => [
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[w=x]'],
+                        self::URL_1_EXAMPLE_COM,
+                        $headersObjects['a=b'],
+                        $parameters['w=x']
+                    ),
+                    new RetrieveResource(
+                        $requestHashes['1.example.com headers=[a=b] parameters=[w=x]'],
+                        self::URL_1_EXAMPLE_COM,
+                        $headersObjects['a=b'],
+                        $parameters['w=x']
                     ),
                 ],
             ],
@@ -497,7 +643,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
             'callback' => 'http://callback.example.com/',
         ]));
 
-        $expectedRetrieveResourceMessage = new RetrieveResource($requestHash, $url);
+        $expectedRetrieveResourceMessage = new RetrieveResource($requestHash, $url, new Headers(), []);
 
         $messageBus
             ->shouldHaveReceived('dispatch')
@@ -564,25 +710,9 @@ class RequestControllerTest extends AbstractFunctionalTestCase
             });
     }
 
-//    public function testSetLogCallbackResponse()
-//    {
-//        $messageBus = \Mockery::spy(MessageBusInterface::class);
-//
-//        $controller = self::$container->get(RequestController::class);
-//        $this->setControllerMessageBus($controller, $messageBus);
-//
-//        $controller->requestAction(new Request([], [
-//            'url' => 'http://example.com/',
-//            'callback' => 'http://callback.example.com/',
-//            'log-callback-response' => 1,
-//        ]));
-//
-//        $this->assertTrue(true);
-//    }
-
-    private function createRequestHash(string $url, array $headers = []): string
+    private function createRequestHash(string $url, array $parameters = []): string
     {
-        $identifier = new RequestIdentifier($url, new Headers($headers));
+        $identifier = new RequestIdentifier($url, $parameters);
 
         return $identifier->getHash();
     }
