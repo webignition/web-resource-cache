@@ -321,13 +321,13 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://foo.example.com/',
-                        'headers' => $headers['a=b'],
+                        'headers' => json_encode($headers['a=b']),
                         'parameters' => $parameters['w=x'],
                     ],
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://bar.example.com/',
-                        'headers' => $headers['a=b'],
+                        'headers' => json_encode($headers['a=b']),
                         'parameters' => $parameters['y=z'],
                     ],
                 ],
@@ -441,13 +441,13 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://callback.example.com/',
-                        'headers' => $headers['a=b'],
+                        'headers' => json_encode($headers['a=b']),
                         'parameters' => $parameters['w=x'],
                     ],
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://callback.example.com/',
-                        'headers' => $headers['a=b'],
+                        'headers' => json_encode($headers['a=b']),
                         'parameters' => $parameters['w=x'],
                     ],
                 ],
