@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7630b1714e0b071cc1de501403937b80",
+    "content-hash": "e3fabf515f8acc0302a47dd444012391",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -3833,21 +3833,22 @@
         },
         {
             "name": "webignition/http-headers",
-            "version": "0.1",
+            "version": "0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/http-headers.git",
-                "reference": "70d5a9b47ce8e501675ca5dde34747f3cfebbc7c"
+                "reference": "9f4d9ea7d8a310403b52a18aed66fb35baa702d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/http-headers/zipball/70d5a9b47ce8e501675ca5dde34747f3cfebbc7c",
-                "reference": "70d5a9b47ce8e501675ca5dde34747f3cfebbc7c",
+                "url": "https://api.github.com/repos/webignition/http-headers/zipball/9f4d9ea7d8a310403b52a18aed66fb35baa702d1",
+                "reference": "9f4d9ea7d8a310403b52a18aed66fb35baa702d1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2",
-                "webignition/http-cache-control-directives": ">=0.2,<1"
+                "webignition/http-cache-control-directives": ">=0.2,<1",
+                "webignition/internet-media-type": "^2"
             },
             "require-dev": {
                 "phpunit/phpunit": "^7",
@@ -3875,7 +3876,7 @@
                 "headers",
                 "http"
             ],
-            "time": "2018-10-24T07:32:00+00:00"
+            "time": "2018-12-18T10:10:02+00:00"
         },
         {
             "name": "webignition/http-history-container",
