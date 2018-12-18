@@ -75,8 +75,7 @@ class RequestController
             return new Response('', 400);
         }
 
-        $parameters = $requestData->get('parameters');
-        $parameters = is_array($parameters) ? $parameters : [];
+        $parameters = $this->createParametersFromRequest($requestData->get('parameters'));
         $headers = $this->createHeadersFromRequest($requestData->get('headers'));
 
         $requestIdentifier = new RequestIdentifier($url, array_merge($headers->toArray(), $parameters));
@@ -123,5 +122,20 @@ class RequestController
         }
 
         return new Headers($headerValues);
+    }
+
+    private function createParametersFromRequest($requestParameters): array
+    {
+        $parameters = [];
+
+        if (is_string($requestParameters)) {
+            $parameters = json_decode($requestParameters, true);
+
+            if (!is_array($parameters)) {
+                $parameters = [];
+            }
+        }
+
+        return $parameters;
     }
 }
