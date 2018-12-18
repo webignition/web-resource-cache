@@ -85,9 +85,9 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
         $this->httpRequestAsserter = self::$container->get(HttpRequestAsserter::class);
 
         $url = 'http://example.com/';
-        $requestIdentifier = new RequestIdentifier($url, new Headers());
+        $requestIdentifier = new RequestIdentifier($url, []);
 
-        $this->retrieveResourceMessage = new RetrieveResource($requestIdentifier->getHash(), $url);
+        $this->retrieveResourceMessage = new RetrieveResource($requestIdentifier->getHash(), $url, new Headers(), []);
     }
 
     /**
@@ -193,7 +193,12 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
 
     public function runSendResponseDataProvider(): array
     {
-        $retrieveResourceMessage = new RetrieveResource('request_hash', 'http://example.com/');
+        $retrieveResourceMessage = new RetrieveResource(
+            'request_hash',
+            'http://example.com/',
+            new Headers(),
+            []
+        );
 
         $http301Response = new Response(301, ['location' => 'http://example.com/foo']);
 
