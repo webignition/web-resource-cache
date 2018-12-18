@@ -273,7 +273,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     }
 
     /**
-     * @dataProvider retrieveRequestCookieHeadersDataProvider
+     * @dataProvider retrieveRequestCookieHeaderDataProvider
      *
      * @param array $httpFixtures
      * @param string $url
@@ -282,7 +282,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
      *
      * @throws HttpTransportException
      */
-    public function testRetrieveRequestCookieHeaders(
+    public function testRetrieveRequestCookieHeader(
         array $httpFixtures,
         string $url,
         RequestParameters $requestParameters,
@@ -307,7 +307,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
         }
     }
 
-    public function retrieveRequestCookieHeadersDataProvider(): array
+    public function retrieveRequestCookieHeaderDataProvider(): array
     {
         return [
             'no parameters' => [
@@ -412,6 +412,95 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestCookieHeaderCollection' => [
                     'foo1=value1; foo2=value2',
                     '',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider retrieveRequestAuthorizationHeaderDataProvider
+     *
+     * @param array $httpFixtures
+     * @param bool[] $expectedRequestAuthorizationHeaderIsSet
+     *
+     * @throws HttpTransportException
+     */
+    public function testRetrieveRequestAuthorizationHeader(
+        array $httpFixtures,
+        array $expectedRequestAuthorizationHeaderIsSet
+    ) {
+        $url = 'http://example.com';
+
+        $headers = new Headers([
+            'Authorization' => 'Basic ' . base64_encode('example:password'),
+        ]);
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, new RequestParameters());
+        $response = $requestResponse->getResponse();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertCount($this->httpHistoryContainer->count(), $expectedRequestAuthorizationHeaderIsSet);
+
+        foreach ($this->httpHistoryContainer->getRequests() as $requestIndex => $request) {
+//            var_dump((string) $request->getUri(), $request->getHeaderLine('authorization'));
+
+            $this->assertEquals(
+                $expectedRequestAuthorizationHeaderIsSet[$requestIndex],
+                '' !== $request->getHeaderLine('authorization')
+            );
+        }
+    }
+
+    public function retrieveRequestAuthorizationHeaderDataProvider(): array
+    {
+        return [
+            'no redirect' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'expectedRequestAuthorizationHeaderIsSet' => [
+                    true,
+                ],
+            ],
+            'redirect to same host' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://example.com/foo'
+                    ]),
+                    new Response(200),
+                ],
+                'expectedRequestAuthorizationHeaderIsSet' => [
+                    true,
+                    true,
+                ],
+            ],
+            'redirect to different host' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://foo.example.com'
+                    ]),
+                    new Response(200),
+                ],
+                'expectedRequestAuthorizationHeaderIsSet' => [
+                    true,
+                    false,
+                ],
+            ],
+            'redirect to different host and back to same host' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://foo.example.com'
+                    ]),
+                    new Response(301, [
+                        'location' => 'http://example.com'
+                    ]),
+                    new Response(200),
+                ],
+                'expectedRequestAuthorizationHeaderIsSet' => [
+                    true,
+                    false,
+                    true,
                 ],
             ],
         ];
