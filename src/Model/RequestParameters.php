@@ -26,4 +26,15 @@ class RequestParameters
 
         return new CookieParameters($domain, $path);
     }
+
+    public function getAuthorizationParameters(): AuthorizationParameters
+    {
+        $authorizationParameters = $this->parameters['cookies'] ?? [
+                'host' => '',
+            ];
+
+        $host = $authorizationParameters['host'] ?? '';
+
+        return new AuthorizationParameters($host);
+    }
 }
