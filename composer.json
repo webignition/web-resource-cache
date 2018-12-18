@@ -16,7 +16,7 @@
         "symfony/orm-pack": "^1.0",
         "symfony/yaml": "*",
         "webignition/guzzle-curl-exception": "^1",
-        "webignition/guzzle-http-authentication-middleware": ">=0.2, <1",
+        "webignition/guzzle-http-authentication-middleware": ">=0.3, <1",
         "webignition/http-headers": ">=0.3,<1",
         "webignition/http-history-container": ">=0.3,<1",
         "webignition/internet-media-type": "^2"
