@@ -142,7 +142,7 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
                         'fizz' => 'buzz',
                     ]),
                     [
-                        'cookies' => [
+                        'parameter-cookies' => [
                             'domain' => '.example.com',
                             'path' => '/',
                         ],
@@ -161,7 +161,7 @@ class RetrieveResourceTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                     'parameters' => [
-                        'cookies' => [
+                        'parameter-cookies' => [
                             'domain' => '.example.com',
                             'path' => '/',
                         ],
