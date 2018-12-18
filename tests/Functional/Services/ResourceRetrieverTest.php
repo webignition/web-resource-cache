@@ -269,161 +269,133 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                     ],
                 ],
             ],
-            'single request, cookie header, no parameters' => [
+        ];
+    }
+
+    /**
+     * @dataProvider retrieveRequestCookieHeadersDataProvider
+     *
+     * @param array $httpFixtures
+     * @param string $url
+     * @param RequestParameters $requestParameters
+     * @param array $expectedRequestCookieHeaderCollection
+     *
+     * @throws HttpTransportException
+     */
+    public function testRetrieveRequestCookieHeaders(
+        array $httpFixtures,
+        string $url,
+        RequestParameters $requestParameters,
+        array $expectedRequestCookieHeaderCollection
+    ) {
+        $headers = new Headers([
+            'cookie' => 'foo1=value1; foo2=value2'
+        ]);
+
+        $this->httpMockHandler->appendFixtures($httpFixtures);
+
+        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, $requestParameters);
+        $response = $requestResponse->getResponse();
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertCount($this->httpHistoryContainer->count(), $expectedRequestCookieHeaderCollection);
+
+        foreach ($this->httpHistoryContainer->getRequests() as $requestIndex => $request) {
+            $this->assertEquals(
+                $expectedRequestCookieHeaderCollection[$requestIndex],
+                $request->getHeaderLine('cookie')
+            );
+        }
+    }
+
+    public function retrieveRequestCookieHeadersDataProvider(): array
+    {
+        return [
+            'no parameters' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'url' => 'http://example.com',
-                'headers' => new Headers([
-                    'cookie' => 'foo1=value1; foo2=value2'
-                ]),
                 'parameters' => new RequestParameters(),
-                'expectedRequestHeadersCollection' => [
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'example.com',
-                        ],
-                    ],
+                'expectedRequestCookieHeaderCollection' => [
+                    '',
                 ],
             ],
-            'single request, cookie header, non-matching cookie parameters (no match on domain)' => [
+            'non-matching cookie parameters (no match on domain)' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'url' => 'http://example.com',
-                'headers' => new Headers([
-                    'cookie' => 'foo1=value1; foo2=value2'
-                ]),
                 'parameters' => new RequestParameters([
                     'cookies' => [
                         'domain' => 'foo.example.com',
                         'path' => '/',
                     ],
                 ]),
-                'expectedRequestHeadersCollection' => [
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'example.com',
-                        ],
-                    ],
+                'expectedRequestCookieHeaderCollection' => [
+                    '',
                 ],
             ],
-            'single request, cookie header, non-matching cookie parameters (no match on path)' => [
+            'non-matching cookie parameters (no match on path)' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'url' => 'http://example.com',
-                'headers' => new Headers([
-                    'cookie' => 'foo1=value1; foo2=value2'
-                ]),
                 'parameters' => new RequestParameters([
                     'cookies' => [
                         'domain' => '.example.com',
                         'path' => '/foo',
                     ],
                 ]),
-                'expectedRequestHeadersCollection' => [
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'example.com',
-                        ],
-                    ],
+                'expectedRequestCookieHeaderCollection' => [
+                    '',
                 ],
             ],
-            'single request, cookie header, matching cookie parameters (exact domain, minimal path)' => [
+            'matching cookie parameters (exact domain, minimal path)' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'url' => 'http://example.com',
-                'headers' => new Headers([
-                    'cookie' => 'foo1=value1; foo2=value2'
-                ]),
                 'parameters' => new RequestParameters([
                     'cookies' => [
                         'domain' => 'example.com',
                         'path' => '/',
                     ],
                 ]),
-                'expectedRequestHeadersCollection' => [
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'example.com',
-                        ],
-                        'Cookie' => [
-                            'foo1=value1; foo2=value2',
-                        ],
-                    ],
+                'expectedRequestCookieHeaderCollection' => [
+                    'foo1=value1; foo2=value2',
                 ],
             ],
-            'single request, cookie header, matching cookie parameters (exact domain, non-minimal path)' => [
+            'matching cookie parameters (exact domain, non-minimal path)' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'url' => 'http://example.com/foo',
-                'headers' => new Headers([
-                    'cookie' => 'foo1=value1; foo2=value2'
-                ]),
                 'parameters' => new RequestParameters([
                     'cookies' => [
                         'domain' => 'example.com',
                         'path' => '/foo',
                     ],
                 ]),
-                'expectedRequestHeadersCollection' => [
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'example.com',
-                        ],
-                        'Cookie' => [
-                            'foo1=value1; foo2=value2',
-                        ],
-                    ],
+                'expectedRequestCookieHeaderCollection' => [
+                    'foo1=value1; foo2=value2',
                 ],
             ],
-            'single request, cookie header, matching cookie parameters (wildcard domain, minimal path)' => [
+            ' matching cookie parameters (wildcard domain, minimal path)' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'url' => 'http://foo.example.com',
-                'headers' => new Headers([
-                    'cookie' => 'foo1=value1; foo2=value2'
-                ]),
                 'parameters' => new RequestParameters([
                     'cookies' => [
                         'domain' => '.example.com',
                         'path' => '/',
                     ],
                 ]),
-                'expectedRequestHeadersCollection' => [
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'foo.example.com',
-                        ],
-                        'Cookie' => [
-                            'foo1=value1; foo2=value2',
-                        ],
-                    ],
+                'expectedRequestCookieHeaderCollection' => [
+                    'foo1=value1; foo2=value2',
                 ],
             ],
-            'single redirect on different host, cookie header matches first request only' => [
+            'cookie header matches first request only' => [
                 'httpFixtures' => [
                     new Response(301, [
                         'location' => 'http://anotherexample.com'
@@ -431,35 +403,15 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                     new Response(200),
                 ],
                 'url' => 'http://example.com',
-                'headers' => new Headers([
-                    'cookie' => 'foo1=value1; foo2=value2'
-                ]),
                 'parameters' => new RequestParameters([
                     'cookies' => [
                         'domain' => '.example.com',
                         'path' => '/',
                     ],
                 ]),
-                'expectedRequestHeadersCollection' => [
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'example.com',
-                        ],
-                        'Cookie' => [
-                            'foo1=value1; foo2=value2',
-                        ],
-                    ],
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'anotherexample.com',
-                        ],
-                    ],
+                'expectedRequestCookieHeaderCollection' => [
+                    'foo1=value1; foo2=value2',
+                    '',
                 ],
             ],
         ];
