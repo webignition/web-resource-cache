@@ -75,7 +75,7 @@ class RequestController
             return new Response('', 400);
         }
 
-        $headers = new Headers($requestData->get('headers') ?? []);
+        $headers = $this->createHeadersFromRequest($requestData->get('headers'));
         $requestIdentifier = new RequestIdentifier($url, $headers);
         $requestHash = $requestIdentifier->getHash();
 
@@ -105,5 +105,20 @@ class RequestController
         }
 
         return new JsonResponse((string) $requestIdentifier, 200);
+    }
+
+    private function createHeadersFromRequest($requestHeaders): Headers
+    {
+        $headerValues = [];
+
+        if (is_string($requestHeaders)) {
+            $headerValues = json_decode($requestHeaders, true);
+
+            if (!is_array($headerValues)) {
+                $headerValues = [];
+            }
+        }
+
+        return new Headers($headerValues);
     }
 }
