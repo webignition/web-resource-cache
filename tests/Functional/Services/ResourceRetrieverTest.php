@@ -180,7 +180,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -200,7 +200,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -224,7 +224,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -253,7 +253,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -261,7 +261,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                     ],
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'foo.example.com',
@@ -281,7 +281,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -306,7 +306,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -331,7 +331,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -356,7 +356,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -384,7 +384,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -412,7 +412,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'foo.example.com',
@@ -443,7 +443,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'example.com',
@@ -454,7 +454,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                     ],
                     [
                         'User-Agent' => [
-                            'GuzzleHttp/6.3.3 curl/7.52.1 PHP/7.2.11',
+                            \GuzzleHttp\default_user_agent(),
                         ],
                         'Host' => [
                             'anotherexample.com',
