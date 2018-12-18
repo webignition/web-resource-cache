@@ -75,8 +75,11 @@ class RequestController
             return new Response('', 400);
         }
 
+        $parameters = $requestData->get('parameters');
+        $parameters = is_array($parameters) ? $parameters : [];
         $headers = $this->createHeadersFromRequest($requestData->get('headers'));
-        $requestIdentifier = new RequestIdentifier($url, $headers);
+
+        $requestIdentifier = new RequestIdentifier($url, array_merge($headers->toArray(), $parameters));
         $requestHash = $requestIdentifier->getHash();
 
         $logCallbackResponse = $requestData->has('log-callback-response')
@@ -101,7 +104,7 @@ class RequestController
                 (new SuccessResponse($requestHash))->jsonSerialize()
             ));
         } else {
-            $this->messageBus->dispatch(new RetrieveResource($requestHash, $url, $headers));
+            $this->messageBus->dispatch(new RetrieveResource($requestHash, $url, $headers, $parameters));
         }
 
         return new JsonResponse((string) $requestIdentifier, 200);
