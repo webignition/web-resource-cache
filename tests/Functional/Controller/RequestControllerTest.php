@@ -191,12 +191,12 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://foo.example.com/',
-                        'headers' => $headers['a=b'],
+                        'headers' => json_encode($headers['a=b']),
                     ],
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://bar.example.com/',
-                        'headers' => $headers['c=d'],
+                        'headers' => json_encode($headers['c=d']),
                     ],
                 ],
                 'expectedResponseDataCollection' => [
@@ -231,12 +231,12 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://foo.example.com/',
-                        'headers' => $headers['a=b'],
+                        'headers' => json_encode($headers['a=b']),
                     ],
                     [
                         'url' => self::URL_2_EXAMPLE_COM,
                         'callback' => 'http://bar.example.com/',
-                        'headers' => $headers['c=d'],
+                        'headers' => json_encode($headers['c=d']),
                     ],
                 ],
                 'expectedResponseDataCollection' => [
@@ -299,12 +299,12 @@ class RequestControllerTest extends AbstractFunctionalTestCase
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://callback.example.com/',
-                        'headers' => $headers['a=b'],
+                        'headers' => json_encode($headers['a=b']),
                     ],
                     [
                         'url' => self::URL_1_EXAMPLE_COM,
                         'callback' => 'http://callback.example.com/',
-                        'headers' => $headers['a=b'],
+                        'headers' => json_encode($headers['a=b']),
                     ],
                 ],
                 'expectedResponseDataCollection' => [
@@ -510,6 +510,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
 
     public function successfulRequestWithNonMatchingCachedResourcesDataProvider(): array
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return [
             'no matching existing cached resource' => [
                 'cachedResourceCollection' => [
@@ -537,6 +538,7 @@ class RequestControllerTest extends AbstractFunctionalTestCase
 
         $requestHash = $this->createRequestHash('http://example.com/');
 
+        /** @noinspection PhpUnhandledExceptionInspection */
         $cachedResource = $this->createCachedResource($requestHash, new \DateTime());
         $entityManager->persist($cachedResource);
         $entityManager->flush();

@@ -21,9 +21,9 @@ specifying the `User-Agent`_, passing along `Authorization`_ or setting `Cookies
 =============  ======================================================  =======
  Name          Description                                             Example
 =============  ======================================================  =======
-``url``        URL of the resource to be retrieved                     ``http://example.com/``
-``callback``   URL to which the resource should be sent                ``http://callback.example.com/``
-``headers``    Key:value collection sent when retrieving the resource
+``url``        URL of the resource to be retrieved                     ``http://example.com``
+``callback``   URL to which the resource should be sent                ``https://httpbin.org/post``
+``headers``    JSON-encoded key:value pairs                            ``{"User-Agent":"Chrome, honest"}``
 =============  ======================================================  =======
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -33,7 +33,7 @@ Curl Example Without Headers
 .. code-block:: sh
 
     curl -X POST http://localhost:8001/ \
-         -d "url=http://example.com/&callback=http://callback.example.com"
+         -d 'url=http://example.com/&callback=https://httpbin.org/post'
 
     "118e35f631be802c41bec5c9dfb0f415"
 
@@ -44,9 +44,9 @@ Curl Example With Headers
 .. code-block:: sh
 
     curl -X POST http://localhost:8001/ \
-         -d "url=http://example.com/&callback=http://c.example.com/&headers[k1]=v1&headers[k2]=v2"
+         -d 'url=http://example.com/&callback=https://httpbin.org/post&headers={"User-Agent":"Chrome"}'
 
-    "dd7011cb26b7435d1ab901b4caec5f01"
+    "ea8a4d4eb1840d0bec6284658a8ef064"
 
 --------------------------
 Understanding The Response
@@ -58,7 +58,7 @@ Understanding The Response
 Successful Request (200)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-The response body (``"118e35f631be802c41bec5c9dfb0f415"`` in the first example, ``"dd7011cb26b7435d1ab901b4caec5f01"``
+The response body (``"118e35f631be802c41bec5c9dfb0f415"`` in the first example, ``"ea8a4d4eb1840d0bec6284658a8ef064"``
 in the second example) is a json-encoded request ID.
 
 The request ID is unique to the combination of ``url`` and ``headers``.
