@@ -344,6 +344,9 @@
     "webignition/guzzle-curl-exception": {
         "version": "1.1"
     },
+    "webignition/guzzle-http-authentication-middleware": {
+        "version": "0.2"
+    },
     "webignition/http-cache-control-directives": {
         "version": "0.1"
     },

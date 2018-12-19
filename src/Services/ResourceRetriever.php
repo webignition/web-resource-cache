@@ -13,7 +13,9 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\TransferStats;
+use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\HttpHeaders\Headers;
 
 class ResourceRetriever
@@ -28,10 +30,19 @@ class ResourceRetriever
      */
     private $cookieJar;
 
-    public function __construct(HttpClient $httpClient, CookieJarInterface $cookieJar)
-    {
+    /**
+     * @var HttpAuthenticationMiddleware
+     */
+    private $httpAuthenticationMiddleware;
+
+    public function __construct(
+        HttpClient $httpClient,
+        CookieJarInterface $cookieJar,
+        HttpAuthenticationMiddleware $httpAuthenticationMiddleware
+    ) {
         $this->httpClient = $httpClient;
         $this->cookieJar = $cookieJar;
+        $this->httpAuthenticationMiddleware = $httpAuthenticationMiddleware;
     }
 
     /**
@@ -49,6 +60,14 @@ class ResourceRetriever
         if ($cookieHeader) {
             $this->setCookies($cookieHeader[0], $requestParameters->getCookieParameters());
             $headers = $headers->withoutHeader('cookie');
+        }
+
+        $authorizationHeader = $headers->getLine('authorization');
+        if ($authorizationHeader) {
+            $uri = new Uri($url);
+
+            $this->setAuthorization($authorizationHeader, $uri->getHost());
+            $headers->withoutHeader('authorization');
         }
 
         $request = new Request('GET', $url, $headers->toArray());
@@ -101,6 +120,21 @@ class ResourceRetriever
             }
 
             $this->cookieJar->setCookie(new SetCookie($cookieData));
+        }
+    }
+
+    private function setAuthorization(string $authorizationHeader, string $host)
+    {
+        $authorizationParts = explode(' ', $authorizationHeader, 2);
+        $expectedPartCount = 2;
+
+        if ($expectedPartCount === count($authorizationParts)) {
+            $this->httpAuthenticationMiddleware->setType($authorizationParts[0]);
+            $this->httpAuthenticationMiddleware->setCredentials($authorizationParts[1]);
+            $this->httpAuthenticationMiddleware->setHost($host);
+        } else {
+            $this->httpAuthenticationMiddleware->clearType();
+            $this->httpAuthenticationMiddleware->clearCredentials();
         }
     }
 }

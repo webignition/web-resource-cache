@@ -118,3 +118,5 @@ services:
 
     webignition\InternetMediaType\Parser\Parser:
         class: webignition\InternetMediaType\Parser\Parser
+
+    webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware:
