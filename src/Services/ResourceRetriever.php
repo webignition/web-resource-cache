@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Exception\HttpTransportException;
-use App\Model\AuthorizationParameters;
 use App\Model\CookieParameters;
 use App\Model\RequestParameters;
 use App\Model\RequestResponse;
@@ -14,6 +13,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\TransferStats;
 use webignition\Guzzle\Middleware\HttpAuthentication\HttpAuthenticationMiddleware;
 use webignition\HttpHeaders\Headers;
@@ -64,7 +64,9 @@ class ResourceRetriever
 
         $authorizationHeader = $headers->getLine('authorization');
         if ($authorizationHeader) {
-            $this->setAuthorization($authorizationHeader, $requestParameters->getAuthorizationParameters());
+            $uri = new Uri($url);
+
+            $this->setAuthorization($authorizationHeader, $uri->getHost());
             $headers->withoutHeader('authorization');
         }
 
@@ -121,7 +123,7 @@ class ResourceRetriever
         }
     }
 
-    private function setAuthorization(string $authorizationHeader, AuthorizationParameters $authorizationParameters)
+    private function setAuthorization(string $authorizationHeader, string $host)
     {
         $authorizationParts = explode(' ', $authorizationHeader, 2);
         $expectedPartCount = 2;
@@ -129,7 +131,7 @@ class ResourceRetriever
         if ($expectedPartCount === count($authorizationParts)) {
             $this->httpAuthenticationMiddleware->setType($authorizationParts[0]);
             $this->httpAuthenticationMiddleware->setCredentials($authorizationParts[1]);
-            $this->httpAuthenticationMiddleware->setHost($authorizationParameters->getHost());
+            $this->httpAuthenticationMiddleware->setHost($host);
         } else {
             $this->httpAuthenticationMiddleware->clearType();
             $this->httpAuthenticationMiddleware->clearCredentials();

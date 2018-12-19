@@ -503,11 +503,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
 
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, new RequestParameters([
-            'http-authorization' => [
-                'host' => 'example.com',
-            ],
-        ]));
+        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, new RequestParameters());
         $response = $requestResponse->getResponse();
         $this->assertSame(200, $response->getStatusCode());
         $this->assertCount($this->httpHistoryContainer->count(), $expectedRequestAuthorizationHeaderIsSet);
