@@ -29,7 +29,7 @@ class RequestParameters
 
     public function getAuthorizationParameters(): AuthorizationParameters
     {
-        $authorizationParameters = $this->parameters['cookies'] ?? [
+        $authorizationParameters = $this->parameters['http-authorization'] ?? [
                 'host' => '',
             ];
 

@@ -142,7 +142,6 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
      * @param array $httpFixtures
      * @param string $url
      * @param Headers $headers
-     * @param RequestParameters $requestParameters
      * @param array $expectedRequestHeaderCollection
      *
      * @throws HttpTransportException
@@ -151,12 +150,11 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
         array $httpFixtures,
         string $url,
         Headers $headers,
-        RequestParameters $requestParameters,
         array $expectedRequestHeaderCollection
     ) {
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, $requestParameters);
+        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, new RequestParameters());
         $response = $requestResponse->getResponse();
         $this->assertSame(200, $response->getStatusCode());
         $this->assertCount($this->httpHistoryContainer->count(), $expectedRequestHeaderCollection);
@@ -170,13 +168,12 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
     public function retrieveRequestHeadersDataProvider(): array
     {
         return [
-            'single request, no explicit headers, no parameters' => [
+            'single request, no explicit headers' => [
                 'httpFixtures' => [
                     new Response(200),
                 ],
                 'url' => 'http://example.com',
                 'headers' => new Headers(),
-                'parameters' => new RequestParameters(),
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
@@ -188,30 +185,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                     ],
                 ],
             ],
-            'single request, basic http authorization headers, no parameters' => [
-                'httpFixtures' => [
-                    new Response(200),
-                ],
-                'url' => 'http://example.com',
-                'headers' => new Headers([
-                    'Authorization' => 'Basic ' . base64_encode('example:password'),
-                ]),
-                'parameters' => new RequestParameters(),
-                'expectedRequestHeadersCollection' => [
-                    [
-                        'User-Agent' => [
-                            \GuzzleHttp\default_user_agent(),
-                        ],
-                        'Host' => [
-                            'example.com',
-                        ],
-                        'authorization' => [
-                            'Basic ' . base64_encode('example:password'),
-                        ],
-                    ],
-                ],
-            ],
-            'single redirect on same host, no explicit headers, no parameters' => [
+            'single redirect on same host, no explicit headers' => [
                 'httpFixtures' => [
                     new Response(301, [
                         'location' => 'http://example.com/foo'
@@ -220,7 +194,6 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 ],
                 'url' => 'http://example.com',
                 'headers' => new Headers(),
-                'parameters' => new RequestParameters(),
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
@@ -240,7 +213,7 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                     ],
                 ],
             ],
-            'single redirect on different host, no explicit headers, no parameters' => [
+            'single redirect on different host, no explicit headers' => [
                 'httpFixtures' => [
                     new Response(301, [
                         'location' => 'http://foo.example.com'
@@ -249,7 +222,6 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                 ],
                 'url' => 'http://example.com',
                 'headers' => new Headers(),
-                'parameters' => new RequestParameters(),
                 'expectedRequestHeadersCollection' => [
                     [
                         'User-Agent' => [
@@ -265,6 +237,100 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
                         ],
                         'Host' => [
                             'foo.example.com',
+                        ],
+                    ],
+                ],
+            ],
+            'single request, has explicit headers' => [
+                'httpFixtures' => [
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'foo' => 'bar',
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'foo' => [
+                            'bar',
+                        ],
+                    ],
+                ],
+            ],
+            'single redirect on same host, has explicit headers' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://example.com/foo'
+                    ]),
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'foo' => 'bar',
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'foo' => [
+                            'bar',
+                        ],
+                    ],
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'foo' => [
+                            'bar',
+                        ],
+                    ],
+                ],
+            ],
+            'single redirect on different host, has explicit headers' => [
+                'httpFixtures' => [
+                    new Response(301, [
+                        'location' => 'http://foo.example.com'
+                    ]),
+                    new Response(200),
+                ],
+                'url' => 'http://example.com',
+                'headers' => new Headers([
+                    'foo' => 'bar',
+                ]),
+                'expectedRequestHeadersCollection' => [
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'example.com',
+                        ],
+                        'foo' => [
+                            'bar',
+                        ],
+                    ],
+                    [
+                        'User-Agent' => [
+                            \GuzzleHttp\default_user_agent(),
+                        ],
+                        'Host' => [
+                            'foo.example.com',
+                        ],
+                        'foo' => [
+                            'bar',
                         ],
                     ],
                 ],
@@ -437,14 +503,16 @@ class ResourceRetrieverTest extends AbstractFunctionalTestCase
 
         $this->httpMockHandler->appendFixtures($httpFixtures);
 
-        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, new RequestParameters());
+        $requestResponse = $this->resourceRetriever->retrieve($url, $headers, new RequestParameters([
+            'http-authorization' => [
+                'host' => 'example.com',
+            ],
+        ]));
         $response = $requestResponse->getResponse();
         $this->assertSame(200, $response->getStatusCode());
         $this->assertCount($this->httpHistoryContainer->count(), $expectedRequestAuthorizationHeaderIsSet);
 
         foreach ($this->httpHistoryContainer->getRequests() as $requestIndex => $request) {
-//            var_dump((string) $request->getUri(), $request->getHeaderLine('authorization'));
-
             $this->assertEquals(
                 $expectedRequestAuthorizationHeaderIsSet[$requestIndex],
                 '' !== $request->getHeaderLine('authorization')
