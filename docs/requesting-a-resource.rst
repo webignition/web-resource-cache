@@ -89,6 +89,42 @@ set. Cookie parameters prevent cookie data from being exposed where it should no
 If you specify a ``Cookie`` header but do not specify cookie parameters, no cookies will be sent with the request
 to retrieve the resource.
 
+-----------------------------------
+Specifying Authorization Parameters
+-----------------------------------
+
+Including an ``Authorization`` header in your request for a resource will result in an equivalent ``Authorization``
+header being sent with the relevant HTTP request.
+
+.. code-block:: sh
+
+    curl -X POST http://localhost:8001/ \
+         -d 'url=http://example.com/&headers={"Authorization":"Basic dXNlcm5hbWU6cGFzc3dvcmQ="}&callback=https://httpbin.org/post'
+
+Authorization data is sensitive. The request for a resource may be redirected to another host. You do not
+want to pass sensitive information to another host.
+
+Add to your ``parameters`` value a HTTP authorization object:
+
+.. code-block:: json
+
+    {
+      "http-authorization": {
+        "host": "example.com",
+      }
+    }
+
+.. code-block:: sh
+
+    curl -X POST http://localhost:8001/ \
+         -d 'url=http://example.com/&headers={"Authorization":"Basic dXNlcm5hbWU6cGFzc3dvcmQ="}&parameters={"http-authorization":{"host":"example.com"}}&callback=https://httpbin.org/post'
+
+You must include a ``host`` value. This should be identical to the host in the URL of the resource that you are
+requesting.
+
+If you specify an ``Authorization`` header but do not specify HTTP authorization parameters, no authorization header
+will be set on the request to retrieve the resource.
+
 --------------------------
 Understanding The Response
 --------------------------
