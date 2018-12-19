@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d31b72ca3ea61069be628cf954ca691",
+    "content-hash": "a6ee865d5c064a5f03b24ca4bc0787f6",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -3787,16 +3787,16 @@
         },
         {
             "name": "webignition/guzzle-http-authentication-middleware",
-            "version": "0.3",
+            "version": "0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webignition/guzzle-http-authentication-middleware.git",
-                "reference": "71b69a2af1fdbec5fb5c455ad00524cb99333563"
+                "reference": "2f3d4570988b5e4e26f2db99e7f062188d24d727"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webignition/guzzle-http-authentication-middleware/zipball/71b69a2af1fdbec5fb5c455ad00524cb99333563",
-                "reference": "71b69a2af1fdbec5fb5c455ad00524cb99333563",
+                "url": "https://api.github.com/repos/webignition/guzzle-http-authentication-middleware/zipball/2f3d4570988b5e4e26f2db99e7f062188d24d727",
+                "reference": "2f3d4570988b5e4e26f2db99e7f062188d24d727",
                 "shasum": ""
             },
             "require": {
@@ -3832,7 +3832,7 @@
                 "middleware",
                 "psr7"
             ],
-            "time": "2018-12-18T19:15:22+00:00"
+            "time": "2018-12-19T09:06:43+00:00"
         },
         {
             "name": "webignition/http-cache-control-directives",
