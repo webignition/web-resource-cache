@@ -200,7 +200,7 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
             []
         );
 
-        $http301Response = new Response(301, ['location' => 'http://example.com/foo']);
+        $http301Response = new Response(301, ['location' => 'http://example.com/redirect']);
 
         return [
             'Unknown failure' => [
@@ -228,13 +228,53 @@ class RetrieveResourceHandlerTest extends AbstractFunctionalTestCase
                     404
                 ))->jsonSerialize(),
             ],
-            'HTTP 301' => [
+            'HTTP 301 (redirect loop)' => [
                 'httpFixtures' => array_fill(0, 6, $http301Response),
                 'retrieveResourceMessage' => $retrieveResourceMessage,
                 'expectedResponseData' => (new KnownFailureResponse(
                     'request_hash',
                     KnownFailureResponse::TYPE_HTTP,
-                    301
+                    301,
+                    [
+                        'too_many_redirects' => true,
+                        'is_redirect_loop' => true,
+                        'history' => [
+                            'http://example.com/',
+                            'http://example.com/redirect',
+                            'http://example.com/redirect',
+                            'http://example.com/redirect',
+                            'http://example.com/redirect',
+                            'http://example.com/redirect',
+                        ],
+                    ]
+                ))->jsonSerialize(),
+            ],
+            'HTTP 301 (not redirect loop)' => [
+                'httpFixtures' => [
+                    new Response(301, ['location' => 'http://example.com/1']),
+                    new Response(301, ['location' => 'http://example.com/2']),
+                    new Response(301, ['location' => 'http://example.com/3']),
+                    new Response(301, ['location' => 'http://example.com/4']),
+                    new Response(301, ['location' => 'http://example.com/5']),
+                    new Response(301, ['location' => 'http://example.com/6']),
+                ],
+                'retrieveResourceMessage' => $retrieveResourceMessage,
+                'expectedResponseData' => (new KnownFailureResponse(
+                    'request_hash',
+                    KnownFailureResponse::TYPE_HTTP,
+                    301,
+                    [
+                        'too_many_redirects' => true,
+                        'is_redirect_loop' => false,
+                        'history' => [
+                            'http://example.com/',
+                            'http://example.com/1',
+                            'http://example.com/2',
+                            'http://example.com/3',
+                            'http://example.com/4',
+                            'http://example.com/5',
+                        ],
+                    ]
                 ))->jsonSerialize(),
             ],
         ];
