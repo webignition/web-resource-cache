@@ -176,6 +176,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                     'status' => 'failed',
                     'failure_type' => KnownFailureResponse::TYPE_HTTP,
                     'status_code' => 404,
+                    'context' => [],
                 ],
             ],
             'http 500 failure response' => [
@@ -185,6 +186,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                     'status' => 'failed',
                     'failure_type' => KnownFailureResponse::TYPE_HTTP,
                     'status_code' => 500,
+                    'context' => [],
                 ],
             ],
             'curl 6 failure response' => [
@@ -194,6 +196,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                     'status' => 'failed',
                     'failure_type' => KnownFailureResponse::TYPE_CONNECTION,
                     'status_code' => 6,
+                    'context' => [],
                 ],
             ],
             'curl 28 failure response' => [
@@ -203,6 +206,7 @@ class ResponseSenderTest extends AbstractFunctionalTestCase
                     'status' => 'failed',
                     'failure_type' => KnownFailureResponse::TYPE_CONNECTION,
                     'status_code' => 28,
+                    'context' => [],
                 ],
             ],
             'success response, text/plain, no additional headers' => [
