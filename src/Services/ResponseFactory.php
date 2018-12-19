@@ -56,6 +56,8 @@ class ResponseFactory
             return null;
         }
 
-        return new KnownFailureResponse($requestId, $failureType, $statusCode);
+        $context = $data['context'] ?? [];
+
+        return new KnownFailureResponse($requestId, $failureType, $statusCode, $context);
     }
 }

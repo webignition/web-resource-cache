@@ -1,4 +1,5 @@
 <?php
+/** @noinspection PhpDocSignatureInspection */
 
 namespace App\Tests\Unit\Services;
 
@@ -26,8 +27,6 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider createFromArrayInvalidDataDataProvider
-     *
-     * @param array $data
      */
     public function testCreateFromArrayInvalidData(array $data)
     {
@@ -78,27 +77,38 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider successDataProvider
-     *
-     * @param ResponseInterface $response
-     * @param string $expectedClass
-     * @param ResponseInterface $expectedResponse
      */
     public function testCreateFromArraySuccess(
         ResponseInterface $response,
         string $expectedClass,
-        ResponseInterface $expectedResponse
+        ResponseInterface $expectedResponse,
+        array $expectedResponseData
     ) {
         $response = $this->responseFactory->createFromArray($response->jsonSerialize());
 
         $this->assertInstanceOf($expectedClass, $response);
         $this->assertEquals($expectedResponse, $response);
+        $this->assertEquals($expectedResponseData, $response->jsonSerialize());
     }
 
     public function successDataProvider(): array
     {
         $successResponse = new SuccessResponse('request_hash');
         $unknownFailureResponse = new UnknownFailureResponse('request_hash');
-        $http404KnownFailureResponse = new KnownFailureResponse('request_hash', KnownFailureResponse::TYPE_HTTP, 404);
+        $http404KnownFailureResponse = new KnownFailureResponse(
+            'request_hash',
+            KnownFailureResponse::TYPE_HTTP,
+            301,
+            [
+                'too_many_redirects' => true,
+                'is_redirect_loop' => false,
+                'history' => [
+                    'http://example.com/',
+                    'http://example.com/1',
+                    'http://example.com/2',
+                ],
+            ]
+        );
         $curl28FailureResponse = new KnownFailureResponse('request_hash', KnownFailureResponse::TYPE_CONNECTION, 28);
 
         return [
@@ -106,21 +116,52 @@ class ResponseFactoryTest extends \PHPUnit\Framework\TestCase
                 'response' => $successResponse,
                 'expectedClass' => SuccessResponse::class,
                 'expectedResponse' => $successResponse,
+                'expectedResponseData' => [
+                    'request_id' => 'request_hash',
+                    'status' => 'success',
+                ],
             ],
             'unknown failure response' => [
                 'response' => $unknownFailureResponse,
                 'expectedClass' => UnknownFailureResponse::class,
                 'expectedResponse' => $unknownFailureResponse,
+                'expectedResponseData' => [
+                    'request_id' => 'request_hash',
+                    'status' => 'failed',
+                    'failure_type' => 'unknown',
+                ],
             ],
-            'http 404 failure response' => [
+            'http 301 failure response' => [
                 'response' => $http404KnownFailureResponse,
                 'expectedClass' => KnownFailureResponse::class,
                 'expectedResponse' => $http404KnownFailureResponse,
+                'expectedResponseData' => [
+                    'request_id' => 'request_hash',
+                    'status' => 'failed',
+                    'failure_type' => 'http',
+                    'status_code' => 301,
+                    'context' => [
+                        'too_many_redirects' => true,
+                        'is_redirect_loop' => false,
+                        'history' => [
+                            'http://example.com/',
+                            'http://example.com/1',
+                            'http://example.com/2',
+                        ],
+                    ],
+                ],
             ],
             'curl 28 failure response' => [
                 'response' => $curl28FailureResponse,
                 'expectedClass' => KnownFailureResponse::class,
                 'expectedResponse' => $curl28FailureResponse,
+                'expectedResponseData' => [
+                    'request_id' => 'request_hash',
+                    'status' => 'failed',
+                    'failure_type' => 'connection',
+                    'status_code' => 28,
+                    'context' => [],
+                ],
             ],
         ];
     }

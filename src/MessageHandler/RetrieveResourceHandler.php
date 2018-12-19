@@ -15,48 +15,33 @@ use App\Services\RetryDecider;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use webignition\HttpHistoryContainer\Container as HttpHistoryContainer;
 
 class RetrieveResourceHandler implements MessageHandlerInterface
 {
     const MAX_RETRIES = 3;
 
-    /**
-     * @var ResourceRetriever
-     */
     private $resourceRetriever;
-
-    /**
-     * @var RetryDecider
-     */
     private $retryDecider;
-
-    /**
-     * @var CachedResourceManager
-     */
     private $cachedResourceManager;
-
-    /**
-     * @var CachedResourceFactory
-     */
     private $cachedResourceFactory;
-
-    /**
-     * @var MessageBusInterface
-     */
     private $messageBus;
+    private $httpHistoryContainer;
 
     public function __construct(
         ResourceRetriever $resourceRetriever,
         RetryDecider $retryDecider,
         CachedResourceManager $cachedResourceManager,
         CachedResourceFactory $cachedResourceFactory,
-        MessageBusInterface $messageBus
+        MessageBusInterface $messageBus,
+        HttpHistoryContainer $httpHistoryContainer
     ) {
         $this->resourceRetriever = $resourceRetriever;
         $this->retryDecider = $retryDecider;
         $this->cachedResourceManager = $cachedResourceManager;
         $this->cachedResourceFactory = $cachedResourceFactory;
         $this->messageBus = $messageBus;
+        $this->httpHistoryContainer = $httpHistoryContainer;
     }
 
     public function __invoke(RetrieveResource $retrieveResourceMessage)
@@ -129,7 +114,17 @@ class RetrieveResourceHandler implements MessageHandlerInterface
 
             $response = new SuccessResponse($requestHash);
         } else {
-            $response = new KnownFailureResponse($requestHash, $responseType, $statusCode);
+            $context = [];
+
+            if (301 === $statusCode) {
+                $context = [
+                    'too_many_redirects' => true,
+                    'is_redirect_loop' => $this->httpHistoryContainer->hasRedirectLoop(),
+                    'history' => $this->httpHistoryContainer->getRequestUrlsAsStrings(),
+                ];
+            }
+
+            $response = new KnownFailureResponse($requestHash, $responseType, $statusCode, $context);
         }
 
         $this->messageBus->dispatch(new SendResponse($response->jsonSerialize()));
