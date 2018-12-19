@@ -19,14 +19,18 @@ Response Object Properties
 ``failure_type``  If ``status=failed``                                    ``http``, ``curl`` or ``unknown``
 ``status_code``   | If ``status=failed``                                  | ``failure_type=http``: ``404``, ``500`` …
                   | and (``failure_type=http`` or ``failure_type=curl``)  | ``failure_type=curl``: ``6``, ``28`` …
-``headers``       | Response headers if ``status=success``                ``{"content-type": "text/html" }``
+``context``       | Array of additional information                       |
+                  | If ``status=failed``                                  |
+                  | and ``failure_type=http`` and ``status_code=301``     |
+                  |                                                       |
+``headers``       | Response headers if ``status=success``                ``{"content-type": "text/html"}``
 ``content``       | Base64-encoded response body                          ``PGRvY3R5cGUgaHRtbD4=``
                   | in cases where ``status=success``
 ================  ======================================================  =======
 
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 Success Response Example
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 .. code-block:: json
 
@@ -41,9 +45,9 @@ Success Response Example
       "content": "PGRvY3R5cGUgaHRtbD48aHRtbD48Ym9keT48L2JvZHk+PC9odG1sPg=="
     }
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 HTTP Failure Example (404 Not Found)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------
 
 .. code-block:: json
 
@@ -54,9 +58,33 @@ HTTP Failure Example (404 Not Found)
       "status_code": 404
     }
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
+HTTP Failure Example (301)
+--------------------------
+
+.. code-block:: json
+
+    {
+      "request_id": "118e35f631be802c41bec5c9dfb0f415",
+      "status": "failed",
+      "failure_type": "http",
+      "status_code": 404,
+      "context": {
+        "too_many_redirects": true,
+        "is_redirect_loop": true,
+        "history": [
+            "http://example.com",
+            "http://example.com",
+            "http://example.com",
+            "http://example.com",
+            "http://example.com"
+        ]
+      }
+    }
+
+------------------------------------------
 Curl Failure Example (Operation Timed Out)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 .. code-block:: json
 
@@ -67,9 +95,9 @@ Curl Failure Example (Operation Timed Out)
       "status_code": 28
     }
 
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 Unknown Failure Example
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 .. code-block:: json
 
